@@ -2,7 +2,7 @@
 
 CHANNEL="stable"
 BRANCH="master"
-NAME="PocketMine-MP"
+NAME="Mcpp"
 BUILD_URL=""
 
 LINUX_32_BUILD="PHP_7.0.6_x86_Linux"
@@ -59,7 +59,6 @@ while getopts "rxucid:v:t:" opt; do
   esac
 done
 
-
 #Needed to use aliases
 shopt -s expand_aliases
 type wget > /dev/null 2>&1
@@ -89,10 +88,6 @@ if [ "$checkRoot" == "on" ]; then
 	   echo "If you want to run it as root, add the -r flag."
 	   exit 1
 	fi
-fi
-
-if [ "$CHANNEL" == "soft" ]; then
-	NAME="PocketMine-Soft"
 fi
 
 ENABLE_GPG="no"
@@ -190,16 +185,7 @@ elif [ "$GPG_SIGNATURE" == "" ]; then
 	fi
 fi
 
-
-
-if [ "$CHANNEL" == "soft" ]; then
-	download_file "https://raw.githubusercontent.com/PocketMine/PocketMine-Soft/${BRANCH}/resources/start.sh" > start.sh
-else
-	download_file "https://raw.githubusercontent.com/pmmp/PocketMine-MP/${BRANCH}/start.sh" > start.sh
-fi
-
 download_file "https://raw.githubusercontent.com/pmmp/php-build-scripts/${BRANCH}/compile.sh" > compile.sh
-
 
 chmod +x compile.sh
 chmod +x start.sh
@@ -429,8 +415,6 @@ else
 		fi
 	fi
 fi
-
-rm compile.sh
 
 echo "[*] Everything done! Run ./start.sh to start $NAME"
 exit 0

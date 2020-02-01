@@ -9,11 +9,10 @@ logs/
 banned-ips.txt
 banned-players.txt
 ops.txt
-pocketmine.yml
-pocketmine-soft.yml
+mcpp.yml
+mcpp-soft.yml
 server.properties
 white-list.txt
-start.sh
 mods/
 launcher.sh
 checker.sh
