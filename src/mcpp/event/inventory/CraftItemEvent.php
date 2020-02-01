@@ -27,46 +27,50 @@ use mcpp\inventory\Recipe;
 use mcpp\item\Item;
 use mcpp\Player;
 
-class CraftItemEvent extends Event implements Cancellable{
-	public static $handlerList = null;
+class CraftItemEvent extends Event implements Cancellable
+{
+    public static $handlerList = null;
+    /** @var Item[] */
+    private $input = [];
+    /** @var Recipe */
+    private $recipe;
+    /** @var Player */
+    private $player;
 
-	/** @var Item[] */
-	private $input = [];
-	/** @var Recipe */
-	private $recipe;
-		/** @var Player */
-		private $player;
-	/**
-	 * @param Item[] $input
-	 * @param Recipe $recipe
-	 */
-	public function __construct(array $input, Recipe $recipe, Player $player){
-		$this->input = $input;
-		$this->recipe = $recipe;
-				$this->player = $player;
-	}
+    /**
+     * @param Item[] $input
+     * @param Recipe $recipe
+     */
+    public function __construct(array $input, Recipe $recipe, Player $player)
+    {
+        $this->input = $input;
+        $this->recipe = $recipe;
+        $this->player = $player;
+    }
 
-	/**
-	 * @return Item[]
-	 */
-	public function getInput(){
-		$items = [];
-		foreach($items as $i => $item){
-			$items[$i] = clone $item;
-		}
+    /**
+     * @return Item[]
+     */
+    public function getInput()
+    {
+        $items = [];
+        foreach($items as $i => $item){
+            $items[$i] = clone $item;
+        }
 
-		return $items;
-	}
-		
-		public function getPlayer(){
-		return $this->player;
-	}
+        return $items;
+    }
 
-	/**
-	 * @return Recipe
-	 */
-	public function getRecipe(){
-		return $this->recipe;
-	}
+    public function getPlayer()
+    {
+        return $this->player;
+    }
 
+    /**
+     * @return Recipe
+     */
+    public function getRecipe()
+    {
+        return $this->recipe;
+    }
 }

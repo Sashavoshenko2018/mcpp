@@ -24,35 +24,36 @@ namespace mcpp\command\defaults;
 use mcpp\command\Command;
 use mcpp\command\CommandSender;
 
+class SaveCommand extends VanillaCommand
+{
+    public function __construct($name)
+    {
+        parent::__construct(
+            $name,
+            "Saves the server to disk",
+            "/save-all"
+        );
+        $this->setPermission("pocketmine.command.save.perform");
+    }
 
-class SaveCommand extends VanillaCommand{
+    public function execute(CommandSender $sender, $currentAlias, array $args)
+    {
+        if(!$this->testPermission($sender)){
+            return true;
+        }
 
-	public function __construct($name){
-		parent::__construct(
-			$name,
-			"Saves the server to disk",
-			"/save-all"
-		);
-		$this->setPermission("pocketmine.command.save.perform");
-	}
+        Command::broadcastCommandMessage($sender, "Forcing save...");
 
-	public function execute(CommandSender $sender, $currentAlias, array $args){
-		if(!$this->testPermission($sender)){
-			return true;
-		}
+        foreach($sender->getServer()->getOnlinePlayers() as $player){
+            $player->save();
+        }
 
-		Command::broadcastCommandMessage($sender, "Forcing save...");
+        foreach($sender->getServer()->getLevels() as $level){
+            $level->save(true);
+        }
 
-		foreach($sender->getServer()->getOnlinePlayers() as $player){
-			$player->save();
-		}
+        Command::broadcastCommandMessage($sender, "Save complete.");
 
-		foreach($sender->getServer()->getLevels() as $level){
-			$level->save(true);
-		}
-
-		Command::broadcastCommandMessage($sender, "Save complete.");
-
-		return true;
-	}
+        return true;
+    }
 }

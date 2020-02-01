@@ -22,15 +22,19 @@
 /**
  * Entity related Events, like spawn, inventory, attack...
  */
+
 namespace mcpp\event\entity;
 
+use mcpp\entity\Entity;
 use mcpp\event\Event;
 
-abstract class EntityEvent extends Event{
-	/** @var \mcpp\entity\Entity */
-	protected $entity;
+abstract class EntityEvent extends Event
+{
+    /** @var Entity */
+    protected $entity;
 
-	public function getEntity(){
-		return $this->entity;
-	}
+    public function getEntity()
+    {
+        return $this->entity;
+    }
 }

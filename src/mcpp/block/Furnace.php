@@ -21,12 +21,12 @@
 
 namespace mcpp\block;
 
+class Furnace extends BurningFurnace
+{
+    protected $id = self::FURNACE;
 
-class Furnace extends BurningFurnace{
-
-	protected $id = self::FURNACE;
-
-	public function getName(){
-		return "Furnace";
-	}
+    public function getName()
+    {
+        return "Furnace";
+    }
 }

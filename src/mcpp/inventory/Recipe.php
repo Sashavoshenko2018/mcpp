@@ -21,22 +21,22 @@
 
 namespace mcpp\inventory;
 
+use mcpp\item\Item;
 use mcpp\utils\UUID;
 
-interface Recipe {
+interface Recipe
+{
+    /**
+     * @return Item
+     */
+    public function getResult();
 
-	/**
-	 * @return \mcpp\item\Item
-	 */
-	public function getResult();
+    public function registerToCraftingManager();
 
-	public function registerToCraftingManager();
+    /**
+     * @return UUID
+     */
+    public function getId();
 
-	/**
-	 * @return UUID
-	 */
-	public function getId();
-	
-	public function scale($scale);
-	
+    public function scale($scale);
 }

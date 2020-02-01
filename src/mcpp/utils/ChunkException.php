@@ -21,6 +21,8 @@
 
 namespace mcpp\utils;
 
-class ChunkException extends \RuntimeException{
+use RuntimeException;
 
+class ChunkException extends RuntimeException
+{
 }

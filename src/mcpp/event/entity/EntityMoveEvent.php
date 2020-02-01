@@ -22,27 +22,26 @@
 namespace mcpp\event\entity;
 
 use mcpp\entity\Entity;
-use mcpp\Event;
 use mcpp\event\Cancellable;
 use mcpp\math\Vector3;
 
 /**
  * @deprecated
  */
-class EntityMoveEvent extends EntityEvent implements Cancellable{
-	public static $handlerList = null;
+class EntityMoveEvent extends EntityEvent implements Cancellable
+{
+    public static $handlerList = null;
+    /** @var Vector3 */
+    private $pos;
 
-	/** @var \mcpp\math\Vector3 */
-	private $pos;
+    public function __construct(Entity $entity, Vector3 $pos)
+    {
+        $this->entity = $entity;
+        $this->pos = $pos;
+    }
 
-	public function __construct(Entity $entity, Vector3 $pos){
-		$this->entity = $entity;
-		$this->pos = $pos;
-	}
-
-	public function getVector(){
-		return $this->pos;
-	}
-
-
+    public function getVector()
+    {
+        return $this->pos;
+    }
 }

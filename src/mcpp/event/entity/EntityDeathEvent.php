@@ -24,41 +24,43 @@ namespace mcpp\event\entity;
 use mcpp\entity\Living;
 use mcpp\item\Item;
 
-class EntityDeathEvent extends EntityEvent{
-	public static $handlerList = null;
+class EntityDeathEvent extends EntityEvent
+{
+    public static $handlerList = null;
+    /** @var Item[] */
+    private $drops = [];
 
-	/** @var Item[] */
-	private $drops = [];
+    /**
+     * @param Living $entity
+     * @param Item[] $drops
+     */
+    public function __construct(Living $entity, array $drops = [])
+    {
+        $this->entity = $entity;
+        $this->drops = $drops;
+    }
 
+    /**
+     * @return Living
+     */
+    public function getEntity()
+    {
+        return $this->entity;
+    }
 
-	/**
-	 * @param Living $entity
-	 * @param Item[] $drops
-	 */
-	public function __construct(Living $entity, array $drops = []){
-		$this->entity = $entity;
-		$this->drops = $drops;
-	}
+    /**
+     * @return Item[]
+     */
+    public function getDrops()
+    {
+        return $this->drops;
+    }
 
-	/**
-	 * @return Living
-	 */
-	public function getEntity(){
-		return $this->entity;
-	}
-
-	/**
-	 * @return \mcpp\item\Item[]
-	 */
-	public function getDrops(){
-		return $this->drops;
-	}
-
-	/**
-	 * @param Item[] $drops
-	 */
-	public function setDrops(array $drops){
-		$this->drops = $drops;
-	}
-
+    /**
+     * @param Item[] $drops
+     */
+    public function setDrops(array $drops)
+    {
+        $this->drops = $drops;
+    }
 }

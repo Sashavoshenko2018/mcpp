@@ -24,30 +24,33 @@ namespace mcpp\block;
 use mcpp\item\Item;
 use mcpp\item\Tool;
 
-class Cocoa extends Transparent {
+class Cocoa extends Transparent
+{
+    protected $id = self::COCOA;
 
-	protected $id = self::COCOA;
+    public function __construct()
+    {
+    }
 
-	public function __construct() {
-		
-	}
+    public function getHardness()
+    {
+        return 0.2;
+    }
 
-	public function getHardness() {
-		return 0.2;
-	}
+    public function getName()
+    {
+        return "Cocoa";
+    }
 
-	public function getName() {
-		return "Cocoa";
-	}
+    public function getToolType()
+    {
+        return Tool::TYPE_AXE;
+    }
 
-	public function getToolType() {
-		return Tool::TYPE_AXE;
-	}
-
-	public function getDrops(Item $item) {
-		return [
-			[Item::COCOA, 0, 1],
-		];
-	}
-
+    public function getDrops(Item $item)
+    {
+        return [
+            [Item::COCOA, 0, 1],
+        ];
+    }
 }

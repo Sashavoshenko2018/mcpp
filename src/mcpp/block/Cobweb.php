@@ -25,43 +25,49 @@ use mcpp\entity\Entity;
 use mcpp\item\Item;
 use mcpp\item\Tool;
 
-class Cobweb extends Flowable{
+class Cobweb extends Flowable
+{
+    protected $id = self::COBWEB;
 
-	protected $id = self::COBWEB;
+    public function __construct()
+    {
+    }
 
-	public function __construct(){
+    public function hasEntityCollision()
+    {
+        return true;
+    }
 
-	}
+    public function getName()
+    {
+        return "Cobweb";
+    }
 
-	public function hasEntityCollision(){
-		return true;
-	}
+    public function getHardness()
+    {
+        return 4;
+    }
 
-	public function getName(){
-		return "Cobweb";
-	}
+    public function getToolType()
+    {
+        return Tool::TYPE_SWORD;
+    }
 
-	public function getHardness(){
-		return 4;
-	}
+    public function onEntityCollide(Entity $entity)
+    {
+        $entity->resetFallDistance();
+        $entity->onGround = true;
+    }
 
-	public function getToolType(){
-		return Tool::TYPE_SWORD;
-	}
-
-	public function onEntityCollide(Entity $entity){
-		$entity->resetFallDistance();
-		$entity->onGround = true;
-	}
-
-	public function getDrops(Item $item){
-		//TODO: correct drops
-		if ($item->isSword() >= 1) {
-			return [
-				[Item::AIR, 0, 0],
-			];
-		} else {
-			return [];
-		}
-	}
+    public function getDrops(Item $item)
+    {
+        //TODO: correct drops
+        if($item->isSword() >= 1){
+            return [
+                [Item::AIR, 0, 0],
+            ];
+        }else{
+            return [];
+        }
+    }
 }

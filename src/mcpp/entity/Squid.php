@@ -21,89 +21,90 @@
 
 namespace mcpp\entity;
 
-
 use mcpp\event\entity\EntityDamageByEntityEvent;
 use mcpp\event\entity\EntityDamageEvent;
 use mcpp\item\Item as ItemItem;
+use mcpp\level\Level;
 use mcpp\math\Vector3;
-use mcpp\network\Network;
 use mcpp\network\protocol\AddEntityPacket;
 use mcpp\network\protocol\EntityEventPacket;
 use mcpp\Player;
 use mcpp\Server;
-use mcpp\level\Level;
 
-class Squid extends WaterAnimal implements Ageable{
-	const NETWORK_ID = 17;
+class Squid extends WaterAnimal implements Ageable
+{
+    const NETWORK_ID = 17;
+    public $width = 0.95;
+    public $length = 0.95;
+    public $height = 0.95;
+    /** @var Vector3 */
+    public $swimDirection = null;
+    public $swimSpeed = 0.1;
+    private $switchDirectionTicker = 0;
 
-	public $width = 0.95;
-	public $length = 0.95;
-	public $height = 0.95;
+    public function initEntity()
+    {
+        $this->setMaxHealth(5);
+        parent::initEntity();
+    }
 
-	/** @var Vector3 */
-	public $swimDirection = null;
-	public $swimSpeed = 0.1;
+    public function getName()
+    {
+        return "Squid";
+    }
 
-	private $switchDirectionTicker = 0;
+    public function attack($damage, EntityDamageEvent $source)
+    {
+        parent::attack($damage, $source);
+        if($source->isCancelled()){
+            return;
+        }
 
-	public function initEntity(){
-		$this->setMaxHealth(5);
-		parent::initEntity();
-	}
+        if($source instanceof EntityDamageByEntityEvent){
+            $this->swimSpeed = mt_rand(150, 350) / 2000;
+            $e = $source->getDamager();
+            $this->swimDirection = (new Vector3($this->x - $e->x, $this->y - $e->y, $this->z - $e->z))->normalize();
 
-	public function getName(){
-		return "Squid";
-	}
+            $pk = new EntityEventPacket();
+            $pk->eid = $this->getId();
+            $pk->event = EntityEventPacket::SQUID_INK_CLOUD;
+            Server::broadcastPacket($this->hasSpawned, $pk);
+        }
+    }
 
-	public function attack($damage, EntityDamageEvent $source){
-		parent::attack($damage, $source);
-		if($source->isCancelled()){
-			return;
-		}
+    private function generateRandomDirection()
+    {
+        return new Vector3(mt_rand(-1000, 1000) / 1000, mt_rand(-500, 500) / 1000, mt_rand(-1000, 1000) / 1000);
+    }
 
-		if($source instanceof EntityDamageByEntityEvent){
-			$this->swimSpeed = mt_rand(150, 350) / 2000;
-			$e = $source->getDamager();
-			$this->swimDirection = (new Vector3($this->x - $e->x, $this->y - $e->y, $this->z - $e->z))->normalize();
+    public function onUpdate($currentTick)
+    {
+    }
 
-			$pk = new EntityEventPacket();
-			$pk->eid = $this->getId();
-			$pk->event = EntityEventPacket::SQUID_INK_CLOUD;
-			Server::broadcastPacket($this->hasSpawned, $pk);
-		}
-	}
+    public function spawnTo(Player $player)
+    {
+        if(!isset($this->hasSpawned[$player->getId()]) && isset($player->usedChunks[Level::chunkHash($this->chunk->getX(), $this->chunk->getZ())])){
+            $this->hasSpawned[$player->getId()] = $player;
+            $pk = new AddEntityPacket();
+            $pk->eid = $this->getId();
+            $pk->type = Squid::NETWORK_ID;
+            $pk->x = $this->x;
+            $pk->y = $this->y;
+            $pk->z = $this->z;
+            $pk->speedX = $this->motionX;
+            $pk->speedY = $this->motionY;
+            $pk->speedZ = $this->motionZ;
+            $pk->yaw = $this->yaw;
+            $pk->pitch = $this->pitch;
+            $pk->metadata = $this->dataProperties;
+            $player->dataPacket($pk);
+        }
+    }
 
-	private function generateRandomDirection(){
-		return new Vector3(mt_rand(-1000, 1000) / 1000, mt_rand(-500, 500) / 1000, mt_rand(-1000, 1000) / 1000);
-	}
-
-
-	public function onUpdate($currentTick){
-	}
-
-
-	public function spawnTo(Player $player) {
-		if (!isset($this->hasSpawned[$player->getId()]) && isset($player->usedChunks[Level::chunkHash($this->chunk->getX(), $this->chunk->getZ())])) {
-			$this->hasSpawned[$player->getId()] = $player;
-			$pk = new AddEntityPacket();
-			$pk->eid = $this->getId();
-			$pk->type = Squid::NETWORK_ID;
-			$pk->x = $this->x;
-			$pk->y = $this->y;
-			$pk->z = $this->z;
-			$pk->speedX = $this->motionX;
-			$pk->speedY = $this->motionY;
-			$pk->speedZ = $this->motionZ;
-			$pk->yaw = $this->yaw;
-			$pk->pitch = $this->pitch;
-			$pk->metadata = $this->dataProperties;
-			$player->dataPacket($pk);
-		}
-	}
-
-	public function getDrops(){
-		return [
-			ItemItem::get(ItemItem::DYE, 0, mt_rand(1, 3))
-		];
-	}
+    public function getDrops()
+    {
+        return [
+            ItemItem::get(ItemItem::DYE, 0, mt_rand(1, 3))
+        ];
+    }
 }

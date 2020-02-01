@@ -23,34 +23,33 @@ namespace mcpp\network\protocol;
 
 #include <rules/DataPacket.h>
 
+class InteractPacket extends PEPacket
+{
+    const NETWORK_ID = Info::INTERACT_PACKET;
+    const PACKET_NAME = "INTERACT_PACKET";
+    const ACTION_DAMAGE = 2;
+    const ACTION_SEE = 4;
+    public $action;
+    public $eid;
+    public $target;
 
-class InteractPacket extends PEPacket{
-	const NETWORK_ID = Info::INTERACT_PACKET;
-	const PACKET_NAME = "INTERACT_PACKET";
-	
-	const ACTION_DAMAGE = 2;
-	const ACTION_SEE = 4;
+    public function decode($playerProtocol)
+    {
+        $this->getHeader($playerProtocol);
+        $this->action = $this->getByte();
+        $this->target = $this->getVarInt();
+    }
 
-	public $action;
-	public $eid;
-	public $target;
-
-	public function decode($playerProtocol){
-		$this->getHeader($playerProtocol);
-		$this->action = $this->getByte();
-		$this->target = $this->getVarInt();
-	}
-
-	public function encode($playerProtocol){
-		$this->reset($playerProtocol);
-		$this->putByte($this->action);
-		$this->putVarInt($this->target);
-		/** @todo do it right */
-		if ($this->action == self::ACTION_SEE) {
-			$this->putLFloat(0); // position X
-			$this->putLFloat(0); // position Y
-			$this->putLFloat(0); // position Z
-		}
-	}
-
+    public function encode($playerProtocol)
+    {
+        $this->reset($playerProtocol);
+        $this->putByte($this->action);
+        $this->putVarInt($this->target);
+        /** @todo do it right */
+        if($this->action == self::ACTION_SEE){
+            $this->putLFloat(0); // position X
+            $this->putLFloat(0); // position Y
+            $this->putLFloat(0); // position Z
+        }
+    }
 }

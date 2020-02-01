@@ -21,8 +21,7 @@
 
 namespace mcpp\entity;
 
-
-interface Explosive{
-
-	public function explode();
+interface Explosive
+{
+    public function explode();
 }

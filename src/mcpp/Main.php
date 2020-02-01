@@ -19,403 +19,413 @@
  *
 */
 
-namespace mcpp {
+namespace mcpp
+{
 
-	use mcpp\utils\Binary;
-	use mcpp\utils\MainLogger;
-	use mcpp\utils\ServerKiller;
-	use mcpp\utils\Terminal;
-	use mcpp\utils\Utils;
+    use Exception;
+    use mcpp\utils\Binary;
+    use mcpp\utils\MainLogger;
+    use mcpp\utils\ServerKiller;
+    use mcpp\utils\Terminal;
+    use mcpp\utils\Utils;
+    use Phar;
+    use ReflectionClass;
+    use function profiler_enable;
 
     ##################################################
 
-	const VERSION = "0.0.1";
-	const API_VERSION = "1.0.0";
-	const CODENAME = "reborn";
-	const MINECRAFT_VERSION = "v1.x";
-	const MINECRAFT_VERSION_NETWORK = "1.2";
+    const VERSION = "0.0.1";
+    const API_VERSION = "1.0.0";
+    const CODENAME = "reborn";
+    const MINECRAFT_VERSION = "v1.x";
+    const MINECRAFT_VERSION_NETWORK = "1.2";
 
-	##################################################
+    ##################################################
 
-	if(\Phar::running(true) !== ""){
-		@define("PATH", \Phar::running(true) . "/");
-	}else{
-		@define("PATH", getcwd() . DIRECTORY_SEPARATOR);
-	}
+    if(Phar::running(true) !== ""){
+        @define("PATH", Phar::running(true) . "/");
+    }else{
+        @define("PATH", getcwd() . DIRECTORY_SEPARATOR);
+    }
 
-	if(version_compare("7.0", PHP_VERSION) > 0){
-		echo "[CRITICAL] You must use PHP >= 7.0" . PHP_EOL;
-		echo "[CRITICAL] Please use the installer provided on the homepage." . PHP_EOL;
-		exit(1);
-	}
+    if(version_compare("7.0", PHP_VERSION) > 0){
+        echo "[CRITICAL] You must use PHP >= 7.0" . PHP_EOL;
+        echo "[CRITICAL] Please use the installer provided on the homepage." . PHP_EOL;
+        exit(1);
+    }
 
-	if(!extension_loaded("pthreads")){
-		echo "[CRITICAL] Unable to find the pthreads extension." . PHP_EOL;
-		echo "[CRITICAL] Please use the installer provided on the homepage." . PHP_EOL;
-		exit(1);
-	}
+    if(!extension_loaded("pthreads")){
+        echo "[CRITICAL] Unable to find the pthreads extension." . PHP_EOL;
+        echo "[CRITICAL] Please use the installer provided on the homepage." . PHP_EOL;
+        exit(1);
+    }
 
-	if(!class_exists("ClassLoader", false)){
-		require_once(PATH . "src/spl/ClassLoader.php");
-		require_once(PATH . "src/spl/BaseClassLoader.php");
-		require_once(PATH . "src/mcpp/CompatibleClassLoader.php");
-	}
+    if(!class_exists("ClassLoader", false)){
+        require_once(PATH . "src/spl/ClassLoader.php");
+        require_once(PATH . "src/spl/BaseClassLoader.php");
+        require_once(PATH . "src/mcpp/CompatibleClassLoader.php");
+    }
 
-	$autoloader = new CompatibleClassLoader();
-	$autoloader->addPath(PATH . "src");
-	require_once(PATH . "src/mcpp/utils/Utils.php");
-	$autoloader->addPath(PATH . "src" . DIRECTORY_SEPARATOR . "spl");
-	$autoloader->register(true);
+    $autoloader = new CompatibleClassLoader();
+    $autoloader->addPath(PATH . "src");
+    require_once(PATH . "src/mcpp/utils/Utils.php");
+    $autoloader->addPath(PATH . "src" . DIRECTORY_SEPARATOR . "spl");
+    $autoloader->register(true);
 
-	set_time_limit(0);
+    set_time_limit(0);
 
-	gc_enable();
-	error_reporting(-1);
-	ini_set("allow_url_fopen", 1);
-	ini_set("display_errors", 1);
-	ini_set("display_startup_errors", 1);
-	ini_set("default_charset", "utf-8");
-	ini_set("error_log", "logs/" . date('Y.m.d') . "_php_error.log");
-	
-	ini_set("memory_limit", -1);
-	define("mcpp\\START_TIME", microtime(true));
+    gc_enable();
+    error_reporting(-1);
+    ini_set("allow_url_fopen", 1);
+    ini_set("display_errors", 1);
+    ini_set("display_startup_errors", 1);
+    ini_set("default_charset", "utf-8");
+    ini_set("error_log", "logs/" . date('Y.m.d') . "_php_error.log");
 
-	$opts = getopt("", ["data:", "plugins:", "no-wizard", "enable-profiler"]);
+    ini_set("memory_limit", -1);
+    define("mcpp\\START_TIME", microtime(true));
 
-	define("mcpp\\DATA", isset($opts["data"]) ? $opts["data"] . DIRECTORY_SEPARATOR : getcwd() . DIRECTORY_SEPARATOR);
-	define("mcpp\\PLUGIN_PATH", isset($opts["plugins"]) ? $opts["plugins"] . DIRECTORY_SEPARATOR : getcwd() . DIRECTORY_SEPARATOR . "plugins" . DIRECTORY_SEPARATOR);
+    $opts = getopt("", ["data:", "plugins:", "no-wizard", "enable-profiler"]);
 
-	Terminal::init();
+    define("mcpp\\DATA", isset($opts["data"]) ? $opts["data"] . DIRECTORY_SEPARATOR : getcwd() . DIRECTORY_SEPARATOR);
+    define("mcpp\\PLUGIN_PATH", isset($opts["plugins"]) ? $opts["plugins"] . DIRECTORY_SEPARATOR : getcwd() . DIRECTORY_SEPARATOR . "plugins" . DIRECTORY_SEPARATOR);
 
-	define("mcpp\\ANSI", Terminal::hasFormattingCodes());
+    Terminal::init();
 
-	if(!file_exists(\mcpp\DATA)){
-		mkdir(\mcpp\DATA, 0777, true);
-	}
+    define("mcpp\\ANSI", Terminal::hasFormattingCodes());
 
-	//Logger has a dependency on timezone, so we'll set it to UTC until we can get the actual timezone.
-	date_default_timezone_set("UTC");
-	$logger = new MainLogger(\mcpp\DATA . "server.log", \mcpp\ANSI);
+    if(!file_exists(DATA)){
+        mkdir(DATA, 0777, true);
+    }
 
-	if(!ini_get("date.timezone")){
-		if(($timezone = detect_system_timezone()) and date_default_timezone_set($timezone)){
-			//Success! Timezone has already been set and validated in the if statement.
-			//This here is just for redundancy just in case some program wants to read timezone data from the ini.
-			ini_set("date.timezone", $timezone);
-		}else{
-			//If system timezone detection fails or timezone is an invalid value.
-			if($response = Utils::getURL("http://ip-api.com/json")
-				and $ip_geolocation_data = json_decode($response, true)
-				and $ip_geolocation_data['status'] != 'fail'
-				and date_default_timezone_set($ip_geolocation_data['timezone'])
-			){
-				//Again, for redundancy.
-				ini_set("date.timezone", $ip_geolocation_data['timezone']);
-			}else{
-				ini_set("date.timezone", "UTC");
-				date_default_timezone_set("UTC");
-				$logger->warning("Timezone could not be automatically determined. An incorrect timezone will result in incorrect timestamps on console logs. It has been set to \"UTC\" by default. You can change it on the php.ini file.");
-			}
-		}
-	}else{
-		/*
-		 * This is here so that people don't come to us complaining and fill up the issue tracker when they put
-		 * an incorrect timezone abbreviation in php.ini apparently.
-		 */
-		$default_timezone = date_default_timezone_get();
-		if(strpos($default_timezone, "/") === false){
-			$default_timezone = timezone_name_from_abbr($default_timezone);
-			ini_set("date.timezone", $default_timezone);
-			date_default_timezone_set($default_timezone);
-		}
-	}
+    //Logger has a dependency on timezone, so we'll set it to UTC until we can get the actual timezone.
+    date_default_timezone_set("UTC");
+    $logger = new MainLogger(DATA . "server.log", ANSI);
 
-	function detect_system_timezone(){
-		switch(Utils::getOS()){
-			case 'win':
-				$regex = '/(UTC)(\+*\-*\d*\d*\:*\d*\d*)/';
+    if(!ini_get("date.timezone")){
+        if(($timezone = detect_system_timezone()) and date_default_timezone_set($timezone)){
+            //Success! Timezone has already been set and validated in the if statement.
+            //This here is just for redundancy just in case some program wants to read timezone data from the ini.
+            ini_set("date.timezone", $timezone);
+        }else{
+            //If system timezone detection fails or timezone is an invalid value.
+            if($response = Utils::getURL("http://ip-api.com/json")
+                and $ip_geolocation_data = json_decode($response, true)
+                and $ip_geolocation_data['status'] != 'fail'
+                and date_default_timezone_set($ip_geolocation_data['timezone'])
+            ){
+                //Again, for redundancy.
+                ini_set("date.timezone", $ip_geolocation_data['timezone']);
+            }else{
+                ini_set("date.timezone", "UTC");
+                date_default_timezone_set("UTC");
+                $logger->warning("Timezone could not be automatically determined. An incorrect timezone will result in incorrect timestamps on console logs. It has been set to \"UTC\" by default. You can change it on the php.ini file.");
+            }
+        }
+    }else{
+        /*
+         * This is here so that people don't come to us complaining and fill up the issue tracker when they put
+         * an incorrect timezone abbreviation in php.ini apparently.
+         */
+        $default_timezone = date_default_timezone_get();
+        if(strpos($default_timezone, "/") === false){
+            $default_timezone = timezone_name_from_abbr($default_timezone);
+            ini_set("date.timezone", $default_timezone);
+            date_default_timezone_set($default_timezone);
+        }
+    }
 
-				/*
-				 * wmic timezone get Caption
-				 * Get the timezone offset
-				 *
-				 * Sample Output var_dump
-				 * array(3) {
-				 *	  [0] =>
-				 *	  string(7) "Caption"
-				 *	  [1] =>
-				 *	  string(20) "(UTC+09:30) Adelaide"
-				 *	  [2] =>
-				 *	  string(0) ""
-				 *	}
-				 */
-				exec("wmic timezone get Caption", $output);
+    function detect_system_timezone()
+    {
+        switch(Utils::getOS()){
+            case 'win':
+                $regex = '/(UTC)(\+*\-*\d*\d*\:*\d*\d*)/';
 
-				$string = trim(implode("\n", $output));
+                /*
+                 * wmic timezone get Caption
+                 * Get the timezone offset
+                 *
+                 * Sample Output var_dump
+                 * array(3) {
+                 *	  [0] =>
+                 *	  string(7) "Caption"
+                 *	  [1] =>
+                 *	  string(20) "(UTC+09:30) Adelaide"
+                 *	  [2] =>
+                 *	  string(0) ""
+                 *	}
+                 */
+                exec("wmic timezone get Caption", $output);
 
-				//Detect the Time Zone string
-				preg_match($regex, $string, $matches);
+                $string = trim(implode("\n", $output));
 
-				if(!isset($matches[2])){
-					return false;
-				}
+                //Detect the Time Zone string
+                preg_match($regex, $string, $matches);
 
-				$offset = $matches[2];
+                if(!isset($matches[2])){
+                    return false;
+                }
 
-				if($offset == ""){
-					return "UTC";
-				}
+                $offset = $matches[2];
 
-				return parse_offset($offset);
-				break;
-			case 'linux':
-				// Ubuntu / Debian.
-				if(file_exists('/etc/timezone')){
-					$data = file_get_contents('/etc/timezone');
-					if($data){
-						return trim($data);
-					}
-				}
+                if($offset == ""){
+                    return "UTC";
+                }
 
-				// RHEL / CentOS
-				if(file_exists('/etc/sysconfig/clock')){
-					$data = parse_ini_file('/etc/sysconfig/clock');
-					if(!empty($data['ZONE'])){
-						return trim($data['ZONE']);
-					}
-				}
+                return parse_offset($offset);
+                break;
+            case 'linux':
+                // Ubuntu / Debian.
+                if(file_exists('/etc/timezone')){
+                    $data = file_get_contents('/etc/timezone');
+                    if($data){
+                        return trim($data);
+                    }
+                }
 
-				//Portable method for incompatible linux distributions.
+                // RHEL / CentOS
+                if(file_exists('/etc/sysconfig/clock')){
+                    $data = parse_ini_file('/etc/sysconfig/clock');
+                    if(!empty($data['ZONE'])){
+                        return trim($data['ZONE']);
+                    }
+                }
 
-				$offset = trim(exec('date +%:z'));
+                //Portable method for incompatible linux distributions.
 
-				if($offset == "+00:00"){
-					return "UTC";
-				}
+                $offset = trim(exec('date +%:z'));
 
-				return parse_offset($offset);
-				break;
-			case 'mac':
-				if(is_link('/etc/localtime')){
-					$filename = readlink('/etc/localtime');
-					if(strpos($filename, '/usr/share/zoneinfo/') === 0){
-						$timezone = substr($filename, 20);
-						return trim($timezone);
-					}
-				}
+                if($offset == "+00:00"){
+                    return "UTC";
+                }
 
-				return false;
-				break;
-			default:
-				return false;
-				break;
-		}
-	}
+                return parse_offset($offset);
+                break;
+            case 'mac':
+                if(is_link('/etc/localtime')){
+                    $filename = readlink('/etc/localtime');
+                    if(strpos($filename, '/usr/share/zoneinfo/') === 0){
+                        $timezone = substr($filename, 20);
+                        return trim($timezone);
+                    }
+                }
 
-	/**
-	 * @param string $offset In the format of +09:00, +02:00, -04:00 etc.
-	 *
-	 * @return string
-	 */
-	function parse_offset($offset){
-		//Make signed offsets unsigned for date_parse
-		if(strpos($offset, '-') !== false){
-			$negative_offset = true;
-			$offset = str_replace('-', '', $offset);
-		}else{
-			if(strpos($offset, '+') !== false){
-				$negative_offset = false;
-				$offset = str_replace('+', '', $offset);
-			}else{
-				return false;
-			}
-		}
+                return false;
+                break;
+            default:
+                return false;
+                break;
+        }
+    }
 
-		$parsed = date_parse($offset);
-		$offset = $parsed['hour'] * 3600 + $parsed['minute'] * 60 + $parsed['second'];
+    /**
+     * @param string $offset In the format of +09:00, +02:00, -04:00 etc.
+     *
+     * @return string
+     */
+    function parse_offset($offset)
+    {
+        //Make signed offsets unsigned for date_parse
+        if(strpos($offset, '-') !== false){
+            $negative_offset = true;
+            $offset = str_replace('-', '', $offset);
+        }else{
+            if(strpos($offset, '+') !== false){
+                $negative_offset = false;
+                $offset = str_replace('+', '', $offset);
+            }else{
+                return false;
+            }
+        }
 
-		//After date_parse is done, put the sign back
-		if($negative_offset == true){
-			$offset = -abs($offset);
-		}
+        $parsed = date_parse($offset);
+        $offset = $parsed['hour'] * 3600 + $parsed['minute'] * 60 + $parsed['second'];
 
-		//And then, look the offset up.
-		//timezone_name_from_abbr is not used because it returns false on some(most) offsets because it's mapping function is weird.
-		//That's been a bug in PHP since 2008!
-		foreach(timezone_abbreviations_list() as $zones){
-			foreach($zones as $timezone){
-				if($timezone['offset'] == $offset){
-					return $timezone['timezone_id'];
-				}
-			}
-		}
+        //After date_parse is done, put the sign back
+        if($negative_offset == true){
+            $offset = -abs($offset);
+        }
 
-		return false;
-	}
+        //And then, look the offset up.
+        //timezone_name_from_abbr is not used because it returns false on some(most) offsets because it's mapping function is weird.
+        //That's been a bug in PHP since 2008!
+        foreach(timezone_abbreviations_list() as $zones){
+            foreach($zones as $timezone){
+                if($timezone['offset'] == $offset){
+                    return $timezone['timezone_id'];
+                }
+            }
+        }
 
-	if(isset($opts["enable-profiler"])){
-		if(function_exists("profiler_enable")){
-			\profiler_enable();
-			$logger->notice("Execution is being profiled");
-		}else{
-			$logger->notice("No profiler found. Please install https://github.com/krakjoe/profiler");
-		}
-	}
+        return false;
+    }
 
-	function kill($pid){
-		switch(Utils::getOS()){
-			case "win":
-				exec("taskkill.exe /F /PID " . ((int) $pid) . " > NUL");
-				break;
-			case "mac":
-			case "linux":
-			default:
-				exec("kill -9 " . ((int) $pid) . " > /dev/null 2>&1");
-				}
-		}
+    if(isset($opts["enable-profiler"])){
+        if(function_exists("profiler_enable")){
+            profiler_enable();
+            $logger->notice("Execution is being profiled");
+        }else{
+            $logger->notice("No profiler found. Please install https://github.com/krakjoe/profiler");
+        }
+    }
 
-	/**
-	 * @param object $value
-	 * @param bool   $includeCurrent
-	 *
-	 * @return int
-	 */
-	function getReferenceCount($value, $includeCurrent = true){
-		ob_start();
-		debug_zval_dump($value);
-		$ret = explode("\n", ob_get_contents());
-		ob_end_clean();
+    function kill($pid)
+    {
+        switch(Utils::getOS()){
+            case "win":
+                exec("taskkill.exe /F /PID " . ((int)$pid) . " > NUL");
+                break;
+            case "mac":
+            case "linux":
+            default:
+                exec("kill -9 " . ((int)$pid) . " > /dev/null 2>&1");
+        }
+    }
 
-		if(count($ret) >= 1 and preg_match('/^.* refcount\\(([0-9]+)\\)\\{$/', trim($ret[0]), $m) > 0){
-			return ((int) $m[1]) - ($includeCurrent ? 3 : 4); //$value + zval call + extra call
-		}
-		return -1;
-	}
+    /**
+     * @param object $value
+     * @param bool $includeCurrent
+     *
+     * @return int
+     */
+    function getReferenceCount($value, $includeCurrent = true)
+    {
+        ob_start();
+        debug_zval_dump($value);
+        $ret = explode("\n", ob_get_contents());
+        ob_end_clean();
 
-	function getTrace($start = 1, $trace = null){
-		if($trace === null){
-			if(function_exists("xdebug_get_function_stack")){
-				$trace = array_reverse(xdebug_get_function_stack());
-			}else{
-				$e = new \Exception();
-				$trace = $e->getTrace();
-			}
-		}
+        if(count($ret) >= 1 and preg_match('/^.* refcount\\(([0-9]+)\\)\\{$/', trim($ret[0]), $m) > 0){
+            return ((int)$m[1]) - ($includeCurrent ? 3 : 4); //$value + zval call + extra call
+        }
+        return -1;
+    }
 
-		$messages = [];
-		$j = 0;
-		for($i = (int) $start; isset($trace[$i]); ++$i, ++$j){
-			$params = "";
-			if(isset($trace[$i]["args"]) or isset($trace[$i]["params"])){
-				if(isset($trace[$i]["args"])){
-					$args = $trace[$i]["args"];
-				}else{
-					$args = $trace[$i]["params"];
-				}
-				foreach($args as $name => $value){
-					$params .= (is_object($value) ? get_class($value) . " " . (method_exists($value, "__toString") ? $value->__toString() : "object") : gettype($value) . " " . (is_array($value) ? "Array()" : Utils::printable(@strval($value)))) . ", ";
-				}
-			}
-			$messages[] = "#$j " . (isset($trace[$i]["file"]) ? cleanPath($trace[$i]["file"]) : "") . "(" . (isset($trace[$i]["line"]) ? $trace[$i]["line"] : "") . "): " . (isset($trace[$i]["class"]) ? $trace[$i]["class"] . (($trace[$i]["type"] === "dynamic" or $trace[$i]["type"] === "->") ? "->" : "::") : "") . $trace[$i]["function"] . "(" . Utils::printable(substr($params, 0, -2)) . ")";
-		}
+    function getTrace($start = 1, $trace = null)
+    {
+        if($trace === null){
+            if(function_exists("xdebug_get_function_stack")){
+                $trace = array_reverse(xdebug_get_function_stack());
+            }else{
+                $e = new Exception();
+                $trace = $e->getTrace();
+            }
+        }
 
-		return $messages;
-	}
+        $messages = [];
+        $j = 0;
+        for($i = (int)$start; isset($trace[$i]); ++$i, ++$j){
+            $params = "";
+            if(isset($trace[$i]["args"]) or isset($trace[$i]["params"])){
+                if(isset($trace[$i]["args"])){
+                    $args = $trace[$i]["args"];
+                }else{
+                    $args = $trace[$i]["params"];
+                }
+                foreach($args as $name => $value){
+                    $params .= (is_object($value) ? get_class($value) . " " . (method_exists($value, "__toString") ? $value->__toString() : "object") : gettype($value) . " " . (is_array($value) ? "Array()" : Utils::printable(@strval($value)))) . ", ";
+                }
+            }
+            $messages[] = "#$j " . (isset($trace[$i]["file"]) ? cleanPath($trace[$i]["file"]) : "") . "(" . (isset($trace[$i]["line"]) ? $trace[$i]["line"] : "") . "): " . (isset($trace[$i]["class"]) ? $trace[$i]["class"] . (($trace[$i]["type"] === "dynamic" or $trace[$i]["type"] === "->") ? "->" : "::") : "") . $trace[$i]["function"] . "(" . Utils::printable(substr($params, 0, -2)) . ")";
+        }
 
-	function cleanPath($path){
-		return rtrim(str_replace(["\\", ".php", "phar://", rtrim(str_replace(["\\", "phar://"], ["/", ""], PATH), "/"), rtrim(str_replace(["\\", "phar://"], ["/", ""], \mcpp\PLUGIN_PATH), "/")], ["/", "", "", "", ""], $path), "/");
-	}
+        return $messages;
+    }
 
-	$errors = 0;
+    function cleanPath($path)
+    {
+        return rtrim(str_replace(["\\", ".php", "phar://", rtrim(str_replace(["\\", "phar://"], ["/", ""], PATH), "/"), rtrim(str_replace(["\\", "phar://"], ["/", ""], PLUGIN_PATH), "/")], ["/", "", "", "", ""], $path), "/");
+    }
 
-	if(php_sapi_name() !== "cli"){
-		$logger->critical("You must run PocketMine-MP using the CLI.");
-		++$errors;
-	}
+    $errors = 0;
 
-	if(!extension_loaded("sockets")){
-		$logger->critical("Unable to find the Socket extension.");
-		++$errors;
-	}
+    if(php_sapi_name() !== "cli"){
+        $logger->critical("You must run PocketMine-MP using the CLI.");
+        ++$errors;
+    }
 
-	$pthreads_version = phpversion("pthreads");
-	if(substr_count($pthreads_version, ".") < 2){
-		$pthreads_version = "0.$pthreads_version";
-	}
-	if(version_compare($pthreads_version, "3.0.7") < 0){
-		$logger->critical("pthreads >= 3.0.7 is required, while you have $pthreads_version.");
-		++$errors;
-	}
+    if(!extension_loaded("sockets")){
+        $logger->critical("Unable to find the Socket extension.");
+        ++$errors;
+    }
 
-	if(!extension_loaded("uopz")){
-		//$logger->notice("Couldn't find the uopz extension. Some functions may be limited");
-	}
+    $pthreads_version = phpversion("pthreads");
+    if(substr_count($pthreads_version, ".") < 2){
+        $pthreads_version = "0.$pthreads_version";
+    }
+    if(version_compare($pthreads_version, "3.0.7") < 0){
+        $logger->critical("pthreads >= 3.0.7 is required, while you have $pthreads_version.");
+        ++$errors;
+    }
 
-	if(extension_loaded("pocketmine")){
-		if(version_compare(phpversion("pocketmine"), "0.0.1") < 0){
-			$logger->critical("You have the native PocketMine extension, but your version is lower than 0.0.1.");
-			++$errors;
-		}elseif(version_compare(phpversion("pocketmine"), "0.0.4") > 0){
-			$logger->critical("You have the native PocketMine extension, but your version is higher than 0.0.4.");
-			++$errors;
-		}
-	}
+    if(!extension_loaded("uopz")){
+        //$logger->notice("Couldn't find the uopz extension. Some functions may be limited");
+    }
 
-	if(!extension_loaded("curl")){
-		$logger->critical("Unable to find the cURL extension.");
-		++$errors;
-	}
+    if(extension_loaded("pocketmine")){
+        if(version_compare(phpversion("pocketmine"), "0.0.1") < 0){
+            $logger->critical("You have the native PocketMine extension, but your version is lower than 0.0.1.");
+            ++$errors;
+        }elseif(version_compare(phpversion("pocketmine"), "0.0.4") > 0){
+            $logger->critical("You have the native PocketMine extension, but your version is higher than 0.0.4.");
+            ++$errors;
+        }
+    }
 
-	if(!extension_loaded("yaml")){
-		$logger->critical("Unable to find the YAML extension.");
-		++$errors;
-	}
+    if(!extension_loaded("curl")){
+        $logger->critical("Unable to find the cURL extension.");
+        ++$errors;
+    }
 
-	if(!extension_loaded("sqlite3")){
-		$logger->critical("Unable to find the SQLite3 extension.");
-		++$errors;
-	}
+    if(!extension_loaded("yaml")){
+        $logger->critical("Unable to find the YAML extension.");
+        ++$errors;
+    }
 
-	if(!extension_loaded("zlib")){
-		$logger->critical("Unable to find the Zlib extension.");
-		++$errors;
-	}
+    if(!extension_loaded("sqlite3")){
+        $logger->critical("Unable to find the SQLite3 extension.");
+        ++$errors;
+    }
 
-	if($errors > 0){
-		$logger->critical("Please use the installer provided on the homepage, or recompile PHP again.");
-		$logger->shutdown();
-		$logger->join();
-		exit(1); //Exit with error
-	}
+    if(!extension_loaded("zlib")){
+        $logger->critical("Unable to find the Zlib extension.");
+        ++$errors;
+    }
 
-	if(file_exists(PATH . ".git/refs/heads/master")){ //Found Git information!
-		define("mcpp\\GIT_COMMIT", strtolower(trim(file_get_contents(PATH . ".git/refs/heads/master"))));
-	}else{ //Unknown :(
-		define("mcpp\\GIT_COMMIT", str_repeat("00", 20));
-	}
+    if($errors > 0){
+        $logger->critical("Please use the installer provided on the homepage, or recompile PHP again.");
+        $logger->shutdown();
+        $logger->join();
+        exit(1); //Exit with error
+    }
 
-	@define("ENDIANNESS", (pack("d", 1) === "\77\360\0\0\0\0\0\0" ? Binary::BIG_ENDIAN : Binary::LITTLE_ENDIAN));
-	@define("INT32_MASK", is_int(0xffffffff) ? 0xffffffff : -1);
-	@ini_set("opcache.mmap_base", bin2hex(Utils::getRandomBytes(8, false))); //Fix OPCache address errors
+    if(file_exists(PATH . ".git/refs/heads/master")){ //Found Git information!
+        define("mcpp\\GIT_COMMIT", strtolower(trim(file_get_contents(PATH . ".git/refs/heads/master"))));
+    }else{ //Unknown :(
+        define("mcpp\\GIT_COMMIT", str_repeat("00", 20));
+    }
 
-	ThreadManager::init();
-	$server = new Server($autoloader, $logger, PATH, \mcpp\DATA, \mcpp\PLUGIN_PATH);
+    @define("ENDIANNESS", (pack("d", 1) === "\77\360\0\0\0\0\0\0" ? Binary::BIG_ENDIAN : Binary::LITTLE_ENDIAN));
+    @define("INT32_MASK", is_int(0xffffffff) ? 0xffffffff : -1);
+    @ini_set("opcache.mmap_base", bin2hex(Utils::getRandomBytes(8, false))); //Fix OPCache address errors
 
-	$logger->info("Stopping other threads");
+    ThreadManager::init();
+    $server = new Server($autoloader, $logger, PATH, DATA, PLUGIN_PATH);
 
-	foreach(ThreadManager::getInstance()->getAll() as $id => $thread){
-		$logger->debug("Stopping " . (new \ReflectionClass($thread))->getShortName() . " thread");
-		$thread->quit();
-	}
+    $logger->info("Stopping other threads");
 
-	$killer = new ServerKiller(8);
-	$killer->start();
+    foreach(ThreadManager::getInstance()->getAll() as $id => $thread){
+        $logger->debug("Stopping " . (new ReflectionClass($thread))->getShortName() . " thread");
+        $thread->quit();
+    }
 
-	$logger->shutdown();
-	$logger->join();
+    $killer = new ServerKiller(8);
+    $killer->start();
 
-	echo Terminal::$FORMAT_RESET . "\n";
+    $logger->shutdown();
+    $logger->join();
 
-	exit(0);
+    echo Terminal::$FORMAT_RESET . "\n";
 
+    exit(0);
 }

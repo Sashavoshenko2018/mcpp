@@ -23,9 +23,12 @@
  * All the Tile classes and related classes
  * TODO: Add Nether Reactor tile
  */
+
 namespace mcpp\tile;
 
+use mcpp\block\Block;
 use mcpp\event\Timings;
+use mcpp\event\TimingsHandler;
 use mcpp\level\format\Chunk;
 use mcpp\level\format\FullChunk;
 use mcpp\level\Level;
@@ -34,157 +37,166 @@ use mcpp\nbt\tag\Compound;
 use mcpp\nbt\tag\IntTag;
 use mcpp\nbt\tag\StringTag;
 use mcpp\utils\ChunkException;
+use ReflectionClass;
 
-abstract class Tile extends Position{
-	const SIGN = "Sign";
-	const CHEST = "Chest";
-	const FURNACE = "Furnace";
-	const FLOWER_POT = "FlowerPot";
-	const MOB_SPAWNER = "MobSpawner";
-	const SKULL = "Skull";
-	const BREWING_STAND = "Cauldron";
-	const ENCHANT_TABLE = "EnchantTable";
-	const ENDER_CHEST = "EnderChest";
-	const BED = "Bed";
-	const CAULDRON = "Cauldron";
-	const ITEM_FRAME = "ItemFrame";
-	const BEACON = "Beacon";
-	const BANNER = "Banner";
+abstract class Tile extends Position
+{
+    const SIGN = "Sign";
+    const CHEST = "Chest";
+    const FURNACE = "Furnace";
+    const FLOWER_POT = "FlowerPot";
+    const MOB_SPAWNER = "MobSpawner";
+    const SKULL = "Skull";
+    const BREWING_STAND = "Cauldron";
+    const ENCHANT_TABLE = "EnchantTable";
+    const ENDER_CHEST = "EnderChest";
+    const BED = "Bed";
+    const CAULDRON = "Cauldron";
+    const ITEM_FRAME = "ItemFrame";
+    const BEACON = "Beacon";
+    const BANNER = "Banner";
+    public static $tileCount = 1;
+    private static $knownTiles = [];
+    private static $shortNames = [];
+    /** @var Chunk */
+    public $chunk;
+    public $name;
+    public $id;
+    public $x;
+    public $y;
+    public $z;
+    public $attach;
+    public $metadata;
+    public $closed = false;
+    public $namedtag;
+    protected $lastUpdate;
+    protected $server;
+    protected $timings;
+    /** @var TimingsHandler */
+    public $tickTimer;
 
-	public static $tileCount = 1;
+    /**
+     * @param string $type
+     * @param FullChunk $chunk
+     * @param Compound $nbt
+     * @param           $args
+     *
+     * @return Tile
+     */
+    public static function createTile($type, FullChunk $chunk, Compound $nbt, ...$args)
+    {
+        if(isset(self::$knownTiles[$type])){
+            $class = self::$knownTiles[$type];
+            return new $class($chunk, $nbt, ...$args);
+        }
 
-	private static $knownTiles = [];
-	private static $shortNames = [];
+        return null;
+    }
 
-	/** @var Chunk */
-	public $chunk;
-	public $name;
-	public $id;
-	public $x;
-	public $y;
-	public $z;
-	public $attach;
-	public $metadata;
-	public $closed = false;
-	public $namedtag;
-	protected $lastUpdate;
-	protected $server;
-	protected $timings;
+    /**
+     * @param $className
+     *
+     * @return bool
+     */
+    public static function registerTile($className)
+    {
+        $class = new ReflectionClass($className);
+        if(is_a($className, Tile::class, true) and !$class->isAbstract()){
+            self::$knownTiles[$class->getShortName()] = $className;
+            self::$shortNames[$className] = $class->getShortName();
+            return true;
+        }
 
-	/** @var \mcpp\event\TimingsHandler */
-	public $tickTimer;
+        return false;
+    }
 
-	/**
-	 * @param string    $type
-	 * @param FullChunk $chunk
-	 * @param Compound  $nbt
-	 * @param           $args
-	 *
-	 * @return Tile
-	 */
-	public static function createTile($type, FullChunk $chunk, Compound $nbt, ...$args){
-		if(isset(self::$knownTiles[$type])){
-			$class = self::$knownTiles[$type];
-			return new $class($chunk, $nbt, ...$args);
-		}
+    /**
+     * Returns the short save name
+     *
+     * @return string
+     */
+    public function getSaveId()
+    {
+        return self::$shortNames[static::class];
+    }
 
-		return null;
-	}
+    public function __construct(FullChunk $chunk, Compound $nbt)
+    {
+        if($chunk === null or $chunk->getProvider() === null){
+            throw new ChunkException("Invalid garbage Chunk given to Tile");
+        }
 
-	/**
-	 * @param $className
-	 *
-	 * @return bool
-	 */
-	public static function registerTile($className){
-		$class = new \ReflectionClass($className);
-		if(is_a($className, Tile::class, true) and !$class->isAbstract()){
-			self::$knownTiles[$class->getShortName()] = $className;
-			self::$shortNames[$className] = $class->getShortName();
-			return true;
-		}
+        $this->timings = Timings::getTileEntityTimings($this);
 
-		return false;
-	}
+        $this->server = $chunk->getProvider()->getLevel()->getServer();
+        $this->chunk = $chunk;
+        $this->setLevel($chunk->getProvider()->getLevel());
+        $this->namedtag = $nbt;
+        $this->name = "";
+        $this->lastUpdate = microtime(true);
+        $this->id = Tile::$tileCount++;
+        $this->x = (int)$this->namedtag["x"];
+        $this->y = (int)$this->namedtag["y"];
+        $this->z = (int)$this->namedtag["z"];
 
-	/**
-	 * Returns the short save name
-	 *
-	 * @return string
-	 */
-	public function getSaveId(){
-		return self::$shortNames[static::class];
-	}
+        $this->chunk->addTile($this);
+        $this->getLevel()->addTile($this);
+        $this->tickTimer = Timings::getTileEntityTimings($this);
+    }
 
-	public function __construct(FullChunk $chunk, Compound $nbt){
-		if($chunk === null or $chunk->getProvider() === null){
-			throw new ChunkException("Invalid garbage Chunk given to Tile");
-		}
+    public function getId()
+    {
+        return $this->id;
+    }
 
-		$this->timings = Timings::getTileEntityTimings($this);
+    public function saveNBT()
+    {
+        $this->namedtag->id = new StringTag("id", $this->getSaveId());
+        $this->namedtag->x = new IntTag("x", $this->x);
+        $this->namedtag->y = new IntTag("y", $this->y);
+        $this->namedtag->z = new IntTag("z", $this->z);
+    }
 
-		$this->server = $chunk->getProvider()->getLevel()->getServer();
-		$this->chunk = $chunk;
-		$this->setLevel($chunk->getProvider()->getLevel());
-		$this->namedtag = $nbt;
-		$this->name = "";
-		$this->lastUpdate = microtime(true);
-		$this->id = Tile::$tileCount++;
-		$this->x = (int) $this->namedtag["x"];
-		$this->y = (int) $this->namedtag["y"];
-		$this->z = (int) $this->namedtag["z"];
+    /**
+     * @return Block
+     */
+    public function getBlock()
+    {
+        return $this->level->getBlock($this);
+    }
 
-		$this->chunk->addTile($this);
-		$this->getLevel()->addTile($this);
-		$this->tickTimer = Timings::getTileEntityTimings($this);
-	}
+    public function onUpdate()
+    {
+        return false;
+    }
 
-	public function getId(){
-		return $this->id;
-	}
+    public final function scheduleUpdate()
+    {
+        $this->level->updateTiles[$this->id] = $this;
+    }
 
-	public function saveNBT(){
-		$this->namedtag->id = new StringTag("id", $this->getSaveId());
-		$this->namedtag->x = new IntTag("x", $this->x);
-		$this->namedtag->y = new IntTag("y", $this->y);
-		$this->namedtag->z = new IntTag("z", $this->z);
-	}
+    public function __destruct()
+    {
+        $this->close();
+    }
 
-	/**
-	 * @return \mcpp\block\Block
-	 */
-	public function getBlock(){
-		return $this->level->getBlock($this);
-	}
+    public function close()
+    {
+        if(!$this->closed){
+            $this->closed = true;
+            unset($this->level->updateTiles[$this->id]);
+            if($this->chunk instanceof FullChunk){
+                $this->chunk->removeTile($this);
+            }
+            if(($level = $this->getLevel()) instanceof Level){
+                $level->removeTile($this);
+            }
+            $this->level = null;
+        }
+    }
 
-	public function onUpdate(){
-		return false;
-	}
-
-	public final function scheduleUpdate(){
-		$this->level->updateTiles[$this->id] = $this;
-	}
-
-	public function __destruct(){
-		$this->close();
-	}
-
-	public function close(){
-		if(!$this->closed){
-			$this->closed = true;
-			unset($this->level->updateTiles[$this->id]);
-			if($this->chunk instanceof FullChunk){
-				$this->chunk->removeTile($this);
-			}
-			if(($level = $this->getLevel()) instanceof Level){
-				$level->removeTile($this);
-			}
-			$this->level = null;
-		}
-	}
-
-	public function getName(){
-		return $this->name;
-	}
-
+    public function getName()
+    {
+        return $this->name;
+    }
 }

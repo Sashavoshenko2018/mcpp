@@ -15,8 +15,9 @@
 
 namespace mcpp\network\raklib;
 
-
 //Dependencies check
+use ClassLoader;
+
 $errors = 0;
 if(version_compare("7.0", PHP_VERSION) > 0){
     echo "[CRITICAL] Use PHP >= 7.0" . PHP_EOL;
@@ -48,15 +49,14 @@ if($errors > 0){
 }
 unset($errors);
 
-abstract class RakLib{
+abstract class RakLib
+{
     const VERSION = "0.8.0";
     const PROTOCOL = 6;
     const MAGIC = "\x00\xff\xff\x00\xfe\xfe\xfe\xfe\xfd\xfd\xfd\xfd\x12\x34\x56\x78";
-
     const PRIORITY_NORMAL = 0;
     const PRIORITY_IMMEDIATE = 1;
-
-	const FLAG_NEED_ZLIB = 0b10;
+    const FLAG_NEED_ZLIB = 0b10;
     /*
      * Internal Packet:
      * int32 (length without this field)
@@ -72,7 +72,6 @@ abstract class RakLib{
      * payload (binary internal EncapsulatedPacket)
      */
     const PACKET_ENCAPSULATED = 0x01;
-
     /*
      * OPEN_SESSION payload:
      * byte (identifier length)
@@ -83,7 +82,6 @@ abstract class RakLib{
      * long (clientID)
      */
     const PACKET_OPEN_SESSION = 0x02;
-
     /*
      * CLOSE_SESSION payload:
      * byte (identifier length)
@@ -91,21 +89,18 @@ abstract class RakLib{
      * string (reason)
      */
     const PACKET_CLOSE_SESSION = 0x03;
-
     /*
      * INVALID_SESSION payload:
      * byte (identifier length)
      * byte[] (identifier)
      */
     const PACKET_INVALID_SESSION = 0x04;
-
     /* TODO: implement this
      * SEND_QUEUE payload:
      * byte (identifier length)
      * byte[] (identifier)
      */
     const PACKET_SEND_QUEUE = 0x05;
-
     /*
      * SET_OPTION payload:
      * byte (option name length)
@@ -113,7 +108,6 @@ abstract class RakLib{
      * byte[] (option value)
      */
     const PACKET_SET_OPTION = 0x07;
-
     /*
      * RAW payload:
      * byte (address length)
@@ -122,7 +116,6 @@ abstract class RakLib{
      * byte[] (payload)
      */
     const PACKET_RAW = 0x08;
-
     /*
      * RAW payload:
      * byte (address length)
@@ -130,20 +123,15 @@ abstract class RakLib{
      * int (timeout)
      */
     const PACKET_BLOCK_ADDRESS = 0x09;
-	
-	const PACKET_PING = 0x0a;
-	
-	const PACKET_ENABLE_ENCRYPT = 0x0b;
-	
-	const PACKET_KICK = 0x0c;
-
+    const PACKET_PING = 0x0a;
+    const PACKET_ENABLE_ENCRYPT = 0x0b;
+    const PACKET_KICK = 0x0c;
     /*
      * No payload
      *
      * Sends the disconnect message, removes sessions correctly, closes sockets.
      */
     const PACKET_SHUTDOWN = 0x7e;
-
     /*
      * No payload
      *
@@ -151,7 +139,8 @@ abstract class RakLib{
      */
     const PACKET_EMERGENCY_SHUTDOWN = 0x7f;
 
-    public static function bootstrap(\ClassLoader $loader){
+    public static function bootstrap(ClassLoader $loader)
+    {
         $loader->addPath(dirname(__FILE__) . DIRECTORY_SEPARATOR . "..");
     }
 }

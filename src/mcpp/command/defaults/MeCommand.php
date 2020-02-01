@@ -27,37 +27,39 @@ use mcpp\command\CommandSender;
 use mcpp\Player;
 use mcpp\utils\TextFormat;
 
-class MeCommand extends VanillaCommand{
+class MeCommand extends VanillaCommand
+{
+    public function __construct($name)
+    {
+        parent::__construct(
+            $name,
+            "Performs the specified action in chat",
+            "/me <action...>"
+        );
+        $this->setPermission("pocketmine.command.me");
+    }
 
-	public function __construct($name){
-		parent::__construct(
-			$name,
-			"Performs the specified action in chat",
-			"/me <action...>"
-		);
-		$this->setPermission("pocketmine.command.me");
-	}
+    public function execute(CommandSender $sender, $currentAlias, array $args)
+    {
+        if(!$this->testPermission($sender)){
+            return true;
+        }
 
-	public function execute(CommandSender $sender, $currentAlias, array $args){
-		if(!$this->testPermission($sender)){
-			return true;
-		}
+        if(count($args) === 0){
+            $sender->sendMessage(TextFormat::RED . "Usage: " . $this->usageMessage);
 
-		if(count($args) === 0){
-			$sender->sendMessage(TextFormat::RED . "Usage: " . $this->usageMessage);
+            return false;
+        }
 
-			return false;
-		}
+        $message = "* ";
+        if($sender instanceof Player){
+            $message .= $sender->getDisplayName();
+        }else{
+            $message .= $sender->getName();
+        }
 
-		$message = "* ";
-		if($sender instanceof Player){
-			$message .= $sender->getDisplayName();
-		}else{
-			$message .= $sender->getName();
-		}
+        $sender->getServer()->broadcastMessage($message . " " . implode(" ", $args));
 
-		$sender->getServer()->broadcastMessage($message . " " . implode(" ", $args));
-
-		return true;
-	}
+        return true;
+    }
 }

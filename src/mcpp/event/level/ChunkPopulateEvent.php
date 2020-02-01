@@ -24,6 +24,7 @@ namespace mcpp\event\level;
 /**
  * Called when a Chunk is populated (after receiving it on the main thread)
  */
-class ChunkPopulateEvent extends ChunkEvent{
-	public static $handlerList = null;
+class ChunkPopulateEvent extends ChunkEvent
+{
+    public static $handlerList = null;
 }

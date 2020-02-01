@@ -25,39 +25,40 @@ use mcpp\block\Sapling;
 use mcpp\level\generator\populator\TallGrass;
 use mcpp\level\generator\populator\Tree;
 
-class ForestBiome extends GrassyBiome{
+class ForestBiome extends GrassyBiome
+{
+    const TYPE_NORMAL = 0;
+    const TYPE_BIRCH = 1;
+    public $type;
 
-	const TYPE_NORMAL = 0;
-	const TYPE_BIRCH = 1;
+    public function __construct($type = self::TYPE_NORMAL)
+    {
+        parent::__construct();
 
-	public $type;
+        $this->type = $type;
 
-	public function __construct($type = self::TYPE_NORMAL){
-		parent::__construct();
+        $trees = new Tree($type === self::TYPE_BIRCH ? Sapling::BIRCH : Sapling::OAK);
+        $trees->setBaseAmount(5);
+        $this->addPopulator($trees);
 
-		$this->type = $type;
+        $tallGrass = new TallGrass();
+        $tallGrass->setBaseAmount(3);
 
-		$trees = new Tree($type === self::TYPE_BIRCH ? Sapling::BIRCH : Sapling::OAK);
-		$trees->setBaseAmount(5);
-		$this->addPopulator($trees);
+        $this->addPopulator($tallGrass);
 
-		$tallGrass = new TallGrass();
-		$tallGrass->setBaseAmount(3);
+        $this->setElevation(63, 68);
 
-		$this->addPopulator($tallGrass);
+        if($type === self::TYPE_BIRCH){
+            $this->temperature = 0.5;
+            $this->rainfall = 0.5;
+        }else{
+            $this->temperature = 0.7;
+            $this->temperature = 0.8;
+        }
+    }
 
-		$this->setElevation(63, 68);
-
-		if($type === self::TYPE_BIRCH){
-			$this->temperature = 0.5;
-			$this->rainfall = 0.5;
-		}else{
-			$this->temperature = 0.7;
-			$this->temperature = 0.8;
-		}
-	}
-
-	public function getName(){
-		return $this->type === self::TYPE_BIRCH ? "Birch Forest" : "Forest";
-	}
+    public function getName()
+    {
+        return $this->type === self::TYPE_BIRCH ? "Birch Forest" : "Forest";
+    }
 }

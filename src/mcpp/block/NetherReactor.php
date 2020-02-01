@@ -21,21 +21,22 @@
 
 namespace mcpp\block;
 
+class NetherReactor extends Solid
+{
+    protected $id = self::NETHER_REACTOR;
 
-class NetherReactor extends Solid{
+    public function __construct($meta = 0)
+    {
+        $this->meta = $meta;
+    }
 
-	protected $id = self::NETHER_REACTOR;
+    public function getName()
+    {
+        return "Nether Reactor";
+    }
 
-	public function __construct($meta = 0){
-		$this->meta = $meta;
-	}
-
-	public function getName(){
-		return "Nether Reactor";
-	}
-
-	public function canBeActivated(){
-		return true;
-	}
-
+    public function canBeActivated()
+    {
+        return true;
+    }
 }

@@ -22,11 +22,13 @@
 /**
  * All the Object populator classes
  */
+
 namespace mcpp\level\generator\populator;
 
 use mcpp\level\ChunkManager;
 use mcpp\utils\Random;
 
-abstract class Populator{
-	public abstract function populate(ChunkManager $level, $chunkX, $chunkZ, Random $random);
+abstract class Populator
+{
+    public abstract function populate(ChunkManager $level, $chunkX, $chunkZ, Random $random);
 }

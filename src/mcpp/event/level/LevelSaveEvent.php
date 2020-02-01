@@ -26,6 +26,7 @@ use mcpp\event\Cancellable;
 /**
  * Called when a Level is saved
  */
-class LevelSaveEvent extends LevelEvent implements Cancellable{
-	public static $handlerList = null;
+class LevelSaveEvent extends LevelEvent implements Cancellable
+{
+    public static $handlerList = null;
 }

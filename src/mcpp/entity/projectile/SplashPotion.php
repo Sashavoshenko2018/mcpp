@@ -35,10 +35,8 @@ use mcpp\Server;
 class SplashPotion extends Projectile
 {
     const NETWORK_ID = 86;
-
     public $width = 0.25;
     public $height = 0.25;
-
     protected $drag = 0.01;
     protected $gravity = 0.05;
 
@@ -61,7 +59,7 @@ class SplashPotion extends Projectile
 
     public function onUpdate($currentTick)
     {
-        if ($this->closed) {
+        if($this->closed){
             return false;
         }
 
@@ -69,9 +67,9 @@ class SplashPotion extends Projectile
 
         $hasUpdate = parent::onUpdate($currentTick);
 
-        if ($this->onGround || $this->hadCollision) {
+        if($this->onGround || $this->hadCollision){
             if($this->shootingEntity instanceof Player){
-                $this->shootingEntity->sendSound("SOUND_GLASS", ['x' => $this->getX(), 'y' => $this->getY(), 'z' => $this->getZ()] ,EntityIds::ID_NONE, -1 ,$this->getViewers());
+                $this->shootingEntity->sendSound("SOUND_GLASS", ['x' => $this->getX(), 'y' => $this->getY(), 'z' => $this->getZ()], EntityIds::ID_NONE, -1, $this->getViewers());
             }
 
             $color = \mcpp\item\SplashPotion::getColor($this->getPotionId());
@@ -84,9 +82,9 @@ class SplashPotion extends Projectile
             $pk->data = ($color[0] << 16) + ($color[1] << 8) + $color[2];
             Server::broadcastPacket($this->getViewers(), $pk);
 
-            foreach ($this->level->getNearbyEntities($this->boundingBox->grow(4, 4, 4), $this) as $entity) { //todo: someone has to check this https://minecraft.gamepedia.com/Splash_Potion
-                if ($entity->distanceSquared($this) <= 16) {
-                    foreach (\mcpp\item\SplashPotion::getEffectsById($this->getPotionId()) as $effect) {
+            foreach($this->level->getNearbyEntities($this->boundingBox->grow(4, 4, 4), $this) as $entity){ //todo: someone has to check this https://minecraft.gamepedia.com/Splash_Potion
+                if($entity->distanceSquared($this) <= 16){
+                    foreach(\mcpp\item\SplashPotion::getEffectsById($this->getPotionId()) as $effect){
                         $entity->addEffect($effect);
                     }
                 }
@@ -100,7 +98,7 @@ class SplashPotion extends Projectile
 
     public function spawnTo(Player $player)
     {
-        if (!isset($this->hasSpawned[$player->getId()]) && isset($player->usedChunks[Level::chunkHash($this->chunk->getX(), $this->chunk->getZ())])) {
+        if(!isset($this->hasSpawned[$player->getId()]) && isset($player->usedChunks[Level::chunkHash($this->chunk->getX(), $this->chunk->getZ())])){
             $this->hasSpawned[$player->getId()] = $player;
             $pk = new AddEntityPacket();
             $pk->type = self::NETWORK_ID;
@@ -115,5 +113,4 @@ class SplashPotion extends Projectile
             $player->dataPacket($pk);
         }
     }
-
 }

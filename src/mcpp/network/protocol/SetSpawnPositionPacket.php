@@ -23,31 +23,29 @@ namespace mcpp\network\protocol;
 
 #include <rules/DataPacket.h>
 
+class SetSpawnPositionPacket extends PEPacket
+{
+    const NETWORK_ID = Info::SET_SPAWN_POSITION_PACKET;
+    const PACKET_NAME = "SET_SPAWN_POSITION_PACKET";
+    const SPAWN_TYPE_PLAYER_RESPAWN = 0;
+    const SPAWN_TYPE_WORLD_SPAWN = 1;
+    public $spawnType = self::SPAWN_TYPE_PLAYER_RESPAWN;
+    public $x;
+    public $y;
+    public $z;
+    public $isForced = false;
 
-class SetSpawnPositionPacket extends PEPacket{
-	const NETWORK_ID = Info::SET_SPAWN_POSITION_PACKET;
-	const PACKET_NAME = "SET_SPAWN_POSITION_PACKET";
+    public function decode($playerProtocol)
+    {
+    }
 
-	const SPAWN_TYPE_PLAYER_RESPAWN = 0;
-	const SPAWN_TYPE_WORLD_SPAWN = 1;
-	
-	public $spawnType = self::SPAWN_TYPE_PLAYER_RESPAWN;
-	public $x;
-	public $y;
-	public $z;
-	public $isForced = false;
-
-	public function decode($playerProtocol){
-
-	}
-
-	public function encode($playerProtocol){
-		$this->reset($playerProtocol);
-		$this->putSignedVarInt($this->spawnType);
-		$this->putSignedVarInt($this->x);
-		$this->putVarInt($this->y);
-		$this->putSignedVarInt($this->z);
-		$this->putByte($this->isForced); // forced spawn
-	}
-
+    public function encode($playerProtocol)
+    {
+        $this->reset($playerProtocol);
+        $this->putSignedVarInt($this->spawnType);
+        $this->putSignedVarInt($this->x);
+        $this->putVarInt($this->y);
+        $this->putSignedVarInt($this->z);
+        $this->putByte($this->isForced); // forced spawn
+    }
 }

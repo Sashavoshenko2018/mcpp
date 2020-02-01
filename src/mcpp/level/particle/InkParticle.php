@@ -23,8 +23,10 @@ namespace mcpp\level\particle;
 
 use mcpp\math\Vector3;
 
-class InkParticle extends GenericParticle{
-	public function __construct(Vector3 $pos, $scale = 0){
-		parent::__construct($pos, Particle::TYPE_INK, $scale);
-	}
+class InkParticle extends GenericParticle
+{
+    public function __construct(Vector3 $pos, $scale = 0)
+    {
+        parent::__construct($pos, Particle::TYPE_INK, $scale);
+    }
 }

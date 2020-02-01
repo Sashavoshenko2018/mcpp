@@ -24,22 +24,23 @@ namespace mcpp\event\entity;
 use mcpp\entity\Projectile;
 use mcpp\event\Cancellable;
 
-class ProjectileLaunchEvent extends EntityEvent implements Cancellable{
-	public static $handlerList = null;
+class ProjectileLaunchEvent extends EntityEvent implements Cancellable
+{
+    public static $handlerList = null;
 
-	/**
-	 * @param Projectile $entity
-	 */
-	public function __construct(Projectile $entity){
-		$this->entity = $entity;
+    /**
+     * @param Projectile $entity
+     */
+    public function __construct(Projectile $entity)
+    {
+        $this->entity = $entity;
+    }
 
-	}
-
-	/**
-	 * @return Projectile
-	 */
-	public function getEntity(){
-		return $this->entity;
-	}
-
+    /**
+     * @return Projectile
+     */
+    public function getEntity()
+    {
+        return $this->entity;
+    }
 }

@@ -23,19 +23,19 @@ namespace mcpp\network\protocol;
 
 #include <rules/DataPacket.h>
 
+class RequestChunkRadiusPacket extends PEPacket
+{
+    const NETWORK_ID = Info::REQUEST_CHUNK_RADIUS_PACKET;
+    const PACKET_NAME = "REQUEST_CHUNK_RADIUS_PACKET";
+    public $radius;
 
-class RequestChunkRadiusPacket extends PEPacket{
-	const NETWORK_ID = Info::REQUEST_CHUNK_RADIUS_PACKET;
-	const PACKET_NAME = "REQUEST_CHUNK_RADIUS_PACKET";
+    public function decode($playerProtocol)
+    {
+        $this->getHeader($playerProtocol);
+        $this->radius = $this->getSignedVarInt();
+    }
 
-	public $radius;
-
-	public function decode($playerProtocol){
-		$this->getHeader($playerProtocol);
-		$this->radius = $this->getSignedVarInt();
-	}
-
-	public function encode($playerProtocol){
-	}
-
+    public function encode($playerProtocol)
+    {
+    }
 }

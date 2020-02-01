@@ -21,12 +21,12 @@
 
 namespace mcpp\block;
 
+class FenceGateJungle extends FenceGate
+{
+    protected $id = self::FENCE_GATE_JUNGLE;
 
-class FenceGateJungle extends FenceGate{
-
-	protected $id = self::FENCE_GATE_JUNGLE;
-
-	public function getName(){
-		return "Jungle Fence Gate";
-	}
+    public function getName()
+    {
+        return "Jungle Fence Gate";
+    }
 }

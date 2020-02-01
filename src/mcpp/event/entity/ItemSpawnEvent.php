@@ -23,22 +23,23 @@ namespace mcpp\event\entity;
 
 use mcpp\entity\Item;
 
-class ItemSpawnEvent extends EntityEvent{
-	public static $handlerList = null;
+class ItemSpawnEvent extends EntityEvent
+{
+    public static $handlerList = null;
 
-	/**
-	 * @param Item $item
-	 */
-	public function __construct(Item $item){
-		$this->entity = $item;
+    /**
+     * @param Item $item
+     */
+    public function __construct(Item $item)
+    {
+        $this->entity = $item;
+    }
 
-	}
-
-	/**
-	 * @return Item
-	 */
-	public function getEntity(){
-		return $this->entity;
-	}
-
+    /**
+     * @return Item
+     */
+    public function getEntity()
+    {
+        return $this->entity;
+    }
 }

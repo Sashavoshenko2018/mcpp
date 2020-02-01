@@ -26,35 +26,37 @@ use mcpp\event\entity\EntityDamageEvent;
 use mcpp\Player;
 use mcpp\utils\TextFormat;
 
-class KillCommand extends VanillaCommand{
+class KillCommand extends VanillaCommand
+{
+    public function __construct($name)
+    {
+        parent::__construct(
+            $name,
+            "Commits suicide, only usable as a player",
+            "/kill"
+        );
+        $this->setPermission("pocketmine.command.kill");
+    }
 
-	public function __construct($name){
-		parent::__construct(
-			$name,
-			"Commits suicide, only usable as a player",
-			"/kill"
-		);
-		$this->setPermission("pocketmine.command.kill");
-	}
+    public function execute(CommandSender $sender, $currentAlias, array $args)
+    {
+        if(!$this->testPermission($sender)){
+            return true;
+        }
 
-	public function execute(CommandSender $sender, $currentAlias, array $args){
-		if(!$this->testPermission($sender)){
-			return true;
-		}
+        if($sender instanceof Player){
+            $sender->getServer()->getPluginManager()->callEvent($ev = new EntityDamageEvent($sender, EntityDamageEvent::CAUSE_SUICIDE, 1000));
 
-		if($sender instanceof Player){
-			$sender->getServer()->getPluginManager()->callEvent($ev = new EntityDamageEvent($sender, EntityDamageEvent::CAUSE_SUICIDE, 1000));
+            if($ev->isCancelled()){
+                return true;
+            }
 
-			if($ev->isCancelled()){
-				return true;
-			}
+            $sender->setLastDamageCause($ev);
+            $sender->setHealth(0);
+        }else{
+            $sender->sendMessage(TextFormat::RED . "You can only perform this command as a player");
+        }
 
-			$sender->setLastDamageCause($ev);
-			$sender->setHealth(0);
-		}else{
-			$sender->sendMessage(TextFormat::RED . "You can only perform this command as a player");
-		}
-
-		return true;
-	}
+        return true;
+    }
 }

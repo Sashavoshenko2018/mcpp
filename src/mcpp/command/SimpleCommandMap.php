@@ -21,6 +21,7 @@
 
 namespace mcpp\command;
 
+use Exception;
 use mcpp\command\defaults\BanCommand;
 use mcpp\command\defaults\BanIpCommand;
 use mcpp\command\defaults\BanListCommand;
@@ -32,13 +33,12 @@ use mcpp\command\defaults\GamemodeCommand;
 use mcpp\command\defaults\GiveCommand;
 use mcpp\command\defaults\HelpCommand;
 use mcpp\command\defaults\KickCommand;
-use mcpp\command\defaults\KillCommand;
 use mcpp\command\defaults\ListCommand;
-//use mcpp\command\defaults\MeCommand;
 use mcpp\command\defaults\OpCommand;
 use mcpp\command\defaults\PardonCommand;
 use mcpp\command\defaults\PardonIpCommand;
 use mcpp\command\defaults\ParticleCommand;
+use mcpp\command\defaults\PingCommand;
 use mcpp\command\defaults\PluginsCommand;
 use mcpp\command\defaults\ReloadCommand;
 use mcpp\command\defaults\SaveCommand;
@@ -51,7 +51,6 @@ use mcpp\command\defaults\SpawnpointCommand;
 use mcpp\command\defaults\StatusCommand;
 use mcpp\command\defaults\StopCommand;
 use mcpp\command\defaults\TeleportCommand;
-//use mcpp\command\defaults\TellCommand;
 use mcpp\command\defaults\TimeCommand;
 use mcpp\command\defaults\TimingsCommand;
 use mcpp\command\defaults\VanillaCommand;
@@ -59,275 +58,282 @@ use mcpp\command\defaults\VersionCommand;
 use mcpp\command\defaults\WhitelistCommand;
 use mcpp\Server;
 use mcpp\utils\MainLogger;
-use mcpp\command\defaults\TransferCommand;
-use mcpp\command\defaults\PingCommand;
 
-class SimpleCommandMap implements CommandMap{
+//use mcpp\command\defaults\MeCommand;
+//use mcpp\command\defaults\TellCommand;
 
-	/**
-	 * @var Command[]
-	 */
-	protected $knownCommands = [];
+class SimpleCommandMap implements CommandMap
+{
+    /**
+     * @var Command[]
+     */
+    protected $knownCommands = [];
+    /** @var Server */
+    private $server;
 
-	/** @var Server */
-	private $server;
+    public function __construct(Server $server)
+    {
+        $this->server = $server;
+        $this->setDefaultCommands();
+    }
 
-	public function __construct(Server $server){
-		$this->server = $server;
-		$this->setDefaultCommands();
-	}
+    private function setDefaultCommands()
+    {
+        $this->register("pocketmine", new VersionCommand("version"));
+        $this->register("pocketmine", new PluginsCommand("plugins"));
+        $this->register("pocketmine", new SeedCommand("seed"));
+        $this->register("pocketmine", new HelpCommand("help"));
+        $this->register("pocketmine", new StopCommand("stop"));
+        //		$this->register("pocketmine", new TellCommand("tell"));
+        $this->register("pocketmine", new DefaultGamemodeCommand("defaultgamemode"));
+        $this->register("pocketmine", new BanCommand("ban"));
+        $this->register("pocketmine", new BanIpCommand("ban-ip"));
+        $this->register("pocketmine", new BanListCommand("banlist"));
+        $this->register("pocketmine", new PardonCommand("pardon"));
+        $this->register("pocketmine", new PardonIpCommand("pardon-ip"));
+        $this->register("pocketmine", new SayCommand("say"));
+        //		$this->register("pocketmine", new MeCommand("me"));
+        $this->register("pocketmine", new ListCommand("list"));
+        $this->register("pocketmine", new DifficultyCommand("difficulty"));
+        $this->register("pocketmine", new KickCommand("kick"));
+        $this->register("pocketmine", new OpCommand("op"));
+        $this->register("pocketmine", new DeopCommand("deop"));
+        $this->register("pocketmine", new WhitelistCommand("whitelist"));
+        $this->register("pocketmine", new SaveOnCommand("save-on"));
+        $this->register("pocketmine", new SaveOffCommand("save-off"));
+        $this->register("pocketmine", new SaveCommand("save-all"));
+        $this->register("pocketmine", new GiveCommand("give"));
+        $this->register("pocketmine", new EffectCommand("effect"));
+        $this->register("pocketmine", new ParticleCommand("particle"));
+        $this->register("pocketmine", new GamemodeCommand("gamemode"));
+        //		$this->register("pocketmine", new KillCommand("kill"));
+        $this->register("pocketmine", new SpawnpointCommand("spawnpoint"));
+        $this->register("pocketmine", new SetWorldSpawnCommand("setworldspawn"));
+        $this->register("pocketmine", new TeleportCommand("tp"));
+        $this->register("pocketmine", new TimeCommand("time"));
+        $this->register("pocketmine", new TimingsCommand("timings"));
+        $this->register("pocketmine", new ReloadCommand("reload"));
 
-	private function setDefaultCommands(){
-		$this->register("pocketmine", new VersionCommand("version"));
-		$this->register("pocketmine", new PluginsCommand("plugins"));
-		$this->register("pocketmine", new SeedCommand("seed"));
-		$this->register("pocketmine", new HelpCommand("help"));
-		$this->register("pocketmine", new StopCommand("stop"));
-//		$this->register("pocketmine", new TellCommand("tell"));
-		$this->register("pocketmine", new DefaultGamemodeCommand("defaultgamemode"));
-		$this->register("pocketmine", new BanCommand("ban"));
-		$this->register("pocketmine", new BanIpCommand("ban-ip"));
-		$this->register("pocketmine", new BanListCommand("banlist"));
-		$this->register("pocketmine", new PardonCommand("pardon"));
-		$this->register("pocketmine", new PardonIpCommand("pardon-ip"));
-		$this->register("pocketmine", new SayCommand("say"));
-//		$this->register("pocketmine", new MeCommand("me"));
-		$this->register("pocketmine", new ListCommand("list"));
-		$this->register("pocketmine", new DifficultyCommand("difficulty"));
-		$this->register("pocketmine", new KickCommand("kick"));
-		$this->register("pocketmine", new OpCommand("op"));
-		$this->register("pocketmine", new DeopCommand("deop"));
-		$this->register("pocketmine", new WhitelistCommand("whitelist"));
-		$this->register("pocketmine", new SaveOnCommand("save-on"));
-		$this->register("pocketmine", new SaveOffCommand("save-off"));
-		$this->register("pocketmine", new SaveCommand("save-all"));
-		$this->register("pocketmine", new GiveCommand("give"));
-		$this->register("pocketmine", new EffectCommand("effect"));
-		$this->register("pocketmine", new ParticleCommand("particle"));
-		$this->register("pocketmine", new GamemodeCommand("gamemode"));
-//		$this->register("pocketmine", new KillCommand("kill"));
-		$this->register("pocketmine", new SpawnpointCommand("spawnpoint"));
-		$this->register("pocketmine", new SetWorldSpawnCommand("setworldspawn"));
-		$this->register("pocketmine", new TeleportCommand("tp"));
-		$this->register("pocketmine", new TimeCommand("time"));
-		$this->register("pocketmine", new TimingsCommand("timings"));
-		$this->register("pocketmine", new ReloadCommand("reload"));
-		
-//		$this->register("pocketmine", new TransferCommand("transfer"));
-		$this->register("pocketmine", new PingCommand("ping"));
+        //		$this->register("pocketmine", new TransferCommand("transfer"));
+        $this->register("pocketmine", new PingCommand("ping"));
 
-		if($this->server->getProperty("debug.commands", false) === true){
-			$this->register("pocketmine", new StatusCommand("status"));
-		}
-	}
+        if($this->server->getProperty("debug.commands", false) === true){
+            $this->register("pocketmine", new StatusCommand("status"));
+        }
+    }
 
+    public function registerAll($fallbackPrefix, array $commands)
+    {
+        foreach($commands as $command){
+            $this->register($fallbackPrefix, $command);
+        }
+    }
 
-	public function registerAll($fallbackPrefix, array $commands){
-		foreach($commands as $command){
-			$this->register($fallbackPrefix, $command);
-		}
-	}
+    public function register($fallbackPrefix, Command $command, $label = null)
+    {
+        if($label === null){
+            $label = $command->getName();
+        }
+        $label = strtolower(trim($label));
+        $fallbackPrefix = strtolower(trim($fallbackPrefix));
 
-	public function register($fallbackPrefix, Command $command, $label = null){
-		if($label === null){
-			$label = $command->getName();
-		}
-		$label = strtolower(trim($label));
-		$fallbackPrefix = strtolower(trim($fallbackPrefix));
+        $registered = $this->registerAlias($command, false, $fallbackPrefix, $label);
 
-		$registered = $this->registerAlias($command, false, $fallbackPrefix, $label);
+        $aliases = $command->getAliases();
+        foreach($aliases as $index => $alias){
+            if(!$this->registerAlias($command, true, $fallbackPrefix, $alias)){
+                unset($aliases[$index]);
+            }
+        }
+        $command->setAliases($aliases);
 
-		$aliases = $command->getAliases();
-		foreach($aliases as $index => $alias){
-			if(!$this->registerAlias($command, true, $fallbackPrefix, $alias)){
-				unset($aliases[$index]);
-			}
-		}
-		$command->setAliases($aliases);
+        if(!$registered){
+            $command->setLabel($fallbackPrefix . ":" . $label);
+        }
 
-		if(!$registered){
-			$command->setLabel($fallbackPrefix . ":" . $label);
-		}
+        $command->register($this);
 
-		$command->register($this);
+        return $registered;
+    }
 
-		return $registered;
-	}
+    public function registerAlias(Command $command, $isAlias, $fallbackPrefix, $label)
+    {
+        $this->knownCommands[$fallbackPrefix . ":" . $label] = $command;
+        if(($command instanceof VanillaCommand or $isAlias) and isset($this->knownCommands[$label])){
+            return false;
+        }
 
-	public function registerAlias(Command $command, $isAlias, $fallbackPrefix, $label){
-		$this->knownCommands[$fallbackPrefix . ":" . $label] = $command;
-		if(($command instanceof VanillaCommand or $isAlias) and isset($this->knownCommands[$label])){
-			return false;
-		}
+        if(isset($this->knownCommands[$label]) and $this->knownCommands[$label]->getLabel() !== null and $this->knownCommands[$label]->getLabel() === $label){
+            return false;
+        }
 
-		if(isset($this->knownCommands[$label]) and $this->knownCommands[$label]->getLabel() !== null and $this->knownCommands[$label]->getLabel() === $label){
-			return false;
-		}
+        if(!$isAlias){
+            $command->setLabel($label);
+        }
 
-		if(!$isAlias){
-			$command->setLabel($label);
-		}
+        $this->knownCommands[$label] = $command;
 
-		$this->knownCommands[$label] = $command;
+        return true;
+    }
 
-		return true;
-	}
-	
-	private function parseArgs($commandLine) {
-		$lines = (explode(' ', $commandLine));
-		$newArgs = [];
-		$i = 0;
-		$state = 0;
-		foreach ($lines as $arg) {
-			if ($arg == '') {
-				continue;
-			}
-			$needNewArg = false;
+    private function parseArgs($commandLine)
+    {
+        $lines = (explode(' ', $commandLine));
+        $newArgs = [];
+        $i = 0;
+        $state = 0;
+        foreach($lines as $arg){
+            if($arg == ''){
+                continue;
+            }
+            $needNewArg = false;
 
-			if ($state == 0) {
-				if ($arg{0} == '"') {
-					$state = 1;
-					$arg = substr($arg, 1);
-				} elseif ($arg{0} == '\'') {
-					$state = 2;
-					$arg = substr($arg, 1);
-				} else {
-					$needNewArg = true;
-				}
-			}
-			
-			if ($arg == '') {
-				continue;
-			}
-			
-			if ($state == 1) {
-				if ($arg{strlen($arg) - 1} == '"') {
-					$state = 0;
-					$arg = substr($arg, 0, -1);
-					$needNewArg = true;
-				}
-			}
-			if ($state == 2) {
-				if ($arg{strlen($arg) - 1} == '\'') {
-					$needNewArg = true;
-					$state = 0;
-					$arg = substr($arg, 0, -1);
-				}
-			}
+            if($state == 0){
+                if($arg{0} == '"'){
+                    $state = 1;
+                    $arg = substr($arg, 1);
+                }elseif($arg{0} == '\''){
+                    $state = 2;
+                    $arg = substr($arg, 1);
+                }else{
+                    $needNewArg = true;
+                }
+            }
 
-			if (!isset($newArgs[$i])) {
-				$newArgs[$i] = $arg;
-			} else {
-				$newArgs[$i] .= ' ' . $arg;
-			}
-			if ($needNewArg) {
-				$i++;
-			}
-		}
-		return $newArgs;
-	}
+            if($arg == ''){
+                continue;
+            }
 
-	public function dispatch(CommandSender $sender, $commandLine){
-		$args = $this->parseArgs($commandLine);
-		if (count($args) === 0) {
-			return false;
-		}
-		$sentCommandLabel = strtolower(array_shift($args));
-		$target = $this->getCommand($sentCommandLabel);
+            if($state == 1){
+                if($arg{strlen($arg) - 1} == '"'){
+                    $state = 0;
+                    $arg = substr($arg, 0, -1);
+                    $needNewArg = true;
+                }
+            }
+            if($state == 2){
+                if($arg{strlen($arg) - 1} == '\''){
+                    $needNewArg = true;
+                    $state = 0;
+                    $arg = substr($arg, 0, -1);
+                }
+            }
 
-		if($target === null){
-			return false;
-		}
+            if(!isset($newArgs[$i])){
+                $newArgs[$i] = $arg;
+            }else{
+                $newArgs[$i] .= ' ' . $arg;
+            }
+            if($needNewArg){
+                $i++;
+            }
+        }
+        return $newArgs;
+    }
 
-		//$target->timings->startTiming();
-		try{
-			$target->execute($sender, $sentCommandLabel, $args);
-		}catch(\Exception $e){
-			$this->server->getLogger()->critical("Unhandled exception executing command '" . $commandLine . "' in " . $target . ": " . $e->getMessage());
-			$logger = $sender->getServer()->getLogger();
-			if($logger instanceof MainLogger){
-				$logger->logException($e);
-			}
-		}
-		//$target->timings->stopTiming();
+    public function dispatch(CommandSender $sender, $commandLine)
+    {
+        $args = $this->parseArgs($commandLine);
+        if(count($args) === 0){
+            return false;
+        }
+        $sentCommandLabel = strtolower(array_shift($args));
+        $target = $this->getCommand($sentCommandLabel);
 
-		return true;
-	}
+        if($target === null){
+            return false;
+        }
 
-	public function clearCommands(){
-		foreach($this->knownCommands as $command){
-			$command->unregister($this);
-		}
-		$this->knownCommands = [];
-		$this->setDefaultCommands();
-	}
+        //$target->timings->startTiming();
+        try{
+            $target->execute($sender, $sentCommandLabel, $args);
+        }catch(Exception $e){
+            $this->server->getLogger()->critical("Unhandled exception executing command '" . $commandLine . "' in " . $target . ": " . $e->getMessage());
+            $logger = $sender->getServer()->getLogger();
+            if($logger instanceof MainLogger){
+                $logger->logException($e);
+            }
+        }
+        //$target->timings->stopTiming();
 
-	public function unregister(Command $command) {
-		unset($this->knownCommands[strtolower($command->getName())]);
-		foreach($command->getAliases() as $alias) {
-			unset($this->knownCommands[strtolower($alias)]);
-		}
-	}
+        return true;
+    }
 
-	public function getCommand($name){
-		if(isset($this->knownCommands[$name])){
-			return $this->knownCommands[$name];
-		}
+    public function clearCommands()
+    {
+        foreach($this->knownCommands as $command){
+            $command->unregister($this);
+        }
+        $this->knownCommands = [];
+        $this->setDefaultCommands();
+    }
 
-		return null;
-	}
+    public function unregister(Command $command)
+    {
+        unset($this->knownCommands[strtolower($command->getName())]);
+        foreach($command->getAliases() as $alias){
+            unset($this->knownCommands[strtolower($alias)]);
+        }
+    }
 
-	/**
-	 * @return Command[]
-	 */
-	public function getCommands(){
-		return $this->knownCommands;
-	}
+    public function getCommand($name)
+    {
+        if(isset($this->knownCommands[$name])){
+            return $this->knownCommands[$name];
+        }
 
+        return null;
+    }
 
-	/**
-	 * @return void
-	 */
-	public function registerServerAliases(){
-		$values = $this->server->getCommandAliases();
+    /**
+     * @return Command[]
+     */
+    public function getCommands()
+    {
+        return $this->knownCommands;
+    }
 
-		foreach($values as $alias => $commandStrings){
-			if(strpos($alias, ":") !== false or strpos($alias, " ") !== false){
-				$this->server->getLogger()->warning("Could not register alias " . $alias . " because it contains illegal characters");
-				continue;
-			}
+    /**
+     * @return void
+     */
+    public function registerServerAliases()
+    {
+        $values = $this->server->getCommandAliases();
 
-			$targets = [];
+        foreach($values as $alias => $commandStrings){
+            if(strpos($alias, ":") !== false or strpos($alias, " ") !== false){
+                $this->server->getLogger()->warning("Could not register alias " . $alias . " because it contains illegal characters");
+                continue;
+            }
 
-			$bad = "";
-			foreach($commandStrings as $commandString){
-				$args = explode(" ", $commandString);
-				$command = $this->getCommand($args[0]);
+            $targets = [];
 
-				if($command === null){
-					if(strlen($bad) > 0){
-						$bad .= ", ";
-					}
-					$bad .= $commandString;
-				}else{
-					$targets[] = $commandString;
-				}
-			}
+            $bad = "";
+            foreach($commandStrings as $commandString){
+                $args = explode(" ", $commandString);
+                $command = $this->getCommand($args[0]);
 
-			if(strlen($bad) > 0){
-				$this->server->getLogger()->warning("Could not register alias " . $alias . " because it contains commands that do not exist: " . $bad);
-				continue;
-			}
+                if($command === null){
+                    if(strlen($bad) > 0){
+                        $bad .= ", ";
+                    }
+                    $bad .= $commandString;
+                }else{
+                    $targets[] = $commandString;
+                }
+            }
 
-			//These registered commands have absolute priority
-			if(count($targets) > 0){
-				$this->knownCommands[strtolower($alias)] = new FormattedCommandAlias(strtolower($alias), $targets);
-			}else{
-				unset($this->knownCommands[strtolower($alias)]);
-			}
+            if(strlen($bad) > 0){
+                $this->server->getLogger()->warning("Could not register alias " . $alias . " because it contains commands that do not exist: " . $bad);
+                continue;
+            }
 
-		}
-	}
-
-
+            //These registered commands have absolute priority
+            if(count($targets) > 0){
+                $this->knownCommands[strtolower($alias)] = new FormattedCommandAlias(strtolower($alias), $targets);
+            }else{
+                unset($this->knownCommands[strtolower($alias)]);
+            }
+        }
+    }
 }

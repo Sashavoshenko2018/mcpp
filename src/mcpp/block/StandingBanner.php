@@ -24,30 +24,33 @@ namespace mcpp\block;
 use mcpp\item\Item;
 use mcpp\item\Tool;
 
-class StandingBanner extends Transparent {
+class StandingBanner extends Transparent
+{
+    protected $id = self::STANDING_BANNER;
 
-	protected $id = self::STANDING_BANNER;
+    public function __construct()
+    {
+    }
 
-	public function __construct() {
-		
-	}
-	
-	public function getName(){
-		return "Standing Banner";
-	}
-	
-	public function getHardness() {
-		return 1;
-	}
-	
-	public function getToolType() {
-		return Tool::TYPE_AXE;
-	}
-	
-	public function getDrops(Item $item) {
-		return [
-			[Item::STANDING_BANNER, 0, 1]
-		];
-	}
+    public function getName()
+    {
+        return "Standing Banner";
+    }
 
+    public function getHardness()
+    {
+        return 1;
+    }
+
+    public function getToolType()
+    {
+        return Tool::TYPE_AXE;
+    }
+
+    public function getDrops(Item $item)
+    {
+        return [
+            [Item::STANDING_BANNER, 0, 1]
+        ];
+    }
 }

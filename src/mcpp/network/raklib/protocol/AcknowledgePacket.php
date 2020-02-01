@@ -17,15 +17,18 @@ namespace mcpp\network\raklib\protocol;
 
 #ifndef COMPILE
 use mcpp\network\raklib\Binary;
+
 #endif
 
 #include <rules/RakLibPacket.h>
 
-abstract class AcknowledgePacket extends Packet{
+abstract class AcknowledgePacket extends Packet
+{
     /** @var int[] */
     public $packets = [];
 
-    public function encode(){
+    public function encode()
+    {
         parent::encode();
         $payload = "";
         sort($this->packets, SORT_NUMERIC);
@@ -72,7 +75,8 @@ abstract class AcknowledgePacket extends Packet{
         $this->buffer .= $payload;
     }
 
-    public function decode(){
+    public function decode()
+    {
         parent::decode();
         $count = $this->getShort();
         $this->packets = [];
@@ -93,8 +97,9 @@ abstract class AcknowledgePacket extends Packet{
         }
     }
 
-	public function clean(){
-		$this->packets = [];
-		return parent::clean();
-	}
+    public function clean()
+    {
+        $this->packets = [];
+        return parent::clean();
+    }
 }

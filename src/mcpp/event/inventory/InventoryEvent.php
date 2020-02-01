@@ -22,31 +22,36 @@
 /**
  * Inventory related events
  */
+
 namespace mcpp\event\inventory;
 
+use mcpp\entity\Human;
 use mcpp\event\Event;
 use mcpp\inventory\Inventory;
 
-abstract class InventoryEvent extends Event{
+abstract class InventoryEvent extends Event
+{
+    /** @var Inventory */
+    protected $inventory;
 
-	/** @var Inventory */
-	protected $inventory;
+    public function __construct(Inventory $inventory)
+    {
+        $this->inventory = $inventory;
+    }
 
-	public function __construct(Inventory $inventory){
-		$this->inventory = $inventory;
-	}
+    /**
+     * @return Inventory
+     */
+    public function getInventory()
+    {
+        return $this->inventory;
+    }
 
-	/**
-	 * @return Inventory
-	 */
-	public function getInventory(){
-		return $this->inventory;
-	}
-
-	/**
-	 * @return \mcpp\entity\Human[]
-	 */
-	public function getViewers(){
-		return $this->inventory->getViewers();
-	}
+    /**
+     * @return Human[]
+     */
+    public function getViewers()
+    {
+        return $this->inventory->getViewers();
+    }
 }

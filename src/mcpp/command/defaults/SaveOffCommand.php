@@ -24,27 +24,28 @@ namespace mcpp\command\defaults;
 use mcpp\command\Command;
 use mcpp\command\CommandSender;
 
+class SaveOffCommand extends VanillaCommand
+{
+    public function __construct($name)
+    {
+        parent::__construct(
+            $name,
+            "Disables server autosaving",
+            "/save-off"
+        );
+        $this->setPermission("pocketmine.command.save.disable");
+    }
 
-class SaveOffCommand extends VanillaCommand{
+    public function execute(CommandSender $sender, $currentAlias, array $args)
+    {
+        if(!$this->testPermission($sender)){
+            return true;
+        }
 
-	public function __construct($name){
-		parent::__construct(
-			$name,
-			"Disables server autosaving",
-			"/save-off"
-		);
-		$this->setPermission("pocketmine.command.save.disable");
-	}
+        $sender->getServer()->setAutoSave(false);
 
-	public function execute(CommandSender $sender, $currentAlias, array $args){
-		if(!$this->testPermission($sender)){
-			return true;
-		}
+        Command::broadcastCommandMessage($sender, "Disabled level saving");
 
-		$sender->getServer()->setAutoSave(false);
-
-		Command::broadcastCommandMessage($sender, "Disabled level saving");
-
-		return true;
-	}
+        return true;
+    }
 }

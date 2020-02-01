@@ -21,147 +21,156 @@
 
 namespace mcpp\permission;
 
+use DateTime;
 use mcpp\Server;
 use mcpp\utils\MainLogger;
 
-class BanList{
+class BanList
+{
+    /** @var BanEntry[] */
+    private $list = [];
+    /** @var string */
+    private $file;
+    /** @var bool */
+    private $enabled = true;
 
-	/** @var BanEntry[] */
-	private $list = [];
+    /**
+     * @param string $file
+     */
+    public function __construct($file)
+    {
+        $this->file = $file;
+    }
 
-	/** @var string */
-	private $file;
+    /**
+     * @return bool
+     */
+    public function isEnabled()
+    {
+        return $this->enabled === true;
+    }
 
-	/** @var bool */
-	private $enabled = true;
+    /**
+     * @param bool $flag
+     */
+    public function setEnabled($flag)
+    {
+        $this->enabled = (bool)$flag;
+    }
 
-	/**
-	 * @param string $file
-	 */
-	public function __construct($file){
-		$this->file = $file;
-	}
+    /**
+     * @return BanEntry[]
+     */
+    public function getEntries()
+    {
+        $this->removeExpired();
 
-	/**
-	 * @return bool
-	 */
-	public function isEnabled(){
-		return $this->enabled === true;
-	}
+        return $this->list;
+    }
 
-	/**
-	 * @param bool $flag
-	 */
-	public function setEnabled($flag){
-		$this->enabled = (bool) $flag;
-	}
+    /**
+     * @param string $name
+     *
+     * @return bool
+     */
+    public function isBanned($name)
+    {
+        $name = strtolower($name);
+        if(!$this->isEnabled()){
+            return false;
+        }else{
+            $this->removeExpired();
 
-	/**
-	 * @return BanEntry[]
-	 */
-	public function getEntries(){
-		$this->removeExpired();
+            return isset($this->list[$name]);
+        }
+    }
 
-		return $this->list;
-	}
+    /**
+     * @param BanEntry $entry
+     */
+    public function add(BanEntry $entry)
+    {
+        $this->list[$entry->getName()] = $entry;
+        $this->save();
+    }
 
-	/**
-	 * @param string $name
-	 *
-	 * @return bool
-	 */
-	public function isBanned($name){
-		$name = strtolower($name);
-		if(!$this->isEnabled()){
-			return false;
-		}else{
-			$this->removeExpired();
+    /**
+     * @param string $target
+     * @param string $reason
+     * @param DateTime $expires
+     * @param string $source
+     *
+     * @return BanEntry
+     */
+    public function addBan($target, $reason = null, $expires = null, $source = null)
+    {
+        $entry = new BanEntry($target);
+        $entry->setSource($source != null ? $source : $entry->getSource());
+        $entry->setExpires($expires);
+        $entry->setReason($reason != null ? $reason : $entry->getReason());
 
-			return isset($this->list[$name]);
-		}
-	}
+        $this->list[$entry->getName()] = $entry;
+        $this->save();
 
-	/**
-	 * @param BanEntry $entry
-	 */
-	public function add(BanEntry $entry){
-		$this->list[$entry->getName()] = $entry;
-		$this->save();
-	}
+        return $entry;
+    }
 
-	/**
-	 * @param string    $target
-	 * @param string    $reason
-	 * @param \DateTime $expires
-	 * @param string    $source
-	 *
-	 * @return BanEntry
-	 */
-	public function addBan($target, $reason = null, $expires = null, $source = null){
-		$entry = new BanEntry($target);
-		$entry->setSource($source != null ? $source : $entry->getSource());
-		$entry->setExpires($expires);
-		$entry->setReason($reason != null ? $reason : $entry->getReason());
+    /**
+     * @param string $name
+     */
+    public function remove($name)
+    {
+        $name = strtolower($name);
+        if(isset($this->list[$name])){
+            unset($this->list[$name]);
+            $this->save();
+        }
+    }
 
-		$this->list[$entry->getName()] = $entry;
-		$this->save();
+    public function removeExpired()
+    {
+        foreach($this->list as $name => $entry){
+            if($entry->hasExpired()){
+                unset($this->list[$name]);
+            }
+        }
+    }
 
-		return $entry;
-	}
+    public function load()
+    {
+        $this->list = [];
+        $fp = @fopen($this->file, "r");
+        if(is_resource($fp)){
+            while(($line = fgets($fp)) !== false){
+                if($line{0} !== "#"){
+                    $entry = BanEntry::fromString($line);
+                    if($entry instanceof BanEntry){
+                        $this->list[$entry->getName()] = $entry;
+                    }
+                }
+            }
+            fclose($fp);
+        }else{
+            MainLogger::getLogger()->error("Could not load ban list");
+        }
+    }
 
-	/**
-	 * @param string $name
-	 */
-	public function remove($name){
-		$name = strtolower($name);
-		if(isset($this->list[$name])){
-			unset($this->list[$name]);
-			$this->save();
-		}
-	}
+    public function save($flag = true)
+    {
+        $this->removeExpired();
+        $fp = @fopen($this->file, "w");
+        if(is_resource($fp)){
+            if($flag === true){
+                fwrite($fp, "# Updated " . strftime("%x %H:%M", time()) . " by " . Server::getInstance()->getName() . " " . Server::getInstance()->getPocketMineVersion() . "\n");
+                fwrite($fp, "# victim name | ban date | banned by | banned until | reason\n\n");
+            }
 
-	public function removeExpired(){
-		foreach($this->list as $name => $entry){
-			if($entry->hasExpired()){
-				unset($this->list[$name]);
-			}
-		}
-	}
-
-	public function load(){
-		$this->list = [];
-		$fp = @fopen($this->file, "r");
-		if(is_resource($fp)){
-			while(($line = fgets($fp)) !== false){
-				if($line{0} !== "#"){
-					$entry = BanEntry::fromString($line);
-					if($entry instanceof BanEntry){
-						$this->list[$entry->getName()] = $entry;
-					}
-				}
-			}
-			fclose($fp);
-		}else{
-			MainLogger::getLogger()->error("Could not load ban list");
-		}
-	}
-
-	public function save($flag = true){
-		$this->removeExpired();
-		$fp = @fopen($this->file, "w");
-		if(is_resource($fp)){
-			if($flag === true){
-				fwrite($fp, "# Updated " . strftime("%x %H:%M", time()) . " by " . Server::getInstance()->getName() . " " . Server::getInstance()->getPocketMineVersion() . "\n");
-				fwrite($fp, "# victim name | ban date | banned by | banned until | reason\n\n");
-			}
-
-			foreach($this->list as $entry){
-				fwrite($fp, $entry->getString() . "\n");
-			}
-			fclose($fp);
-		}else{
-			MainLogger::getLogger()->error("Could not save ban list");
-		}
-	}
-
+            foreach($this->list as $entry){
+                fwrite($fp, $entry->getString() . "\n");
+            }
+            fclose($fp);
+        }else{
+            MainLogger::getLogger()->error("Could not save ban list");
+        }
+    }
 }

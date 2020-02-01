@@ -23,17 +23,19 @@ namespace mcpp\block;
 
 use mcpp\item\Item;
 
-class RedstoneRepeaterActive extends RedstoneRepeater{
-	
-	protected $id = self::REDSTONE_REPEATER_BLOCK_ACTIVE;
+class RedstoneRepeaterActive extends RedstoneRepeater
+{
+    protected $id = self::REDSTONE_REPEATER_BLOCK_ACTIVE;
 
-	public function __construct($meta = 0){
-		$this->meta = $meta;
-	}
+    public function __construct($meta = 0)
+    {
+        $this->meta = $meta;
+    }
 
-	public function getDrops(Item $item){
-		return [
-			[Item::REDSTONE_REPEATER, 0, 1],
-		];
-	}
+    public function getDrops(Item $item)
+    {
+        return [
+            [Item::REDSTONE_REPEATER, 0, 1],
+        ];
+    }
 }

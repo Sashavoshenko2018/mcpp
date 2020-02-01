@@ -21,27 +21,29 @@
 
 namespace mcpp\level\particle;
 
-use mcpp\network\protocol\LevelEventPacket;
 use mcpp\block\Block;
 use mcpp\math\Vector3;
+use mcpp\network\protocol\LevelEventPacket;
 use mcpp\Server;
 
-class DestroyBlockParticle extends Particle{
-	
-	protected $data;
+class DestroyBlockParticle extends Particle
+{
+    protected $data;
 
-	public function __construct(Vector3 $pos, Block $b){
-		parent::__construct($pos->x, $pos->y, $pos->z);
-		$this->data = $b->getId() + ($b->getDamage() << 8);
-	}
-	
-	public function spawnFor($players) {
-		$pk = new LevelEventPacket;
-		$pk->evid = LevelEventPacket::EVENT_PARTICLE_DESTROY;
-		$pk->x = $this->x;
-		$pk->y = $this->y;
-		$pk->z = $this->z;
-		$pk->data = $this->data;
-		Server::broadcastPacket($players, $pk);
-	}
+    public function __construct(Vector3 $pos, Block $b)
+    {
+        parent::__construct($pos->x, $pos->y, $pos->z);
+        $this->data = $b->getId() + ($b->getDamage() << 8);
+    }
+
+    public function spawnFor($players)
+    {
+        $pk = new LevelEventPacket;
+        $pk->evid = LevelEventPacket::EVENT_PARTICLE_DESTROY;
+        $pk->x = $this->x;
+        $pk->y = $this->y;
+        $pk->z = $this->z;
+        $pk->data = $this->data;
+        Server::broadcastPacket($players, $pk);
+    }
 }

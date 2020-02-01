@@ -21,11 +21,12 @@
 
 namespace mcpp\block;
 
-class StillWater extends Water{
+class StillWater extends Water
+{
+    protected $id = self::STILL_WATER;
 
-	protected $id = self::STILL_WATER;
-
-	public function getName(){
-		return "Still Water";
-	}
+    public function getName()
+    {
+        return "Still Water";
+    }
 }

@@ -22,25 +22,27 @@
 /**
  * Events related Plugin enable / disable events
  */
+
 namespace mcpp\event\plugin;
 
 use mcpp\event\Event;
 use mcpp\plugin\Plugin;
 
+abstract class PluginEvent extends Event
+{
+    /** @var Plugin */
+    private $plugin;
 
-abstract class PluginEvent extends Event{
+    public function __construct(Plugin $plugin)
+    {
+        $this->plugin = $plugin;
+    }
 
-	/** @var Plugin */
-	private $plugin;
-
-	public function __construct(Plugin $plugin){
-		$this->plugin = $plugin;
-	}
-
-	/**
-	 * @return Plugin
-	 */
-	public function getPlugin(){
-		return $this->plugin;
-	}
+    /**
+     * @return Plugin
+     */
+    public function getPlugin()
+    {
+        return $this->plugin;
+    }
 }

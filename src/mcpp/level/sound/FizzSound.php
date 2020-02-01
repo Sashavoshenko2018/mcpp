@@ -24,8 +24,10 @@ namespace mcpp\level\sound;
 use mcpp\math\Vector3;
 use mcpp\network\protocol\LevelEventPacket;
 
-class FizzSound extends GenericSound{
-	public function __construct(Vector3 $pos, $pitch = 0){
-		parent::__construct($pos, LevelEventPacket::EVENT_SOUND_FIZZ, $pitch);
-	}
+class FizzSound extends GenericSound
+{
+    public function __construct(Vector3 $pos, $pitch = 0)
+    {
+        parent::__construct($pos, LevelEventPacket::EVENT_SOUND_FIZZ, $pitch);
+    }
 }

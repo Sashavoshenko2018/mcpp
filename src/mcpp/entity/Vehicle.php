@@ -21,7 +21,6 @@
 
 namespace mcpp\entity;
 
-
-abstract class Vehicle extends Entity implements Rideable{
-
+abstract class Vehicle extends Entity implements Rideable
+{
 }

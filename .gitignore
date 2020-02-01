@@ -13,6 +13,6 @@ mcpp.yml
 mcpp-soft.yml
 server.properties
 white-list.txt
-mods/
+resources/
 launcher.sh
 checker.sh

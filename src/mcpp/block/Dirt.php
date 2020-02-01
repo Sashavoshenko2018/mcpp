@@ -25,38 +25,43 @@ use mcpp\item\Item;
 use mcpp\item\Tool;
 use mcpp\Player;
 
-class Dirt extends Solid{
+class Dirt extends Solid
+{
+    protected $id = self::DIRT;
 
-	protected $id = self::DIRT;
+    public function __construct()
+    {
+    }
 
-	public function __construct(){
+    public function canBeActivated()
+    {
+        return true;
+    }
 
-	}
+    public function getHardness()
+    {
+        return 0.5;
+    }
 
-	public function canBeActivated(){
-		return true;
-	}
+    public function getToolType()
+    {
+        return Tool::TYPE_SHOVEL;
+    }
 
-	public function getHardness(){
-		return 0.5;
-	}
+    public function getName()
+    {
+        return "Dirt";
+    }
 
-	public function getToolType(){
-		return Tool::TYPE_SHOVEL;
-	}
+    public function onActivate(Item $item, Player $player = null)
+    {
+        if($item->isHoe()){
+            $item->useOn($this);
+            $this->getLevel()->setBlock($this, Block::get(Item::FARMLAND, 0), true);
 
-	public function getName(){
-		return "Dirt";
-	}
+            return true;
+        }
 
-	public function onActivate(Item $item, Player $player = null){
-		if($item->isHoe()){
-			$item->useOn($this);
-			$this->getLevel()->setBlock($this, Block::get(Item::FARMLAND, 0), true);
-
-			return true;
-		}
-
-		return false;
-	}
+        return false;
+    }
 }

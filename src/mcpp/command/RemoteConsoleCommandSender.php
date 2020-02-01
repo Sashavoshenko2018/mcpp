@@ -21,23 +21,23 @@
 
 namespace mcpp\command;
 
+class RemoteConsoleCommandSender extends ConsoleCommandSender
+{
+    /** @var string */
+    private $messages = "";
 
-class RemoteConsoleCommandSender extends ConsoleCommandSender{
+    public function sendMessage($message)
+    {
+        $this->messages .= trim($message, "\r\n") . "\n";
+    }
 
-	/** @var string */
-	private $messages = "";
+    public function getMessage()
+    {
+        return $this->messages;
+    }
 
-	public function sendMessage($message){
-		$this->messages .= trim($message, "\r\n") . "\n";
-	}
-
-	public function getMessage(){
-		return $this->messages;
-	}
-
-	public function getName(){
-		return "Rcon";
-	}
-
-
+    public function getName()
+    {
+        return "Rcon";
+    }
 }

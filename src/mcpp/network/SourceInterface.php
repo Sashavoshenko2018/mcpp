@@ -22,38 +22,36 @@
 /**
  * Network-related classes
  */
+
 namespace mcpp\network;
 
-use mcpp\network\protocol\DataPacket;
 use mcpp\Player;
 
 /**
  * Classes that implement this interface will be able to be attached to players
  */
-interface SourceInterface{
+interface SourceInterface
+{
+    /**
+     * Terminates the connection
+     *
+     * @param Player $player
+     * @param string $reason
+     *
+     */
+    public function close(Player $player, $reason = "unknown reason");
 
+    /**
+     * @param string $name
+     */
+    public function setName($name);
 
-	/**
-	 * Terminates the connection
-	 *
-	 * @param Player $player
-	 * @param string $reason
-	 *
-	 */
-	public function close(Player $player, $reason = "unknown reason");
+    /**
+     * @return bool
+     */
+    public function process();
 
-	/**
-	 * @param string $name
-	 */
-	public function setName($name);
+    public function shutdown();
 
-	/**
-	 * @return bool
-	 */
-	public function process();
-
-	public function shutdown();
-
-	public function emergencyShutdown();
-
+    public function emergencyShutdown();
 }

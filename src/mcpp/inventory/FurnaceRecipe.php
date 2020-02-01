@@ -21,66 +21,71 @@
 
 namespace mcpp\inventory;
 
+use InvalidStateException;
 use mcpp\item\Item;
 use mcpp\Server;
 use mcpp\utils\UUID;
 
-class FurnaceRecipe implements Recipe {
+class FurnaceRecipe implements Recipe
+{
+    private $id = null;
+    /** @var Item */
+    private $output;
+    /** @var Item */
+    private $ingredient;
 
-	private $id = null;
+    /**
+     * @param Item $result
+     * @param Item $ingredient
+     */
+    public function __construct(Item $result, Item $ingredient)
+    {
+        $this->output = clone $result;
+        $this->ingredient = clone $ingredient;
+    }
 
-	/** @var Item */
-	private $output;
+    public function getId()
+    {
+        return $this->id;
+    }
 
-	/** @var Item */
-	private $ingredient;
+    public function setId(UUID $id)
+    {
+        if($this->id !== null){
+            throw new InvalidStateException("Id is already set");
+        }
 
-	/**
-	 * @param Item $result
-	 * @param Item $ingredient
-	 */
-	public function __construct(Item $result, Item $ingredient) {
-		$this->output = clone $result;
-		$this->ingredient = clone $ingredient;
-	}
+        $this->id = $id;
+    }
 
-	public function getId() {
-		return $this->id;
-	}
+    /**
+     * @param Item $item
+     */
+    public function setInput(Item $item)
+    {
+        $this->ingredient = clone $item;
+    }
 
-	public function setId(UUID $id) {
-		if ($this->id !== null) {
-			throw new \InvalidStateException("Id is already set");
-		}
+    /**
+     * @return Item
+     */
+    public function getInput()
+    {
+        return clone $this->ingredient;
+    }
 
-		$this->id = $id;
-	}
+    /**
+     * @return Item
+     */
+    public function getResult()
+    {
+        return clone $this->output;
+    }
 
-	/**
-	 * @param Item $item
-	 */
-	public function setInput(Item $item) {
-		$this->ingredient = clone $item;
-	}
+    public function registerToCraftingManager()
+    {
+        Server::getInstance()->getCraftingManager()->registerFurnaceRecipe($this);
+    }
 
-	/**
-	 * @return Item
-	 */
-	public function getInput() {
-		return clone $this->ingredient;
-	}
-
-	/**
-	 * @return Item
-	 */
-	public function getResult() {
-		return clone $this->output;
-	}
-
-	public function registerToCraftingManager() {
-		Server::getInstance()->getCraftingManager()->registerFurnaceRecipe($this);
-	}
-
-	public function scale($scale) {}
-	
+    public function scale($scale){ }
 }

@@ -22,27 +22,30 @@
 namespace mcpp\block;
 
 use mcpp\item\Item;
-use mcpp\item\Tool;
 
-class WeightedPressurePlateLight extends StonePressurePlate{
+class WeightedPressurePlateLight extends StonePressurePlate
+{
+    protected $id = self::WEIGHTED_PRESSURE_PLATE_LIGHT;
 
-	protected $id = self::WEIGHTED_PRESSURE_PLATE_LIGHT;
+    public function __construct($meta = 0)
+    {
+        $this->meta = $meta;
+    }
 
-	public function __construct($meta = 0){
-		$this->meta = $meta;
-	}
+    public function getHardness()
+    {
+        return 0.5;
+    }
 
-	public function getHardness(){
-		return 0.5;
-	}
-	
-	public function getName(){
-		return "Weighted Pressure Plate Light";
-	}
+    public function getName()
+    {
+        return "Weighted Pressure Plate Light";
+    }
 
-	public function getDrops(Item $item){
-		return [
-			[Item::WEIGHTED_PRESSURE_PLATE_LIGHT, 0, 1],
-		];
-	}
+    public function getDrops(Item $item)
+    {
+        return [
+            [Item::WEIGHTED_PRESSURE_PLATE_LIGHT, 0, 1],
+        ];
+    }
 }

@@ -21,49 +21,51 @@
 
 namespace mcpp\block;
 
-use mcpp\event\block\BlockSpreadEvent;
 use mcpp\item\Item;
 use mcpp\item\Tool;
-use mcpp\level\Level;
-use mcpp\math\Vector3;
 use mcpp\Player;
-use mcpp\Server;
-use mcpp\utils\Random;
 
-class Grass extends Solid{
+class Grass extends Solid
+{
+    protected $id = self::GRASS;
 
-	protected $id = self::GRASS;
+    public function __construct()
+    {
+    }
 
-	public function __construct(){
+    public function canBeActivated()
+    {
+        return true;
+    }
 
-	}
+    public function getName()
+    {
+        return "Grass";
+    }
 
-	public function canBeActivated(){
-		return true;
-	}
+    public function getHardness()
+    {
+        return 0.6;
+    }
 
-	public function getName(){
-		return "Grass";
-	}
+    public function getToolType()
+    {
+        return Tool::TYPE_SHOVEL;
+    }
 
-	public function getHardness(){
-		return 0.6;
-	}
+    public function getDrops(Item $item)
+    {
+        return [
+            [Item::DIRT, 0, 1],
+        ];
+    }
 
-	public function getToolType(){
-		return Tool::TYPE_SHOVEL;
-	}
+    public function onUpdate($type)
+    {
+    }
 
-	public function getDrops(Item $item){
-		return [
-			[Item::DIRT, 0, 1],
-		];
-	}
-
-	public function onUpdate($type){
-	}
-
-	public function onActivate(Item $item, Player $player = null){
-		return false;
-	}
+    public function onActivate(Item $item, Player $player = null)
+    {
+        return false;
+    }
 }

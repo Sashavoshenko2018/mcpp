@@ -22,9 +22,9 @@
 /**
  * All the different object classes used in populators
  */
+
 namespace mcpp\level\generator\object;
 
-
-abstract class Object{
-
+abstract class Object
+{
 }

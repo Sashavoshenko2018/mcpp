@@ -23,12 +23,12 @@ namespace mcpp\level\particle;
 
 use mcpp\math\Vector3;
 
-class LavaParticle extends GenericParticle{
-	
-	protected $customSpawnName = "minecraft:lava_particle";
+class LavaParticle extends GenericParticle
+{
+    protected $customSpawnName = "minecraft:lava_particle";
 
-	public function __construct(Vector3 $pos) {
-		parent::__construct($pos, Particle::TYPE_LAVA);
-	}
-
+    public function __construct(Vector3 $pos)
+    {
+        parent::__construct($pos, Particle::TYPE_LAVA);
+    }
 }

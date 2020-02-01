@@ -22,110 +22,123 @@
 namespace mcpp\command;
 
 use mcpp\permission\PermissibleBase;
+use mcpp\permission\Permission;
 use mcpp\permission\PermissionAttachment;
+use mcpp\permission\PermissionAttachmentInfo;
 use mcpp\plugin\Plugin;
 use mcpp\Server;
 use mcpp\utils\MainLogger;
 
-class ConsoleCommandSender implements CommandSender{
+class ConsoleCommandSender implements CommandSender
+{
+    private $perm;
 
-	private $perm;
+    public function __construct()
+    {
+        $this->perm = new PermissibleBase($this);
+    }
 
-	public function __construct(){
-		$this->perm = new PermissibleBase($this);
-	}
+    /**
+     * @param Permission|string $name
+     *
+     * @return bool
+     */
+    public function isPermissionSet($name)
+    {
+        return $this->perm->isPermissionSet($name);
+    }
 
-	/**
-	 * @param \mcpp\permission\Permission|string $name
-	 *
-	 * @return bool
-	 */
-	public function isPermissionSet($name){
-		return $this->perm->isPermissionSet($name);
-	}
+    /**
+     * @param Permission|string $name
+     *
+     * @return bool
+     */
+    public function hasPermission($name)
+    {
+        return $this->perm->hasPermission($name);
+    }
 
-	/**
-	 * @param \mcpp\permission\Permission|string $name
-	 *
-	 * @return bool
-	 */
-	public function hasPermission($name){
-		return $this->perm->hasPermission($name);
-	}
+    /**
+     * @param Plugin $plugin
+     * @param string $name
+     * @param bool $value
+     *
+     * @return PermissionAttachment
+     */
+    public function addAttachment(Plugin $plugin, $name = null, $value = null)
+    {
+        return $this->perm->addAttachment($plugin, $name, $value);
+    }
 
-	/**
-	 * @param Plugin $plugin
-	 * @param string $name
-	 * @param bool   $value
-	 *
-	 * @return \mcpp\permission\PermissionAttachment
-	 */
-	public function addAttachment(Plugin $plugin, $name = null, $value = null){
-		return $this->perm->addAttachment($plugin, $name, $value);
-	}
+    /**
+     * @param PermissionAttachment $attachment
+     *
+     * @return void
+     */
+    public function removeAttachment(PermissionAttachment $attachment)
+    {
+        $this->perm->removeAttachment($attachment);
+    }
 
-	/**
-	 * @param PermissionAttachment $attachment
-	 *
-	 * @return void
-	 */
-	public function removeAttachment(PermissionAttachment $attachment){
-		$this->perm->removeAttachment($attachment);
-	}
+    public function recalculatePermissions()
+    {
+        $this->perm->recalculatePermissions();
+    }
 
-	public function recalculatePermissions(){
-		$this->perm->recalculatePermissions();
-	}
+    /**
+     * @return PermissionAttachmentInfo[]
+     */
+    public function getEffectivePermissions()
+    {
+        return $this->perm->getEffectivePermissions();
+    }
 
-	/**
-	 * @return \mcpp\permission\PermissionAttachmentInfo[]
-	 */
-	public function getEffectivePermissions(){
-		return $this->perm->getEffectivePermissions();
-	}
+    /**
+     * @return bool
+     */
+    public function isPlayer()
+    {
+        return false;
+    }
 
-	/**
-	 * @return bool
-	 */
-	public function isPlayer(){
-		return false;
-	}
+    /**
+     * @return Server
+     */
+    public function getServer()
+    {
+        return Server::getInstance();
+    }
 
-	/**
-	 * @return \mcpp\Server
-	 */
-	public function getServer(){
-		return Server::getInstance();
-	}
+    /**
+     * @param string $message
+     */
+    public function sendMessage($message)
+    {
+        foreach(explode("\n", trim($message)) as $line){
+            MainLogger::getLogger()->info($line);
+        }
+    }
 
-	/**
-	 * @param string $message
-	 */
-	public function sendMessage($message){
-		foreach(explode("\n", trim($message)) as $line){
-			MainLogger::getLogger()->info($line);
-		}
-	}
+    /**
+     * @return string
+     */
+    public function getName()
+    {
+        return "CONSOLE";
+    }
 
-	/**
-	 * @return string
-	 */
-	public function getName(){
-		return "CONSOLE";
-	}
+    /**
+     * @return bool
+     */
+    public function isOp()
+    {
+        return true;
+    }
 
-	/**
-	 * @return bool
-	 */
-	public function isOp(){
-		return true;
-	}
-
-	/**
-	 * @param bool $value
-	 */
-	public function setOp($value){
-
-	}
-
+    /**
+     * @param bool $value
+     */
+    public function setOp($value)
+    {
+    }
 }

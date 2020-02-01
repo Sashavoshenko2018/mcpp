@@ -23,87 +23,92 @@ namespace mcpp\inventory;
 
 use mcpp\item\Item;
 
-class BaseTransaction implements Transaction {
+class BaseTransaction implements Transaction
+{
+    /** @var Inventory */
+    protected $inventory;
+    /** @var int */
+    protected $slot;
+    /** @var Item */
+    protected $sourceItem;
+    /** @var Item */
+    protected $targetItem;
+    /** @var float */
+    protected $creationTime;
+    protected $needInventoryUpdate = false;
 
-	/** @var Inventory */
-	protected $inventory;
+    /**
+     * @param Inventory $inventory
+     * @param int $slot
+     * @param Item $sourceItem
+     * @param Item $targetItem
+     */
+    public function __construct(Inventory $inventory, $slot, Item $sourceItem, Item $targetItem)
+    {
+        $this->inventory = $inventory;
+        $this->slot = (int)$slot;
+        $this->sourceItem = clone $sourceItem;
+        $this->targetItem = clone $targetItem;
+        $this->creationTime = microtime(true);
+    }
 
-	/** @var int */
-	protected $slot;
+    public function __toString()
+    {
+        return "Inventory: " . get_class($this) . " Slot: " . $this->slot . " Old item: " . $this->sourceItem . " New item: " . $this->targetItem;
+    }
 
-	/** @var Item */
-	protected $sourceItem;
+    public function getCreationTime()
+    {
+        return $this->creationTime;
+    }
 
-	/** @var Item */
-	protected $targetItem;
+    public function getInventory()
+    {
+        return $this->inventory;
+    }
 
-	/** @var float */
-	protected $creationTime;
-	
-	protected $needInventoryUpdate = false;
+    public function getSlot()
+    {
+        return $this->slot;
+    }
 
-	/**
-	 * @param Inventory $inventory
-	 * @param int       $slot
-	 * @param Item      $sourceItem
-	 * @param Item      $targetItem
-	 */
-	public function __construct(Inventory $inventory, $slot, Item $sourceItem, Item $targetItem) {
-		$this->inventory = $inventory;
-		$this->slot = (int) $slot;
-		$this->sourceItem = clone $sourceItem;
-		$this->targetItem = clone $targetItem;
-		$this->creationTime = microtime(true);
-	}
-	
-	public function __toString() {
-		return "Inventory: " . get_class($this) . " Slot: " . $this->slot . " Old item: " . $this->sourceItem . " New item: " . $this->targetItem;
-	}
+    public function getSourceItem()
+    {
+        return clone $this->sourceItem;
+    }
 
-	public function getCreationTime() {
-		return $this->creationTime;
-	}
+    public function getTargetItem()
+    {
+        return clone $this->targetItem;
+    }
 
-	public function getInventory() {
-		return $this->inventory;
-	}
+    public function setTargetItem($item)
+    {
+        $this->targetItem = $item;
+        $this->needInventoryUpdate = true;
+    }
 
-	public function getSlot() {
-		return $this->slot;
-	}
+    public function isNeedInventoryUpdate()
+    {
+        return $this->needInventoryUpdate;
+    }
 
-	public function getSourceItem() {
-		return clone $this->sourceItem;
-	}
+    /**
+     *
+     * @param Player $target
+     */
+    public function revert($target)
+    {
+        $this->inventory->sendContents($target);
+    }
 
-	public function getTargetItem() {
-		return clone $this->targetItem;
-	}
-	
-	public function setTargetItem($item) {
-		$this->targetItem = $item;
-		$this->needInventoryUpdate = true;
-	}
-	
-	public function isNeedInventoryUpdate() {
-		return $this->needInventoryUpdate;
-	}
-
-	/**
-	 * 
-	 * @param Player $target
-	 */
-	public function revert($target) {
-		$this->inventory->sendContents($target);
-	}
-	
-	public function clearCustomNames($target = 'both') {
-		if ($target === 'source' || $target === 'both') {
-			$this->sourceItem->clearCustomName();
-		}
-		if ($target === 'target' || $target === 'both') {
-			$this->targetItem->clearCustomName();
-		}
-	}
-
+    public function clearCustomNames($target = 'both')
+    {
+        if($target === 'source' || $target === 'both'){
+            $this->sourceItem->clearCustomName();
+        }
+        if($target === 'target' || $target === 'both'){
+            $this->targetItem->clearCustomName();
+        }
+    }
 }

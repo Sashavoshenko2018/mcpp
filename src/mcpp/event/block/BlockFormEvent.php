@@ -24,11 +24,12 @@ namespace mcpp\event\block;
 use mcpp\block\Block;
 use mcpp\event\Cancellable;
 
-class BlockFormEvent extends BlockGrowEvent implements Cancellable{
-	public static $handlerList = null;
+class BlockFormEvent extends BlockGrowEvent implements Cancellable
+{
+    public static $handlerList = null;
 
-	public function __construct(Block $block, Block $newState){
-		parent::__construct($block, $newState);
-	}
-
+    public function __construct(Block $block, Block $newState)
+    {
+        parent::__construct($block, $newState);
+    }
 }

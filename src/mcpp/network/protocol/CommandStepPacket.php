@@ -21,30 +21,29 @@
 
 namespace mcpp\network\protocol;
 
-class CommandStepPacket extends PEPacket {
+class CommandStepPacket extends PEPacket
+{
+    const NETWORK_ID = Info::COMMAND_STEP_PACKET;
+    const PACKET_NAME = "COMMAND_STEP_PACKET";
+    public $name;
+    public $overload;
+    public $outputFormat;
 
-	const NETWORK_ID = Info::COMMAND_STEP_PACKET;
-	const PACKET_NAME = "COMMAND_STEP_PACKET";
+    public function decode($playerProtocol)
+    {
+        $this->getHeader($playerProtocol);
+        $this->name = $this->getString();
+        $this->overload = $this->getString();
 
-	public $name;
-	public $overload;
-	public $outputFormat;
+        $this->getVarInt();
+        $this->getVarInt();
+        $this->getByte();
+        $this->getVarInt();
 
-	public function decode($playerProtocol) {
-		$this->getHeader($playerProtocol);
-		$this->name = $this->getString();
-		$this->overload = $this->getString();
+        $this->outputFormat = $this->getString();
+    }
 
-		$this->getVarInt();
-		$this->getVarInt();
-		$this->getByte();
-		$this->getVarInt();
-
-		$this->outputFormat = $this->getString();
-	}
-
-	public function encode($playerProtocol) {
-		
-	}
-
+    public function encode($playerProtocol)
+    {
+    }
 }

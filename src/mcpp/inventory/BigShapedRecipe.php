@@ -21,6 +21,6 @@
 
 namespace mcpp\inventory;
 
-class BigShapedRecipe extends ShapedRecipe{
-
+class BigShapedRecipe extends ShapedRecipe
+{
 }

@@ -21,21 +21,22 @@
 
 namespace mcpp\block;
 
+class GlowingObsidian extends Solid
+{
+    protected $id = self::GLOWING_OBSIDIAN;
 
-class GlowingObsidian extends Solid{
+    public function __construct($meta = 0)
+    {
+        $this->meta = $meta;
+    }
 
-	protected $id = self::GLOWING_OBSIDIAN;
+    public function getName()
+    {
+        return "Glowing Obsidian";
+    }
 
-	public function __construct($meta = 0){
-		$this->meta = $meta;
-	}
-
-	public function getName(){
-		return "Glowing Obsidian";
-	}
-
-	public function getLightLevel(){
-		return 12;
-	}
-
+    public function getLightLevel()
+    {
+        return 12;
+    }
 }

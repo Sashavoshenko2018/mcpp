@@ -24,32 +24,37 @@ namespace mcpp\block;
 use mcpp\item\Item;
 use mcpp\Player;
 
-class SlimeBlock extends Solid{
+class SlimeBlock extends Solid
+{
+    protected $id = self::SLIME_BLOCK;
 
-	protected $id = self::SLIME_BLOCK;
+    public function __construct()
+    {
+    }
 
-	public function __construct(){
-		
-	}
+    public function getHardness()
+    {
+        return 0;
+    }
 
-	public function getHardness(){
-		return 0;
-	}
+    public function getName()
+    {
+        return "Slime Block";
+    }
 
-	public function getName(){
-		return "Slime Block";
-	}
+    public function getDrops(Item $item)
+    {
+        return [
+            [Item::SLIME_BLOCK, 0, 1],
+        ];
+    }
 
-	public function getDrops(Item $item){
-		return [
-			[Item::SLIME_BLOCK, 0, 1],
-		];
-	}
-	
-	public function onUpdate($type){
-	}
+    public function onUpdate($type)
+    {
+    }
 
-	public function onActivate(Item $item, Player $player = null){
-		return false;
-	}
+    public function onActivate(Item $item, Player $player = null)
+    {
+        return false;
+    }
 }

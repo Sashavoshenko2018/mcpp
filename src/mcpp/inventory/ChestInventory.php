@@ -22,59 +22,61 @@
 namespace mcpp\inventory;
 
 use mcpp\level\Level;
-use mcpp\network\Network;
+use mcpp\network\protocol\LevelSoundEventPacket;
 use mcpp\network\protocol\TileEventPacket;
 use mcpp\Player;
 use mcpp\Server;
 use mcpp\tile\Chest;
-use mcpp\network\protocol\LevelSoundEventPacket;
 
-class ChestInventory extends ContainerInventory {
+class ChestInventory extends ContainerInventory
+{
+    public function __construct(Chest $tile)
+    {
+        parent::__construct($tile, InventoryType::get(InventoryType::CHEST));
+    }
 
-	public function __construct(Chest $tile) {
-		parent::__construct($tile, InventoryType::get(InventoryType::CHEST));
-	}
+    /**
+     * @return Chest
+     */
+    public function getHolder()
+    {
+        return $this->holder;
+    }
 
-	/**
-	 * @return Chest
-	 */
-	public function getHolder() {
-		return $this->holder;
-	}
+    public function onOpen(Player $who)
+    {
+        parent::onOpen($who);
 
-	public function onOpen(Player $who) {
-		parent::onOpen($who);
+        if(count($this->getViewers()) === 1){
+            $pk = new TileEventPacket();
+            $pk->x = $this->getHolder()->getX();
+            $pk->y = $this->getHolder()->getY();
+            $pk->z = $this->getHolder()->getZ();
+            $pk->case1 = 1;
+            $pk->case2 = 2;
+            if(($level = $this->getHolder()->getLevel()) instanceof Level){
+                Server::broadcastPacket($level->getUsingChunk($this->getHolder()->getX() >> 4, $this->getHolder()->getZ() >> 4), $pk);
+            }
+        }
+        $position = ['x' => $this->holder->x, 'y' => $this->holder->y, 'z' => $this->holder->z];
+        $who->sendSound(LevelSoundEventPacket::SOUND_CHEST_OPEN, $position);
+    }
 
-		if (count($this->getViewers()) === 1) {
-			$pk = new TileEventPacket();
-			$pk->x = $this->getHolder()->getX();
-			$pk->y = $this->getHolder()->getY();
-			$pk->z = $this->getHolder()->getZ();
-			$pk->case1 = 1;
-			$pk->case2 = 2;
-			if (($level = $this->getHolder()->getLevel()) instanceof Level) {
-				Server::broadcastPacket($level->getUsingChunk($this->getHolder()->getX() >> 4, $this->getHolder()->getZ() >> 4), $pk);
-			}
-		}
-		$position = [ 'x' => $this->holder->x, 'y' => $this->holder->y, 'z' => $this->holder->z ];
-		$who->sendSound(LevelSoundEventPacket::SOUND_CHEST_OPEN, $position);
-	}
-
-	public function onClose(Player $who) {
-		if (count($this->getViewers()) === 1) {
-			$pk = new TileEventPacket();
-			$pk->x = $this->getHolder()->getX();
-			$pk->y = $this->getHolder()->getY();
-			$pk->z = $this->getHolder()->getZ();
-			$pk->case1 = 1;
-			$pk->case2 = 0;
-			if (($level = $this->getHolder()->getLevel()) instanceof Level) {
-				Server::broadcastPacket($level->getUsingChunk($this->getHolder()->getX() >> 4, $this->getHolder()->getZ() >> 4), $pk);
-			}
-		}
-		parent::onClose($who);
-		$position = [ 'x' => $this->holder->x, 'y' => $this->holder->y, 'z' => $this->holder->z ];
- 		$who->sendSound(LevelSoundEventPacket::SOUND_CHEST_CLOSED, $position);
-	}
-
+    public function onClose(Player $who)
+    {
+        if(count($this->getViewers()) === 1){
+            $pk = new TileEventPacket();
+            $pk->x = $this->getHolder()->getX();
+            $pk->y = $this->getHolder()->getY();
+            $pk->z = $this->getHolder()->getZ();
+            $pk->case1 = 1;
+            $pk->case2 = 0;
+            if(($level = $this->getHolder()->getLevel()) instanceof Level){
+                Server::broadcastPacket($level->getUsingChunk($this->getHolder()->getX() >> 4, $this->getHolder()->getZ() >> 4), $pk);
+            }
+        }
+        parent::onClose($who);
+        $position = ['x' => $this->holder->x, 'y' => $this->holder->y, 'z' => $this->holder->z];
+        $who->sendSound(LevelSoundEventPacket::SOUND_CHEST_CLOSED, $position);
+    }
 }

@@ -22,42 +22,46 @@
 namespace mcpp\event\entity;
 
 use mcpp\entity\Entity;
-use mcpp\Event;
 use mcpp\event\Cancellable;
 use mcpp\item\Item;
 
-class EntityInventoryChangeEvent extends EntityEvent implements Cancellable{
-	public static $handlerList = null;
+class EntityInventoryChangeEvent extends EntityEvent implements Cancellable
+{
+    public static $handlerList = null;
+    private $oldItem;
+    private $newItem;
+    private $slot;
 
-	private $oldItem;
-	private $newItem;
-	private $slot;
+    public function __construct(Entity $entity, Item $oldItem, Item $newItem, $slot)
+    {
+        $this->entity = $entity;
+        $this->oldItem = $oldItem;
+        $this->newItem = $newItem;
+        $this->slot = (int)$slot;
+    }
 
-	public function __construct(Entity $entity, Item $oldItem, Item $newItem, $slot){
-		$this->entity = $entity;
-		$this->oldItem = $oldItem;
-		$this->newItem = $newItem;
-		$this->slot = (int) $slot;
-	}
+    public function getSlot()
+    {
+        return $this->slot;
+    }
 
-	public function getSlot(){
-		return $this->slot;
-	}
+    public function getNewItem()
+    {
+        return $this->newItem;
+    }
 
-	public function getNewItem(){
-		return $this->newItem;
-	}
+    public function setNewItem(Item $item)
+    {
+        $this->newItem = $item;
+    }
 
-	public function setNewItem(Item $item){
-		$this->newItem = $item;
-	}
+    public function getOldItem()
+    {
+        return $this->oldItem;
+    }
 
-	public function getOldItem(){
-		return $this->oldItem;
-	}
-
-	public function setSlot($slot){
-		$this->slot = $slot;
-	}
-
+    public function setSlot($slot)
+    {
+        $this->slot = $slot;
+    }
 }

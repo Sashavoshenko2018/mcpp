@@ -22,27 +22,30 @@
 namespace mcpp\block;
 
 use mcpp\item\Item;
-use mcpp\item\Tool;
 
-class WeightedPressurePlateHeavy extends StonePressurePlate{
+class WeightedPressurePlateHeavy extends StonePressurePlate
+{
+    protected $id = self::WEIGHTED_PRESSURE_PLATE_HEAVY;
 
-	protected $id = self::WEIGHTED_PRESSURE_PLATE_HEAVY;
+    public function __construct($meta = 0)
+    {
+        $this->meta = $meta;
+    }
 
-	public function __construct($meta = 0){
-		$this->meta = $meta;
-	}
+    public function getName()
+    {
+        return "Weighted Pressure Plate Heavy";
+    }
 
-	public function getName(){
-		return "Weighted Pressure Plate Heavy";
-	}
-	
-	public function getHardness(){
-		return 0.5;
-	}
+    public function getHardness()
+    {
+        return 0.5;
+    }
 
-	public function getDrops(Item $item){
-		return [
-			[Item::WEIGHTED_PRESSURE_PLATE_HEAVY, 0, 1],
-		];
-	}
+    public function getDrops(Item $item)
+    {
+        return [
+            [Item::WEIGHTED_PRESSURE_PLATE_HEAVY, 0, 1],
+        ];
+    }
 }

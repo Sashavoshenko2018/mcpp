@@ -21,165 +21,163 @@
 
 namespace mcpp\level\generator;
 
-
 use mcpp\level\format\FullChunk;
-
 use mcpp\level\Level;
 use mcpp\level\SimpleChunkManager;
 use mcpp\scheduler\AsyncTask;
 use mcpp\Server;
 
+class PopulationTask extends AsyncTask
+{
+    public $state;
+    public $levelId;
+    public $chunk;
+    public $chunkClass;
+    public $chunk0;
+    public $chunk1;
+    public $chunk2;
+    public $chunk3;
+    //center chunk
+    public $chunk5;
+    public $chunk6;
+    public $chunk7;
+    public $chunk8;
 
-class PopulationTask extends AsyncTask{
+    public function __construct(Level $level, FullChunk $chunk)
+    {
+        $this->state = true;
+        $this->levelId = $level->getId();
+        $this->chunk = $chunk->toFastBinary();
+        $this->chunkClass = get_class($chunk);
 
+        for($i = 0; $i < 9; ++$i){
+            if($i === 4){
+                continue;
+            }
+            $xx = -1 + $i % 3;
+            $zz = -1 + (int)($i / 3);
+            $ck = $level->getChunk($chunk->getX() + $xx, $chunk->getZ() + $zz, false);
+            $this->{"chunk$i"} = $ck !== null ? $ck->toFastBinary() : null;
+        }
+    }
 
-	public $state;
-	public $levelId;
-	public $chunk;
-	public $chunkClass;
+    public function onRun()
+    {
+        /** @var SimpleChunkManager $manager */
+        $manager = $this->getFromThreadStore("generation.level{$this->levelId}.manager");
+        /** @var Generator $generator */
+        $generator = $this->getFromThreadStore("generation.level{$this->levelId}.generator");
+        if($manager === null or $generator === null){
+            $this->state = false;
+            return;
+        }
 
-	public $chunk0;
-	public $chunk1;
-	public $chunk2;
-	public $chunk3;
-	//center chunk
-	public $chunk5;
-	public $chunk6;
-	public $chunk7;
-	public $chunk8;
+        /** @var FullChunk[] $chunks */
+        $chunks = [];
+        /** @var FullChunk $chunkC */
+        $chunkC = $this->chunkClass;
 
-	public function __construct(Level $level, FullChunk $chunk){
-		$this->state = true;
-		$this->levelId = $level->getId();
-		$this->chunk = $chunk->toFastBinary();
-		$this->chunkClass = get_class($chunk);
+        $chunk = $chunkC::fromFastBinary($this->chunk);
 
-		for($i = 0; $i < 9; ++$i){
-			if($i === 4){
-				continue;
-			}
-			$xx = -1 + $i % 3;
-			$zz = -1 + (int) ($i / 3);
-			$ck = $level->getChunk($chunk->getX() + $xx, $chunk->getZ() + $zz, false);
-			$this->{"chunk$i"} = $ck !== null ? $ck->toFastBinary() : null;
-		}
-	}
+        for($i = 0; $i < 9; ++$i){
+            if($i === 4){
+                continue;
+            }
+            $xx = -1 + $i % 3;
+            $zz = -1 + (int)($i / 3);
+            $ck = $this->{"chunk$i"};
+            if($ck === null){
+                $chunks[$i] = $chunkC::getEmptyChunk($chunk->getX() + $xx, $chunk->getZ() + $zz);
+            }else{
+                $chunks[$i] = $chunkC::fromFastBinary($ck);
+            }
+        }
 
-	public function onRun(){
-		/** @var SimpleChunkManager $manager */
-		$manager = $this->getFromThreadStore("generation.level{$this->levelId}.manager");
-		/** @var Generator $generator */
-		$generator = $this->getFromThreadStore("generation.level{$this->levelId}.generator");
-		if($manager === null or $generator === null){
-			$this->state = false;
-			return;
-		}
+        if($chunk === null){
+            //TODO error
+            return;
+        }
 
-		/** @var FullChunk[] $chunks */
-		$chunks = [];
-		/** @var FullChunk $chunkC */
-		$chunkC = $this->chunkClass;
+        $manager->setChunk($chunk->getX(), $chunk->getZ(), $chunk);
+        if(!$chunk->isGenerated()){
+            $generator->generateChunk($chunk->getX(), $chunk->getZ());
+            $chunk->setGenerated();
+        }
 
-		$chunk = $chunkC::fromFastBinary($this->chunk);
+        foreach($chunks as $c){
+            if($c !== null){
+                $manager->setChunk($c->getX(), $c->getZ(), $c);
+                if(!$c->isGenerated()){
+                    $generator->generateChunk($c->getX(), $c->getZ());
+                    $c = $manager->getChunk($c->getX(), $c->getZ());
+                    $c->setGenerated();
+                }
+            }
+        }
 
-		for($i = 0; $i < 9; ++$i){
-			if($i === 4){
-				continue;
-			}
-			$xx = -1 + $i % 3;
-			$zz = -1 + (int) ($i / 3);
-			$ck = $this->{"chunk$i"};
-			if($ck === null){
-				$chunks[$i] = $chunkC::getEmptyChunk($chunk->getX() + $xx, $chunk->getZ() + $zz);
-			}else{
-				$chunks[$i] = $chunkC::fromFastBinary($ck);
-			}
-		}
+        $generator->populateChunk($chunk->getX(), $chunk->getZ());
 
-		if($chunk === null){
-			//TODO error
-			return;
-		}
+        $chunk = $manager->getChunk($chunk->getX(), $chunk->getZ());
+        $chunk->recalculateHeightMap();
+        $chunk->setPopulated();
+        $this->chunk = $chunk->toFastBinary();
 
-		$manager->setChunk($chunk->getX(), $chunk->getZ(), $chunk);
-		if(!$chunk->isGenerated()){
-			$generator->generateChunk($chunk->getX(), $chunk->getZ());
-			$chunk->setGenerated();
-		}
+        $manager->setChunk($chunk->getX(), $chunk->getZ(), null);
 
-		foreach($chunks as $c){
-			if($c !== null){
-				$manager->setChunk($c->getX(), $c->getZ(), $c);
-				if(!$c->isGenerated()){
-					$generator->generateChunk($c->getX(), $c->getZ());
-					$c = $manager->getChunk($c->getX(), $c->getZ());
-					$c->setGenerated();
-				}
-			}
-		}
+        foreach($chunks as $i => $c){
+            if($c !== null){
+                $c = $chunks[$i] = $manager->getChunk($c->getX(), $c->getZ());
+                if(!$c->hasChanged()){
+                    $chunks[$i] = null;
+                }
+            }else{
+                //This way non-changed chunks are not set
+                $chunks[$i] = null;
+            }
+        }
 
-		$generator->populateChunk($chunk->getX(), $chunk->getZ());
+        $manager->cleanChunks();
 
-		$chunk = $manager->getChunk($chunk->getX(), $chunk->getZ());
-		$chunk->recalculateHeightMap();
-		$chunk->setPopulated();
-		$this->chunk = $chunk->toFastBinary();
+        for($i = 0; $i < 9; ++$i){
+            if($i === 4){
+                continue;
+            }
 
-		$manager->setChunk($chunk->getX(), $chunk->getZ(), null);
+            $this->{"chunk$i"} = $chunks[$i] !== null ? $chunks[$i]->toFastBinary() : null;
+        }
+    }
 
-		foreach($chunks as $i => $c){
-			if($c !== null){
-				$c = $chunks[$i] = $manager->getChunk($c->getX(), $c->getZ());
-				if(!$c->hasChanged()){
-					$chunks[$i] = null;
-				}
-			}else{
-				//This way non-changed chunks are not set
-				$chunks[$i] = null;
-			}
-		}
+    public function onCompletion(Server $server)
+    {
+        $level = $server->getLevel($this->levelId);
+        if($level !== null){
+            if($this->state === false){
+                $level->registerGenerator();
+                return;
+            }
 
-		$manager->cleanChunks();
+            /** @var FullChunk $chunkC */
+            $chunkC = $this->chunkClass;
 
-		for($i = 0; $i < 9; ++$i){
-			if($i === 4){
-				continue;
-			}
+            $chunk = $chunkC::fromFastBinary($this->chunk, $level->getProvider());
 
-			$this->{"chunk$i"} = $chunks[$i] !== null ? $chunks[$i]->toFastBinary() : null;
-		}
-	}
+            if($chunk === null){
+                //TODO error
+                return;
+            }
 
-	public function onCompletion(Server $server){
-		$level = $server->getLevel($this->levelId);
-		if($level !== null){
-			if($this->state === false){
-				$level->registerGenerator();
-				return;
-			}
+            for($i = 0; $i < 9; ++$i){
+                if($i === 4){
+                    continue;
+                }
+                $c = $this->{"chunk$i"};
+                if($c !== null){
+                    $c = $chunkC::fromFastBinary($c, $level->getProvider());
+                    $level->generateChunkCallback($c->getX(), $c->getZ(), $c);
+                }
+            }
 
-			/** @var FullChunk $chunkC */
-			$chunkC = $this->chunkClass;
-
-			$chunk = $chunkC::fromFastBinary($this->chunk, $level->getProvider());
-
-			if($chunk === null){
-				//TODO error
-				return;
-			}
-
-			for($i = 0; $i < 9; ++$i){
-				if($i === 4){
-					continue;
-				}
-				$c = $this->{"chunk$i"};
-				if($c !== null){
-					$c = $chunkC::fromFastBinary($c, $level->getProvider());
-					$level->generateChunkCallback($c->getX(), $c->getZ(), $c);
-				}
-			}
-
-			$level->generateChunkCallback($chunk->getX(), $chunk->getZ(), $chunk);
-		}
-	}
+            $level->generateChunkCallback($chunk->getX(), $chunk->getZ(), $chunk);
+        }
+    }
 }

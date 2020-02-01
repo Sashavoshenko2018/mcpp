@@ -21,97 +21,98 @@
 
 namespace mcpp\entity\projectile;
 
+use mcpp\entity\Entity;
+use mcpp\entity\Projectile;
+use mcpp\event\entity\ExplosionPrimeEvent;
+use mcpp\level\Explosion;
 use mcpp\level\format\FullChunk;
+use mcpp\level\Level;
 use mcpp\level\particle\CriticalParticle;
 use mcpp\nbt\tag\Compound;
 use mcpp\network\protocol\AddEntityPacket;
 use mcpp\Player;
-use mcpp\entity\Projectile;
-use mcpp\entity\Entity;
-use mcpp\level\Explosion;
-use mcpp\event\entity\ExplosionPrimeEvent;
-use mcpp\level\Level;
 
-class FireBall extends Projectile{
-	const NETWORK_ID = 85;
+class FireBall extends Projectile
+{
+    const NETWORK_ID = 85;
+    public $width = 0.5;
+    public $height = 0.5;
+    protected $damage = 4;
+    protected $drag = 0.01;
+    protected $gravity = 0.05;
+    protected $isCritical;
+    protected $canExplode = false;
 
-	public $width = 0.5;
-	public $height = 0.5;
+    public function __construct(FullChunk $chunk, Compound $nbt, Entity $shootingEntity = null, bool $critical = false)
+    {
+        parent::__construct($chunk, $nbt, $shootingEntity);
 
-	protected $damage = 4;
+        $this->isCritical = $critical;
+    }
 
-	protected $drag = 0.01;
-	protected $gravity = 0.05;
+    public function isExplode()
+    {
+        return $this->canExplode;
+    }
 
-	protected $isCritical;
-	protected $canExplode = false;
+    public function setExplode(bool $bool)
+    {
+        $this->canExplode = $bool;
+    }
 
-	public function __construct(FullChunk $chunk, Compound $nbt, Entity $shootingEntity = null, bool $critical = false){
-		parent::__construct($chunk, $nbt, $shootingEntity);
+    public function onUpdate($currentTick)
+    {
+        if($this->closed){
+            return false;
+        }
 
-		$this->isCritical = $critical;
-	}
+        //$this->timings->startTiming();
 
-	public function isExplode(){
-		return $this->canExplode;
-	}
+        $hasUpdate = parent::onUpdate($currentTick);
 
-	public function setExplode(bool $bool){
-		$this->canExplode = $bool;
-	}
+        if(!$this->hadCollision and $this->isCritical){
+            $this->level->addParticle(new CriticalParticle($this->add(
+                $this->width / 2 + mt_rand(-100, 100) / 500,
+                $this->height / 2 + mt_rand(-100, 100) / 500,
+                $this->width / 2 + mt_rand(-100, 100) / 500)));
+        }elseif($this->onGround){
+            $this->isCritical = false;
+        }
 
-	public function onUpdate($currentTick){
-		if($this->closed){
-			return false;
-		}
+        if($this->age > 1200 or $this->isCollided){
+            if($this->isCollided and $this->canExplode){
+                $this->server->getPluginManager()->callEvent($ev = new ExplosionPrimeEvent($this, 2.8));
+                if(!$ev->isCancelled()){
+                    $explosion = new Explosion($this, $ev->getForce(), $this->shootingEntity);
+                    if($ev->isBlockBreaking()){
+                        $explosion->explodeA();
+                    }
+                    $explosion->explodeB();
+                }
+            }
+            $this->kill();
+            $hasUpdate = true;
+        }
 
-		//$this->timings->startTiming();
+        //$this->timings->stopTiming();
+        return $hasUpdate;
+    }
 
-		$hasUpdate = parent::onUpdate($currentTick);
-
-		if(!$this->hadCollision and $this->isCritical){
-			$this->level->addParticle(new CriticalParticle($this->add(
-				$this->width / 2 + mt_rand(-100, 100) / 500,
-				$this->height / 2 + mt_rand(-100, 100) / 500,
-				$this->width / 2 + mt_rand(-100, 100) / 500)));
-		}elseif($this->onGround){
-			$this->isCritical = false;
-		}
-
-		if($this->age > 1200 or $this->isCollided){
-			if($this->isCollided and $this->canExplode){
-				$this->server->getPluginManager()->callEvent($ev = new ExplosionPrimeEvent($this, 2.8));
-				if(!$ev->isCancelled()){
-					$explosion = new Explosion($this, $ev->getForce(), $this->shootingEntity);
-					if($ev->isBlockBreaking()){
-						$explosion->explodeA();
-					}
-					$explosion->explodeB();
-				}
-			}
-			$this->kill();
-			$hasUpdate = true;
-		}
-
-		//$this->timings->stopTiming();
-		return $hasUpdate;
-	}
-
-	public function spawnTo(Player $player) {
-		if (!isset($this->hasSpawned[$player->getId()]) && isset($player->usedChunks[Level::chunkHash($this->chunk->getX(), $this->chunk->getZ())])) {
-			$this->hasSpawned[$player->getId()] = $player;
-			$pk = new AddEntityPacket();
-			$pk->type = self::NETWORK_ID;
-			$pk->eid = $this->getId();
-			$pk->x = $this->x;
-			$pk->y = $this->y;
-			$pk->z = $this->z;
-			$pk->speedX = $this->motionX;
-			$pk->speedY = $this->motionY;
-			$pk->speedZ = $this->motionZ;
-//			$pk->metadata = $this->dataProperties;
-			$player->dataPacket($pk);
-		}
-	}
-
+    public function spawnTo(Player $player)
+    {
+        if(!isset($this->hasSpawned[$player->getId()]) && isset($player->usedChunks[Level::chunkHash($this->chunk->getX(), $this->chunk->getZ())])){
+            $this->hasSpawned[$player->getId()] = $player;
+            $pk = new AddEntityPacket();
+            $pk->type = self::NETWORK_ID;
+            $pk->eid = $this->getId();
+            $pk->x = $this->x;
+            $pk->y = $this->y;
+            $pk->z = $this->z;
+            $pk->speedX = $this->motionX;
+            $pk->speedY = $this->motionY;
+            $pk->speedZ = $this->motionZ;
+            //			$pk->metadata = $this->dataProperties;
+            $player->dataPacket($pk);
+        }
+    }
 }

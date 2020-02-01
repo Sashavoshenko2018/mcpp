@@ -21,202 +21,218 @@
 
 namespace mcpp\event\server;
 
-use mcpp\event;
+use mcpp\Player;
+use mcpp\plugin\Plugin;
 use mcpp\Server;
 use mcpp\utils\Binary;
 
-class QueryRegenerateEvent extends ServerEvent{
-	public static $handlerList = null;
+class QueryRegenerateEvent extends ServerEvent
+{
+    public static $handlerList = null;
+    const GAME_ID = "MINECRAFTPE";
+    private $timeout;
+    private $serverName;
+    private $listPlugins;
+    /** @var Plugin[] */
+    private $plugins;
+    /** @var Player[] */
+    private $players;
+    private $gametype;
+    private $version;
+    private $server_engine;
+    private $map;
+    private $numPlayers;
+    private $maxPlayers;
+    private $whitelist;
+    private $port;
+    private $ip;
+    private $extraData = [];
 
-	const GAME_ID = "MINECRAFTPE";
+    public function __construct(Server $server, $timeout = 5)
+    {
+        $this->timeout = $timeout;
+        $this->serverName = $server->getServerName();
+        $this->listPlugins = $server->getProperty("settings.query-plugins", true);
+        $this->plugins = $server->getPluginManager()->getPlugins();
+        $this->players = [];
+        foreach($server->getOnlinePlayers() as $player){
+            if($player->isOnline()){
+                $this->players[] = $player;
+            }
+        }
 
-	private $timeout;
-	private $serverName;
-	private $listPlugins;
-	/** @var \mcpp\plugin\Plugin[] */
-	private $plugins;
-	/** @var \mcpp\Player[] */
-	private $players;
+        $this->gametype = ($server->getGamemode() & 0x01) === 0 ? "SMP" : "CMP";
+        $this->version = $server->getVersion();
+        $this->server_engine = $server->getName() . " " . $server->getPocketMineVersion();
+        $this->map = $server->getDefaultLevel() === null ? "unknown" : $server->getDefaultLevel()->getName();
+        $this->numPlayers = count($this->players);
+        $this->maxPlayers = $server->getMaxPlayers();
+        $this->whitelist = $server->hasWhitelist() ? "on" : "off";
+        $this->port = $server->getPort();
+        $this->ip = $server->getIp();
+    }
 
-	private $gametype;
-	private $version;
-	private $server_engine;
-	private $map;
-	private $numPlayers;
-	private $maxPlayers;
-	private $whitelist;
-	private $port;
-	private $ip;
+    /**
+     * Gets the min. timeout for Query Regeneration
+     *
+     * @return int
+     */
+    public function getTimeout()
+    {
+        return $this->timeout;
+    }
 
-	private $extraData = [];
+    public function setTimeout($timeout)
+    {
+        $this->timeout = $timeout;
+    }
 
+    public function getServerName()
+    {
+        return $this->serverName;
+    }
 
-	public function __construct(Server $server, $timeout = 5){
-		$this->timeout = $timeout;
-		$this->serverName = $server->getServerName();
-		$this->listPlugins = $server->getProperty("settings.query-plugins", true);
-		$this->plugins = $server->getPluginManager()->getPlugins();
-		$this->players = [];
-		foreach($server->getOnlinePlayers() as $player){
-			if($player->isOnline()){
-				$this->players[] = $player;
-			}
-		}
+    public function setServerName($serverName)
+    {
+        $this->serverName = $serverName;
+    }
 
-		$this->gametype = ($server->getGamemode() & 0x01) === 0 ? "SMP" : "CMP";
-		$this->version = $server->getVersion();
-		$this->server_engine = $server->getName() . " " . $server->getPocketMineVersion();
-		$this->map = $server->getDefaultLevel() === null ? "unknown" : $server->getDefaultLevel()->getName();
-		$this->numPlayers = count($this->players);
-		$this->maxPlayers = $server->getMaxPlayers();
-		$this->whitelist = $server->hasWhitelist() ? "on" : "off";
-		$this->port = $server->getPort();
-		$this->ip = $server->getIp();
+    public function canListPlugins()
+    {
+        return $this->listPlugins;
+    }
 
-	}
+    public function setListPlugins($value)
+    {
+        $this->listPlugins = (bool)$value;
+    }
 
-	/**
-	 * Gets the min. timeout for Query Regeneration
-	 *
-	 * @return int
-	 */
-	public function getTimeout(){
-		return $this->timeout;
-	}
+    /**
+     * @return Plugin[]
+     */
+    public function getPlugins()
+    {
+        return $this->plugins;
+    }
 
-	public function setTimeout($timeout){
-		$this->timeout = $timeout;
-	}
+    /**
+     * @param Plugin[] $plugins
+     */
+    public function setPlugins(array $plugins)
+    {
+        $this->plugins = $plugins;
+    }
 
-	public function getServerName(){
-		return $this->serverName;
-	}
+    /**
+     * @return Player[]
+     */
+    public function getPlayerList()
+    {
+        return $this->players;
+    }
 
-	public function setServerName($serverName){
-		$this->serverName = $serverName;
-	}
+    /**
+     * @param Player[] $players
+     */
+    public function setPlayerList(array $players)
+    {
+        $this->players = $players;
+    }
 
-	public function canListPlugins(){
-		return $this->listPlugins;
-	}
+    public function getPlayerCount()
+    {
+        return $this->numPlayers;
+    }
 
-	public function setListPlugins($value){
-		$this->listPlugins = (bool) $value;
-	}
+    public function setPlayerCount($count)
+    {
+        $this->numPlayers = (int)$count;
+    }
 
-	/**
-	 * @return \mcpp\plugin\Plugin[]
-	 */
-	public function getPlugins(){
-		return $this->plugins;
-	}
+    public function getMaxPlayerCount()
+    {
+        return $this->maxPlayers;
+    }
 
-	/**
-	 * @param \mcpp\plugin\Plugin[] $plugins
-	 */
-	public function setPlugins(array $plugins){
-		$this->plugins = $plugins;
-	}
+    public function setMaxPlayerCount($count)
+    {
+        $this->maxPlayers = (int)$count;
+    }
 
-	/**
-	 * @return \mcpp\Player[]
-	 */
-	public function getPlayerList(){
-		return $this->players;
-	}
+    public function getWorld()
+    {
+        return $this->map;
+    }
 
-	/**
-	 * @param \mcpp\Player[] $players
-	 */
-	public function setPlayerList(array $players){
-		$this->players = $players;
-	}
+    public function setWorld($world)
+    {
+        $this->map = (string)$world;
+    }
 
-	public function getPlayerCount(){
-		return $this->numPlayers;
-	}
+    /**
+     * Returns the extra Query data in key => value form
+     *
+     * @return array
+     */
+    public function getExtraData()
+    {
+        return $this->extraData;
+    }
 
-	public function setPlayerCount($count){
-		$this->numPlayers = (int) $count;
-	}
+    public function setExtraData(array $extraData)
+    {
+        $this->extraData = $extraData;
+    }
 
-	public function getMaxPlayerCount(){
-		return $this->maxPlayers;
-	}
+    public function getLongQuery()
+    {
+        $query = "";
 
-	public function setMaxPlayerCount($count){
-		$this->maxPlayers = (int) $count;
-	}
+        $plist = $this->server_engine;
+        if(count($this->plugins) > 0 and $this->listPlugins){
+            $plist .= ":";
+            foreach($this->plugins as $p){
+                $d = $p->getDescription();
+                $plist .= " " . str_replace([";", ":", " "], ["", "", "_"], $d->getName()) . " " . str_replace([";", ":", " "], ["", "", "_"], $d->getVersion()) . ";";
+            }
+            $plist = substr($plist, 0, -1);
+        }
 
-	public function getWorld(){
-		return $this->map;
-	}
+        $KVdata = [
+            "splitnum" => chr(128),
+            "hostname" => $this->serverName,
+            "gametype" => $this->gametype,
+            "game_id" => self::GAME_ID,
+            "version" => $this->version,
+            "server_engine" => $this->server_engine,
+            "plugins" => $plist,
+            "map" => $this->map,
+            "numplayers" => $this->numPlayers,
+            "maxplayers" => $this->maxPlayers,
+            "whitelist" => $this->whitelist,
+            "hostip" => $this->ip,
+            "hostport" => $this->port
+        ];
 
-	public function setWorld($world){
-		$this->map = (string) $world;
-	}
+        foreach($KVdata as $key => $value){
+            $query .= $key . "\x00" . $value . "\x00";
+        }
 
-	/**
-	 * Returns the extra Query data in key => value form
-	 *
-	 * @return array
-	 */
-	public function getExtraData(){
-		return $this->extraData;
-	}
+        foreach($this->extraData as $key => $value){
+            $query .= $key . "\x00" . $value . "\x00";
+        }
 
-	public function setExtraData(array $extraData){
-		$this->extraData = $extraData;
-	}
+        $query .= "\x00\x01player_\x00\x00";
+        foreach($this->players as $player){
+            $query .= $player->getName() . "\x00";
+        }
+        $query .= "\x00";
 
-	public function getLongQuery(){
-		$query = "";
+        return $query;
+    }
 
-		$plist = $this->server_engine;
-		if(count($this->plugins) > 0 and $this->listPlugins){
-			$plist .= ":";
-			foreach($this->plugins as $p){
-				$d = $p->getDescription();
-				$plist .= " " . str_replace([";", ":", " "], ["", "", "_"], $d->getName()) . " " . str_replace([";", ":", " "], ["", "", "_"], $d->getVersion()) . ";";
-			}
-			$plist = substr($plist, 0, -1);
-		}
-
-		$KVdata = [
-			"splitnum" => chr(128),
-			"hostname" => $this->serverName,
-			"gametype" => $this->gametype,
-			"game_id" => self::GAME_ID,
-			"version" => $this->version,
-			"server_engine" => $this->server_engine,
-			"plugins" => $plist,
-			"map" => $this->map,
-			"numplayers" => $this->numPlayers,
-			"maxplayers" => $this->maxPlayers,
-			"whitelist" => $this->whitelist,
-			"hostip" => $this->ip,
-			"hostport" => $this->port
-		];
-
-		foreach($KVdata as $key => $value){
-			$query .= $key . "\x00" . $value . "\x00";
-		}
-
-		foreach($this->extraData as $key => $value){
-			$query .= $key . "\x00" . $value . "\x00";
-		}
-
-		$query .= "\x00\x01player_\x00\x00";
-		foreach($this->players as $player){
-			$query .= $player->getName() . "\x00";
-		}
-		$query .= "\x00";
-
-		return $query;
-	}
-
-	public function getShortQuery(){
-		return $this->serverName . "\x00" . $this->gametype . "\x00" . $this->map . "\x00" . $this->numPlayers . "\x00" . $this->maxPlayers . "\x00" . Binary::writeLShort($this->port) . $this->ip . "\x00";
-	}
-
+    public function getShortQuery()
+    {
+        return $this->serverName . "\x00" . $this->gametype . "\x00" . $this->map . "\x00" . $this->numPlayers . "\x00" . $this->maxPlayers . "\x00" . Binary::writeLShort($this->port) . $this->ip . "\x00";
+    }
 }

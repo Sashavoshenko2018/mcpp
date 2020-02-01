@@ -22,26 +22,25 @@
 namespace mcpp\event\entity;
 
 use mcpp\entity\Entity;
-use mcpp\Event;
 use mcpp\event\Cancellable;
 use mcpp\math\Vector3;
 
-class EntityMotionEvent extends EntityEvent implements Cancellable{
-	public static $handlerList = null;
+class EntityMotionEvent extends EntityEvent implements Cancellable
+{
+    public static $handlerList = null;
+    private $mot;
 
-	private $mot;
+    public function __construct(Entity $entity, Vector3 $mot)
+    {
+        $this->entity = $entity;
+        $this->mot = $mot;
+    }
 
-	public function __construct(Entity $entity, Vector3 $mot){
-		$this->entity = $entity;
-		$this->mot = $mot;
-	}
-
-	/**
-	 * @return Vector3
-	 */
-	public function getVector(){
-		return $this->mot;
-	}
-
-
+    /**
+     * @return Vector3
+     */
+    public function getVector()
+    {
+        return $this->mot;
+    }
 }

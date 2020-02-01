@@ -47,111 +47,108 @@ use mcpp\network\raklib\protocol\UNCONNECTED_PONG;
 use mcpp\network\raklib\RakLib;
 use mcpp\utils\BinaryStream;
 
-class SessionManager{
+class SessionManager
+{
     protected $packetPool = [];
-
     /** @var RakLibServer */
     protected $server;
-
     protected $socket;
-
     protected $receiveBytes = 0;
     protected $sendBytes = 0;
-
     /** @var Session[] */
     protected $sessions = [];
-
     protected $name = "";
-
     protected $packetLimit = 500;
-
     protected $shutdown = false;
-
     protected $ticks = 0;
     protected $lastMeasure;
-
     protected $block = [];
     protected $ipSec = [];
-
     public $portChecking = true;
 
-    public function __construct(RakLibServer $server, UDPServerSocket $socket){
+    public function __construct(RakLibServer $server, UDPServerSocket $socket)
+    {
         $this->server = $server;
         $this->socket = $socket;
         $this->registerPackets();
 
-	    $this->serverId = mt_rand(0, PHP_INT_MAX);
+        $this->serverId = mt_rand(0, PHP_INT_MAX);
 
         $this->run();
     }
 
-    public function getPort(){
+    public function getPort()
+    {
         return $this->server->getPort();
     }
 
-    public function getLogger(){
+    public function getLogger()
+    {
         return $this->server->getLogger();
     }
 
-    public function run(){
+    public function run()
+    {
         $this->tickProcessor();
     }
 
-    private function tickProcessor(){
+    private function tickProcessor()
+    {
         $this->lastMeasure = microtime(true);
 
         while(!$this->shutdown){
             $start = microtime(true);
             $max = 10000;
-            while(--$max and $this->receivePacket());
-	        while($this->receiveStream());
-			$time = microtime(true) - $start;
-			if($time < 0.025){
-				@time_sleep_until(microtime(true) + 0.025 - $time);
-			}
-			$this->tick();
+            while(--$max and $this->receivePacket()) ;
+            while($this->receiveStream()) ;
+            $time = microtime(true) - $start;
+            if($time < 0.025){
+                @time_sleep_until(microtime(true) + 0.025 - $time);
+            }
+            $this->tick();
         }
     }
 
-	private function tick(){
-		$time = microtime(true);
-		foreach($this->sessions as $session){
-			$session->update($time);
-			if(($this->ticks % 40) === 0){
-				$this->streamPing($session);
-			}
-		}
+    private function tick()
+    {
+        $time = microtime(true);
+        foreach($this->sessions as $session){
+            $session->update($time);
+            if(($this->ticks % 40) === 0){
+                $this->streamPing($session);
+            }
+        }
 
-		$this->ipSec = [];
+        $this->ipSec = [];
 
-		if(($this->ticks & 0b1111) === 0){
-			$diff = max(0.005, $time - $this->lastMeasure);
-			$this->streamOption("bandwidth", serialize([
-				"up" => $this->sendBytes / $diff,
-				"down" => $this->receiveBytes / $diff
-			]));
-			$this->lastMeasure = $time;
-			$this->sendBytes = 0;
-			$this->receiveBytes = 0;
+        if(($this->ticks & 0b1111) === 0){
+            $diff = max(0.005, $time - $this->lastMeasure);
+            $this->streamOption("bandwidth", serialize([
+                "up" => $this->sendBytes / $diff,
+                "down" => $this->receiveBytes / $diff
+            ]));
+            $this->lastMeasure = $time;
+            $this->sendBytes = 0;
+            $this->receiveBytes = 0;
 
-			if(count($this->block) > 0){
-				asort($this->block);
-				$now = microtime(true);
-				foreach($this->block as $address => $timeout){
-					if($timeout <= $now){
-						unset($this->block[$address]);
-					}else{
-						break;
-					}
-				}
-			}
-		}
+            if(count($this->block) > 0){
+                asort($this->block);
+                $now = microtime(true);
+                foreach($this->block as $address => $timeout){
+                    if($timeout <= $now){
+                        unset($this->block[$address]);
+                    }else{
+                        break;
+                    }
+                }
+            }
+        }
 
-		++$this->ticks;
-	}
+        ++$this->ticks;
+    }
 
-
-    private function receivePacket(){
+    private function receivePacket()
+    {
         $len = $this->socket->readPacket($buffer, $source, $port);
         if($buffer !== null){
             $this->receiveBytes += $len;
@@ -161,14 +158,14 @@ class SessionManager{
 
             if(isset($this->ipSec[$source])){
                 $this->ipSec[$source]++;
-				if ($this->ipSec[$source] > $this->packetLimit) {
-					$this->blockAddress($source, 30);
-					$sessionId = $source . ":" . $port;
-					if(isset($this->sessions[$sessionId])){
-						$this->streamKick($this->sessions[$sessionId], "Hack mods are not permitted.");
-					}		
-					return true;
-				}
+                if($this->ipSec[$source] > $this->packetLimit){
+                    $this->blockAddress($source, 30);
+                    $sessionId = $source . ":" . $port;
+                    if(isset($this->sessions[$sessionId])){
+                        $this->streamKick($this->sessions[$sessionId], "Hack mods are not permitted.");
+                    }
+                    return true;
+                }
             }else{
                 $this->ipSec[$source] = 1;
             }
@@ -202,95 +199,105 @@ class SessionManager{
         return false;
     }
 
-    public function sendPacket(Packet $packet, $dest, $port){
+    public function sendPacket(Packet $packet, $dest, $port)
+    {
         $packet->encode();
-		$this->sendBytes += $this->socket->writePacket($packet->buffer, $dest, $port);    
+        $this->sendBytes += $this->socket->writePacket($packet->buffer, $dest, $port);
     }
 
-    public function streamEncapsulated(Session $session, EncapsulatedPacket $packet, $flags = RakLib::PRIORITY_NORMAL){
-		$id = $session->getAddress() . ":" . $session->getPort();
-		if (ord($packet->buffer{0}) == 0xfe) {
-			$buff = substr($packet->buffer, 1);
-			if ($session->isEncryptEnable()) {
-				$buff = $session->getDecrypt($buff);
-			}
-			$decoded = zlib_decode($buff);
-			$stream = new BinaryStream($decoded);
-			$length = strlen($decoded);
-			static $spamPacket = "\x39\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00";
-			static $spamPacket2 = "\x39\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00";
-			$count = 0;
-			$source = $session->getAddress();
-			while ($stream->getOffset() < $length) {				
-				$buf = $stream->getString();
-				if (empty($buf) || $buf == $spamPacket || $buf == $spamPacket2) {
-					continue;
-				}
-				if (isset($this->ipSec[$source])) {
-					$this->ipSec[$source] ++;
-					if ($this->ipSec[$source] > $this->packetLimit) {
-						$this->blockAddress($source, 30);
-						$this->streamKick($session, "Hack mods are not permitted.");
-						return true;
-					}
-				} else {
-					$this->ipSec[$source] = 1;
-				}
-				if (ord($buf{0}) != 0x21 && ord($buf{0}) != 0x35) {
-					if (ord($buf{0}) != 0x1e || ord($buf{1}) != 0) {
-						$count++;
-					}
-				}
-				$buffer = chr(RakLib::PACKET_ENCAPSULATED) . chr(strlen($id)) . $id . $buf;
-				$this->server->pushThreadToMainPacket($buffer);
-			}
-			if ($count > 250) {		
-				$this->blockAddress($source, 30);
-				$this->streamKick($session, "Hack mods are not permitted.");
-			}
-		}
-    }
-	
-	public function streamPing(Session $session){
+    public function streamEncapsulated(Session $session, EncapsulatedPacket $packet, $flags = RakLib::PRIORITY_NORMAL)
+    {
         $id = $session->getAddress() . ":" . $session->getPort();
-		$ping = $session->getPing();
-        $buffer = chr(RakLib::PACKET_PING) . chr(strlen($id)) . $id .  chr(strlen($ping)) . $ping;
+        if(ord($packet->buffer{0}) == 0xfe){
+            $buff = substr($packet->buffer, 1);
+            if($session->isEncryptEnable()){
+                $buff = $session->getDecrypt($buff);
+            }
+            $decoded = zlib_decode($buff);
+            $stream = new BinaryStream($decoded);
+            $length = strlen($decoded);
+            static $spamPacket = "\x39\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00";
+            static $spamPacket2 = "\x39\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00";
+            $count = 0;
+            $source = $session->getAddress();
+            while($stream->getOffset() < $length){
+                $buf = $stream->getString();
+                if(empty($buf) || $buf == $spamPacket || $buf == $spamPacket2){
+                    continue;
+                }
+                if(isset($this->ipSec[$source])){
+                    $this->ipSec[$source]++;
+                    if($this->ipSec[$source] > $this->packetLimit){
+                        $this->blockAddress($source, 30);
+                        $this->streamKick($session, "Hack mods are not permitted.");
+                        return true;
+                    }
+                }else{
+                    $this->ipSec[$source] = 1;
+                }
+                if(ord($buf{0}) != 0x21 && ord($buf{0}) != 0x35){
+                    if(ord($buf{0}) != 0x1e || ord($buf{1}) != 0){
+                        $count++;
+                    }
+                }
+                $buffer = chr(RakLib::PACKET_ENCAPSULATED) . chr(strlen($id)) . $id . $buf;
+                $this->server->pushThreadToMainPacket($buffer);
+            }
+            if($count > 250){
+                $this->blockAddress($source, 30);
+                $this->streamKick($session, "Hack mods are not permitted.");
+            }
+        }
+    }
+
+    public function streamPing(Session $session)
+    {
+        $id = $session->getAddress() . ":" . $session->getPort();
+        $ping = $session->getPing();
+        $buffer = chr(RakLib::PACKET_PING) . chr(strlen($id)) . $id . chr(strlen($ping)) . $ping;
         $this->server->pushThreadToMainPacket($buffer);
     }
-	
-	public function streamKick(Session $session, $reason) {
-		$id = $session->getAddress() . ":" . $session->getPort();
-		$buffer = chr(RakLib::PACKET_KICK) . chr(strlen($id)) . $id . chr(strlen($reason)) . $reason;
-		$this->server->pushThreadToMainPacket($buffer);
-	}
 
-	public function streamRaw($address, $port, $payload){
+    public function streamKick(Session $session, $reason)
+    {
+        $id = $session->getAddress() . ":" . $session->getPort();
+        $buffer = chr(RakLib::PACKET_KICK) . chr(strlen($id)) . $id . chr(strlen($reason)) . $reason;
+        $this->server->pushThreadToMainPacket($buffer);
+    }
+
+    public function streamRaw($address, $port, $payload)
+    {
         $buffer = chr(RakLib::PACKET_RAW) . chr(strlen($address)) . $address . Binary::writeShort($port) . $payload;
         $this->server->pushThreadToMainPacket($buffer);
     }
 
-    protected function streamClose($identifier, $reason){
+    protected function streamClose($identifier, $reason)
+    {
         $buffer = chr(RakLib::PACKET_CLOSE_SESSION) . chr(strlen($identifier)) . $identifier . chr(strlen($reason)) . $reason;
         $this->server->pushThreadToMainPacket($buffer);
     }
 
-    protected function streamInvalid($identifier){
+    protected function streamInvalid($identifier)
+    {
         $buffer = chr(RakLib::PACKET_INVALID_SESSION) . chr(strlen($identifier)) . $identifier;
         $this->server->pushThreadToMainPacket($buffer);
     }
 
-    protected function streamOpen(Session $session){
+    protected function streamOpen(Session $session)
+    {
         $identifier = $session->getAddress() . ":" . $session->getPort();
         $buffer = chr(RakLib::PACKET_OPEN_SESSION) . chr(strlen($identifier)) . $identifier . chr(strlen($session->getAddress())) . $session->getAddress() . Binary::writeShort($session->getPort()) . Binary::writeLong($session->getID());
         $this->server->pushThreadToMainPacket($buffer);
     }
 
-    protected function streamOption($name, $value){
+    protected function streamOption($name, $value)
+    {
         $buffer = chr(RakLib::PACKET_SET_OPTION) . chr(strlen($name)) . $name . $value;
         $this->server->pushThreadToMainPacket($buffer);
     }
 
-    private function checkSessions(){
+    private function checkSessions()
+    {
         if(count($this->sessions) > 4096){
             foreach($this->sessions as $i => $s){
                 if($s->isTemporal()){
@@ -303,7 +310,8 @@ class SessionManager{
         }
     }
 
-    public function receiveStream(){
+    public function receiveStream()
+    {
         if(strlen($packet = $this->server->readMainToThreadPacket()) > 0){
             $id = ord($packet{0});
             $offset = 1;
@@ -317,28 +325,28 @@ class SessionManager{
                     $this->sessions[$identifier]->addEncapsulatedToQueue(EncapsulatedPacket::fromBinary($buffer, true), $flags);
                 }else{
                     $this->streamInvalid($identifier);
-				}
-			} elseif ($id === RakLib::PACKET_ENABLE_ENCRYPT) {
-				$len = ord($packet{$offset++});
-				$identifier = substr($packet, $offset, $len);
-				$offset += $len;
-				if (isset($this->sessions[$identifier])) {
-					$len = Binary::readShort(substr($packet, $offset, 2));
-					$offset += 2;
-					$token = substr($packet, $offset, $len);
-					$offset += $len;
-					$len = Binary::readShort(substr($packet, $offset, 2));
-					$offset += 2;
-					$privateKey = substr($packet, $offset, $len);
-					$offset += $len;
-					$len = Binary::readShort(substr($packet, $offset, 2));
-					$offset += 2;
-					$publicKey = substr($packet, $offset, $len);
-					$this->sessions[$identifier]->enableEncrypt($token, $privateKey, $publicKey);
-				} else {
-					$this->streamInvalid($identifier);
-				}
-			}elseif($id === RakLib::PACKET_RAW){
+                }
+            }elseif($id === RakLib::PACKET_ENABLE_ENCRYPT){
+                $len = ord($packet{$offset++});
+                $identifier = substr($packet, $offset, $len);
+                $offset += $len;
+                if(isset($this->sessions[$identifier])){
+                    $len = Binary::readShort(substr($packet, $offset, 2));
+                    $offset += 2;
+                    $token = substr($packet, $offset, $len);
+                    $offset += $len;
+                    $len = Binary::readShort(substr($packet, $offset, 2));
+                    $offset += 2;
+                    $privateKey = substr($packet, $offset, $len);
+                    $offset += $len;
+                    $len = Binary::readShort(substr($packet, $offset, 2));
+                    $offset += 2;
+                    $publicKey = substr($packet, $offset, $len);
+                    $this->sessions[$identifier]->enableEncrypt($token, $privateKey, $publicKey);
+                }else{
+                    $this->streamInvalid($identifier);
+                }
+            }elseif($id === RakLib::PACKET_RAW){
                 $len = ord($packet{$offset++});
                 $address = substr($packet, $offset, $len);
                 $offset += $len;
@@ -370,10 +378,10 @@ class SessionManager{
                         $this->name = $value;
                         break;
                     case "portChecking":
-                        $this->portChecking = (bool) $value;
+                        $this->portChecking = (bool)$value;
                         break;
                     case "packetLimit":
-                        $this->packetLimit = (int) $value;
+                        $this->packetLimit = (int)$value;
                         break;
                 }
             }elseif($id === RakLib::PACKET_BLOCK_ADDRESS){
@@ -392,7 +400,7 @@ class SessionManager{
             }elseif($id === RakLib::PACKET_EMERGENCY_SHUTDOWN){
                 $this->shutdown = true;
             }else{
-	            return false;
+                return false;
             }
 
             return true;
@@ -401,7 +409,8 @@ class SessionManager{
         return false;
     }
 
-    public function blockAddress($address, $timeout = 300){
+    public function blockAddress($address, $timeout = 300)
+    {
         $final = microtime(true) + $timeout;
         if(!isset($this->block[$address]) or $timeout === -1){
             if($timeout === -1){
@@ -417,11 +426,12 @@ class SessionManager{
 
     /**
      * @param string $ip
-     * @param int    $port
+     * @param int $port
      *
      * @return Session
      */
-    public function getSession($ip, $port){
+    public function getSession($ip, $port)
+    {
         $id = $ip . ":" . $port;
         if(!isset($this->sessions[$id])){
             $this->checkSessions();
@@ -431,7 +441,8 @@ class SessionManager{
         return $this->sessions[$id];
     }
 
-    public function removeSession(Session $session, $reason = "unknown"){
+    public function removeSession(Session $session, $reason = "unknown")
+    {
         $id = $session->getAddress() . ":" . $session->getPort();
         if(isset($this->sessions[$id])){
             $this->sessions[$id]->close();
@@ -440,36 +451,42 @@ class SessionManager{
         }
     }
 
-    public function openSession(Session $session){
+    public function openSession(Session $session)
+    {
         $this->streamOpen($session);
     }
 
-    public function getName(){
+    public function getName()
+    {
         return $this->name;
     }
 
-    public function getID(){
+    public function getID()
+    {
         return $this->serverId;
     }
 
-	private function registerPacket($id, $class){
-		$this->packetPool[$id] = new $class;
-	}
+    private function registerPacket($id, $class)
+    {
+        $this->packetPool[$id] = new $class;
+    }
 
-	/**
-	 * @param $id
-	 *
-	 * @return Packet
-	 */
-	public function getPacketFromPool($id){
-		if(isset($this->packetPool[$id])){
-			return clone $this->packetPool[$id];
-		}
+    /**
+     * @param $id
+     *
+     * @return Packet
+     */
+    public function getPacketFromPool($id)
+    {
+        if(isset($this->packetPool[$id])){
+            return clone $this->packetPool[$id];
+        }
 
-		return null;
-	}
+        return null;
+    }
 
-    private function registerPackets(){
+    private function registerPackets()
+    {
         //$this->registerPacket(UNCONNECTED_PING::$ID, UNCONNECTED_PING::class);
         $this->registerPacket(UNCONNECTED_PING_OPEN_CONNECTIONS::$ID, UNCONNECTED_PING_OPEN_CONNECTIONS::class);
         $this->registerPacket(OPEN_CONNECTION_REQUEST_1::$ID, OPEN_CONNECTION_REQUEST_1::class);

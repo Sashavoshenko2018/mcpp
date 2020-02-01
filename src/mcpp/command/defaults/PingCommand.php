@@ -25,28 +25,29 @@ use mcpp\command\CommandSender;
 use mcpp\Player;
 use mcpp\utils\TextFormat;
 
-class PingCommand extends VanillaCommand{
+class PingCommand extends VanillaCommand
+{
+    public function __construct($name)
+    {
+        parent::__construct(
+            $name,
+            "Return player ping",
+            "/ping"
+        );
+        $this->setPermission("pocketmine.command.ping");
+    }
 
-	public function __construct($name){
-		parent::__construct(
-			$name,
-			"Return player ping",
-			"/ping"
-		);
-		$this->setPermission("pocketmine.command.ping");
-	}
+    public function execute(CommandSender $sender, $currentAlias, array $args)
+    {
+        if(!$this->testPermission($sender)){
+            return true;
+        }
 
-	public function execute(CommandSender $sender, $currentAlias, array $args){
-		if(!$this->testPermission($sender)){
-			return true;
-		}
-		
-
-		if(!($sender instanceof Player)){
-			$sender->sendMessage(TextFormat::RED . "Only for players");
-			return true;
-		}		
-		$sender->sendPing();
-		return true;
-	}
+        if(!($sender instanceof Player)){
+            $sender->sendMessage(TextFormat::RED . "Only for players");
+            return true;
+        }
+        $sender->sendPing();
+        return true;
+    }
 }

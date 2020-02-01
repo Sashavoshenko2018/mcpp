@@ -21,10 +21,12 @@
 
 namespace mcpp\command;
 
-interface PluginIdentifiableCommand{
+use mcpp\plugin\Plugin;
 
-	/**
-	 * @return \mcpp\plugin\Plugin
-	 */
-	public function getPlugin();
+interface PluginIdentifiableCommand
+{
+    /**
+     * @return Plugin
+     */
+    public function getPlugin();
 }

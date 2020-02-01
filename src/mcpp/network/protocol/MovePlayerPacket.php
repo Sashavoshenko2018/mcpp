@@ -23,69 +23,67 @@ namespace mcpp\network\protocol;
 
 #include <rules/DataPacket.h>
 
+class MovePlayerPacket extends PEPacket
+{
+    const NETWORK_ID = Info::MOVE_PLAYER_PACKET;
+    const PACKET_NAME = "MOVE_PLAYER_PACKET";
+    const MODE_NORMAL = 0;
+    const MODE_RESET = 1;
+    const MODE_TELEPORT = 2;
+    const MODE_ROTATION = 3;
+    const TELEPORTATION_CAUSE_UNKNOWN = 0;
+    const TELEPORTATION_CAUSE_PROJECTILE = 1;
+    const TELEPORTATION_CAUSE_CHORUS_FRUIT = 2;
+    const TELEPORTATION_CAUSE_COMMAND = 3;
+    const TELEPORTATION_CAUSE_BEHAVIOR = 4;
+    const TELEPORTATION_CAUSE_COUNT = 5; // ???
+    public $eid;
+    public $x;
+    public $y;
+    public $z;
+    public $yaw;
+    public $bodyYaw;
+    public $pitch;
+    public $mode = self::MODE_NORMAL;
+    public $onGround;
 
-class MovePlayerPacket extends PEPacket{
-	const NETWORK_ID = Info::MOVE_PLAYER_PACKET;
-	const PACKET_NAME = "MOVE_PLAYER_PACKET";
+    public function decode($playerProtocol)
+    {
+        $this->getHeader($playerProtocol);
+        $this->eid = $this->getVarInt();
 
-	const MODE_NORMAL = 0;
-	const MODE_RESET = 1;
-	const MODE_TELEPORT = 2;
-	const MODE_ROTATION = 3;
+        $this->x = $this->getLFloat();
+        $this->y = $this->getLFloat();
+        $this->z = $this->getLFloat();
 
-	const TELEPORTATION_CAUSE_UNKNOWN = 0;
-	const TELEPORTATION_CAUSE_PROJECTILE = 1;
-	const TELEPORTATION_CAUSE_CHORUS_FRUIT = 2;
-	const TELEPORTATION_CAUSE_COMMAND = 3;
-	const TELEPORTATION_CAUSE_BEHAVIOR = 4;
-	const TELEPORTATION_CAUSE_COUNT = 5; // ???
+        $this->pitch = $this->getLFloat();
+        $this->yaw = $this->getLFloat();
 
-	public $eid;
-	public $x;
-	public $y;
-	public $z;
-	public $yaw;
-	public $bodyYaw;
-	public $pitch;
-	public $mode = self::MODE_NORMAL;
-	public $onGround;
+        $this->bodyYaw = $this->getLFloat();
+        $this->mode = $this->getByte();
+        $this->onGround = $this->getByte() > 0;
+    }
 
-	public function decode($playerProtocol){
-		$this->getHeader($playerProtocol);
-		$this->eid = $this->getVarInt();
+    public function encode($playerProtocol)
+    {
+        $this->reset($playerProtocol);
+        $this->putVarInt($this->eid);
 
-		$this->x = $this->getLFloat();
-		$this->y = $this->getLFloat();
-		$this->z = $this->getLFloat();
+        $this->putLFloat($this->x);
+        $this->putLFloat($this->y);
+        $this->putLFloat($this->z);
 
-		$this->pitch = $this->getLFloat();
-		$this->yaw = $this->getLFloat();
+        $this->putLFloat($this->pitch);
+        $this->putLFloat($this->yaw);
 
-		$this->bodyYaw = $this->getLFloat();
-		$this->mode = $this->getByte();
-		$this->onGround = $this->getByte() > 0;
-	}
-
-	public function encode($playerProtocol){
-		$this->reset($playerProtocol);
-		$this->putVarInt($this->eid);
-
-		$this->putLFloat($this->x);
-		$this->putLFloat($this->y);
-		$this->putLFloat($this->z);
-	
-		$this->putLFloat($this->pitch);
-		$this->putLFloat($this->yaw);
-
-		$this->putLFloat($this->bodyYaw);
-		$this->putByte($this->mode);
-		$this->putByte($this->onGround > 0);
-		/** @todo do it right */
-		$this->putVarInt(0); // riding runtime ID
-		if (self::MODE_TELEPORT == $this->mode) {
-			$this->putInt(self::TELEPORTATION_CAUSE_UNKNOWN);
-			$this->putInt(1);
-		}
-	}
-
+        $this->putLFloat($this->bodyYaw);
+        $this->putByte($this->mode);
+        $this->putByte($this->onGround > 0);
+        /** @todo do it right */
+        $this->putVarInt(0); // riding runtime ID
+        if(self::MODE_TELEPORT == $this->mode){
+            $this->putInt(self::TELEPORTATION_CAUSE_UNKNOWN);
+            $this->putInt(1);
+        }
+    }
 }

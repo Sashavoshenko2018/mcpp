@@ -21,19 +21,18 @@
 
 namespace mcpp\block;
 
+class Wood2 extends Wood
+{
+    const ACACIA = 0;
+    const DARK_OAK = 1;
+    protected $id = self::WOOD2;
 
-class Wood2 extends Wood{
-
-	const ACACIA = 0;
-	const DARK_OAK = 1;
-
-	protected $id = self::WOOD2;
-
-	public function getName(){
-		static $names = [
-			0 => "Acacia Wood",
-			1 => "Dark Oak Wood",
-		];
-		return $names[$this->meta & 0x01];
-	}
+    public function getName()
+    {
+        static $names = [
+            0 => "Acacia Wood",
+            1 => "Dark Oak Wood",
+        ];
+        return $names[$this->meta & 0x01];
+    }
 }

@@ -24,34 +24,38 @@ namespace mcpp\block;
 use mcpp\item\Item;
 use mcpp\item\Tool;
 
-class BrewingStand extends Transparent {
+class BrewingStand extends Transparent
+{
+    protected $id = self::BREWING_STAND;
 
-	protected $id = self::BREWING_STAND;
+    public function __construct()
+    {
+    }
 
-	public function __construct() {
-		
-	}
+    public function canBeActivated()
+    {
+        return true;
+    }
 
-	public function canBeActivated() {
-		return true;
-	}
+    public function getHardness()
+    {
+        return 0.5;
+    }
 
-	public function getHardness() {
-		return 0.5;
-	}
+    public function getName()
+    {
+        return "Brewing Stand";
+    }
 
-	public function getName() {
-		return "Brewing Stand";
-	}
+    public function getToolType()
+    {
+        return Tool::TYPE_PICKAXE;
+    }
 
-	public function getToolType() {
-		return Tool::TYPE_PICKAXE;
-	}
-
-	public function getDrops(Item $item) {
-		return [
-			[Item::BREWING_STAND, 0, 1],
-		];
-	}
-
+    public function getDrops(Item $item)
+    {
+        return [
+            [Item::BREWING_STAND, 0, 1],
+        ];
+    }
 }

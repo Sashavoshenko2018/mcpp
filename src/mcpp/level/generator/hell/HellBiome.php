@@ -23,13 +23,15 @@ namespace mcpp\level\generator\hell;
 
 use mcpp\level\generator\biome\Biome;
 
-class HellBiome extends Biome{
+class HellBiome extends Biome
+{
+    public function getName()
+    {
+        return "Hell";
+    }
 
-	public function getName(){
-		return "Hell";
-	}
-
-	public function getColor(){
-		return 0;
-	}
+    public function getColor()
+    {
+        return 0;
+    }
 }

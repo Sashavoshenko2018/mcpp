@@ -21,15 +21,17 @@
 
 namespace mcpp\item;
 
-class DiamondBoots extends Armor{
-	
-	const SLOT_NUMBER = 3;
-	
-	public function __construct($meta = 0, $count = 1){
-		parent::__construct(self::DIAMOND_BOOTS, $meta, $count, "Diamond Boots");
-	}
-	
-	public function getMaxDurability() {
-		return 430;
-	}
+class DiamondBoots extends Armor
+{
+    const SLOT_NUMBER = 3;
+
+    public function __construct($meta = 0, $count = 1)
+    {
+        parent::__construct(self::DIAMOND_BOOTS, $meta, $count, "Diamond Boots");
+    }
+
+    public function getMaxDurability()
+    {
+        return 430;
+    }
 }

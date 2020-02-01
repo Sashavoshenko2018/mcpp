@@ -21,27 +21,29 @@
 
 namespace mcpp\event\server;
 
-use mcpp\event;
 use mcpp\event\Cancellable;
 use mcpp\network\protocol\DataPacket;
 use mcpp\Player;
 
-class DataPacketReceiveEvent extends ServerEvent implements Cancellable{
-	public static $handlerList = null;
+class DataPacketReceiveEvent extends ServerEvent implements Cancellable
+{
+    public static $handlerList = null;
+    private $packet;
+    private $player;
 
-	private $packet;
-	private $player;
+    public function __construct(Player $player, DataPacket $packet)
+    {
+        $this->packet = $packet;
+        $this->player = $player;
+    }
 
-	public function __construct(Player $player, DataPacket $packet){
-		$this->packet = $packet;
-		$this->player = $player;
-	}
+    public function getPacket()
+    {
+        return $this->packet;
+    }
 
-	public function getPacket(){
-		return $this->packet;
-	}
-
-	public function getPlayer(){
-		return $this->player;
-	}
+    public function getPlayer()
+    {
+        return $this->player;
+    }
 }

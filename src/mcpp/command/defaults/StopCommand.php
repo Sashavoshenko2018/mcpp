@@ -24,34 +24,35 @@ namespace mcpp\command\defaults;
 use mcpp\command\Command;
 use mcpp\command\CommandSender;
 
+class StopCommand extends VanillaCommand
+{
+    public function __construct($name)
+    {
+        parent::__construct(
+            $name,
+            "Stops the server, with optional reason",
+            "/stop [reason]"
+        );
+        $this->setPermission("pocketmine.command.stop");
+    }
 
-class StopCommand extends VanillaCommand{
+    public function execute(CommandSender $sender, $currentAlias, array $args)
+    {
+        if(!$this->testPermission($sender)){
+            return true;
+        }
 
-	public function __construct($name){
-		parent::__construct(
-			$name,
-			"Stops the server, with optional reason",
-			"/stop [reason]"
-		);
-		$this->setPermission("pocketmine.command.stop");
-	}
+        Command::broadcastCommandMessage($sender, "Stopping the server...");
 
-	public function execute(CommandSender $sender, $currentAlias, array $args){
-		if(!$this->testPermission($sender)){
-			return true;
-		}
+        $reason = implode(" ", $args);
+        if($reason !== ""){
+            foreach($sender->getServer()->getOnlinePlayers() as $player){
+                $player->kick($reason);
+            }
+        }
 
-		Command::broadcastCommandMessage($sender, "Stopping the server...");
+        $sender->getServer()->shutdown();
 
-		$reason = implode(" ", $args);
-		if($reason !== ""){
-			foreach($sender->getServer()->getOnlinePlayers() as $player){
-				$player->kick($reason);
-			}
-		}
-
-		$sender->getServer()->shutdown();
-
-		return true;
-	}
+        return true;
+    }
 }

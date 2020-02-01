@@ -21,11 +21,10 @@
 
 namespace mcpp\item;
 
-
-class BottleOEnchanting extends Item{
-	public function __construct($meta = 0, $count = 1){
-		parent::__construct(self::BOTTLE_ENCHANTING, 0, $count, "Bottle O' Enchanting");
-	}
-
-
+class BottleOEnchanting extends Item
+{
+    public function __construct($meta = 0, $count = 1)
+    {
+        parent::__construct(self::BOTTLE_ENCHANTING, 0, $count, "Bottle O' Enchanting");
+    }
 }

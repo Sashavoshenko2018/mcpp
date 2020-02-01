@@ -25,26 +25,27 @@ use mcpp\entity\Arrow;
 use mcpp\event\Cancellable;
 use mcpp\inventory\Inventory;
 
-class InventoryPickupArrowEvent extends InventoryEvent implements Cancellable{
-	public static $handlerList = null;
+class InventoryPickupArrowEvent extends InventoryEvent implements Cancellable
+{
+    public static $handlerList = null;
+    /** @var Arrow */
+    private $arrow;
 
-	/** @var Arrow */
-	private $arrow;
+    /**
+     * @param Inventory $inventory
+     * @param Arrow $arrow
+     */
+    public function __construct(Inventory $inventory, Arrow $arrow)
+    {
+        $this->arrow = $arrow;
+        parent::__construct($inventory);
+    }
 
-	/**
-	 * @param Inventory $inventory
-	 * @param Arrow     $arrow
-	 */
-	public function __construct(Inventory $inventory, Arrow $arrow){
-		$this->arrow = $arrow;
-		parent::__construct($inventory);
-	}
-
-	/**
-	 * @return Arrow
-	 */
-	public function getArrow(){
-		return $this->arrow;
-	}
-
+    /**
+     * @return Arrow
+     */
+    public function getArrow()
+    {
+        return $this->arrow;
+    }
 }

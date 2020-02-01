@@ -21,28 +21,30 @@
 
 namespace mcpp\block;
 
+abstract class Flowable extends Transparent
+{
+    public function canBeFlowedInto()
+    {
+        return true;
+    }
 
+    public function getHardness()
+    {
+        return 0;
+    }
 
+    public function getResistance()
+    {
+        return 0;
+    }
 
-abstract class Flowable extends Transparent{
+    public function isSolid()
+    {
+        return false;
+    }
 
-	public function canBeFlowedInto(){
-		return true;
-	}
-
-	public function getHardness(){
-		return 0;
-	}
-
-	public function getResistance(){
-		return 0;
-	}
-
-	public function isSolid(){
-		return false;
-	}
-
-	public function getBoundingBox(){
-		return null;
-	}
+    public function getBoundingBox()
+    {
+        return null;
+    }
 }

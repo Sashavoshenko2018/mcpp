@@ -21,22 +21,20 @@
 
 namespace mcpp\tile;
 
+interface Nameable
+{
+    /**
+     * @return string
+     */
+    public function getName();
 
-interface Nameable{
+    /**
+     * @param void $str
+     */
+    public function setName($str);
 
-
-	/**
-	 * @return string
-	 */
-	public function getName();
-
-	/**
-	 * @param void $str
-	 */
-	public function setName($str);
-
-	/**
-	 * @return bool
-	 */
-	public function hasName();
+    /**
+     * @return bool
+     */
+    public function hasName();
 }

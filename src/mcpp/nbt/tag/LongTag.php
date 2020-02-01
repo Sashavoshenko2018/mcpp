@@ -23,27 +23,28 @@ namespace mcpp\nbt\tag;
 
 use mcpp\nbt\NBT;
 
-use mcpp\utils\Binary;
+class LongTag extends NamedTag
+{
+    public function getType()
+    {
+        return NBT::TAG_Long;
+    }
 
-class LongTag extends NamedTag{
+    public function read(NBT $nbt, $new = false)
+    {
+        if($new){
+            $this->value = $nbt->getNewInt();
+        }else{
+            $this->value = $nbt->getLong();
+        }
+    }
 
-	public function getType(){
-		return NBT::TAG_Long;
-	}
-
-	public function read(NBT $nbt, $new = false){
-		if ($new) {
-			$this->value = $nbt->getNewInt();
-		} else {
-			$this->value = $nbt->getLong();
-		}
-	}
-
-	public function write(NBT $nbt, $old = false){
-		if ($old) {
-			$nbt->putLong($this->value);
-		} else {
-			$nbt->putInt($this->value);
-		}
-	}
+    public function write(NBT $nbt, $old = false)
+    {
+        if($old){
+            $nbt->putLong($this->value);
+        }else{
+            $nbt->putInt($this->value);
+        }
+    }
 }

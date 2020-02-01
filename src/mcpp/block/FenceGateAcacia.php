@@ -21,12 +21,12 @@
 
 namespace mcpp\block;
 
+class FenceGateAcacia extends FenceGate
+{
+    protected $id = self::FENCE_GATE_ACACIA;
 
-class FenceGateAcacia extends FenceGate{
-
-	protected $id = self::FENCE_GATE_ACACIA;
-
-	public function getName(){
-		return "Acacia Fence Gate";
-	}
+    public function getName()
+    {
+        return "Acacia Fence Gate";
+    }
 }

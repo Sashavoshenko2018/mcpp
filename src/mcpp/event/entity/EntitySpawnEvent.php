@@ -27,70 +27,78 @@ use mcpp\entity\Human;
 use mcpp\entity\Item;
 use mcpp\entity\Projectile;
 use mcpp\entity\Vehicle;
+use mcpp\level\Position;
 
 /**
  * Called when a entity is spawned
  */
-class EntitySpawnEvent extends EntityEvent{
-	public static $handlerList = null;
+class EntitySpawnEvent extends EntityEvent
+{
+    public static $handlerList = null;
+    private $entityType;
 
-	private $entityType;
+    /**
+     * @param Entity $entity
+     */
+    public function __construct(Entity $entity)
+    {
+        $this->entity = $entity;
+        $this->entityType = $entity::NETWORK_ID;
+    }
 
-	/**
-	 * @param Entity $entity
-	 */
-	public function __construct(Entity $entity){
-		$this->entity = $entity;
-		$this->entityType = $entity::NETWORK_ID;
-	}
+    /**
+     * @return Position
+     */
+    public function getPosition()
+    {
+        return $this->entity->getPosition();
+    }
 
-	/**
-	 * @return \mcpp\level\Position
-	 */
-	public function getPosition(){
-		return $this->entity->getPosition();
-	}
+    /**
+     * @return int
+     */
+    public function getType()
+    {
+        return $this->entityType;
+    }
 
-	/**
-	 * @return int
-	 */
-	public function getType(){
-		return $this->entityType;
-	}
+    /**
+     * @return bool
+     */
+    public function isCreature()
+    {
+        return $this->entity instanceof Creature;
+    }
 
-	/**
-	 * @return bool
-	 */
-	public function isCreature(){
-		return $this->entity instanceof Creature;
-	}
+    /**
+     * @return bool
+     */
+    public function isHuman()
+    {
+        return $this->entity instanceof Human;
+    }
 
-	/**
-	 * @return bool
-	 */
-	public function isHuman(){
-		return $this->entity instanceof Human;
-	}
+    /**
+     * @return bool
+     */
+    public function isProjectile()
+    {
+        return $this->entity instanceof Projectile;
+    }
 
-	/**
-	 * @return bool
-	 */
-	public function isProjectile(){
-		return $this->entity instanceof Projectile;
-	}
+    /**
+     * @return bool
+     */
+    public function isVehicle()
+    {
+        return $this->entity instanceof Vehicle;
+    }
 
-	/**
-	 * @return bool
-	 */
-	public function isVehicle(){
-		return $this->entity instanceof Vehicle;
-	}
-
-	/**
-	 * @return bool
-	 */
-	public function isItem(){
-		return $this->entity instanceof Item;
-	}
-
+    /**
+     * @return bool
+     */
+    public function isItem()
+    {
+        return $this->entity instanceof Item;
+    }
 }

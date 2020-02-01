@@ -26,51 +26,56 @@ use mcpp\event\Cancellable;
 use mcpp\item\Item;
 use mcpp\Player;
 
-class BlockBreakEvent extends BlockEvent implements Cancellable{
-	public static $handlerList = null;
+class BlockBreakEvent extends BlockEvent implements Cancellable
+{
+    public static $handlerList = null;
+    /** @var Player */
+    protected $player;
+    /** @var Item */
+    protected $item;
+    /** @var bool */
+    protected $instaBreak = false;
+    protected $drop = [];
 
-	/** @var \mcpp\Player */
-	protected $player;
+    public function __construct(Player $player, Block $block, Item $item, $instaBreak = false, $drop = [])
+    {
+        $this->block = $block;
+        $this->item = $item;
+        $this->player = $player;
+        $this->instaBreak = (bool)$instaBreak;
+        $this->drop = $drop;
+    }
 
-	/** @var \mcpp\item\Item */
-	protected $item;
+    public function getPlayer()
+    {
+        return $this->player;
+    }
 
-	/** @var bool */
-	protected $instaBreak = false;
-	protected $drop = [];
+    public function getItem()
+    {
+        return $this->item;
+    }
 
-	public function __construct(Player $player, Block $block, Item $item, $instaBreak = false, $drop = []){
-		$this->block = $block;
-		$this->item = $item;
-		$this->player = $player;
-		$this->instaBreak = (bool) $instaBreak;
-		$this->drop = $drop;
-	}
+    public function getInstaBreak()
+    {
+        return $this->instaBreak;
+    }
 
-	public function getPlayer(){
-		return $this->player;
-	}
+    /**
+     * @param boolean $instaBreak
+     */
+    public function setInstaBreak($instaBreak)
+    {
+        $this->instaBreak = (bool)$instaBreak;
+    }
 
-	public function getItem(){
-		return $this->item;
-	}
+    public function getDrops()
+    {
+        return $this->drop;
+    }
 
-	public function getInstaBreak(){
-		return $this->instaBreak;
-	}
-
-	/**
-	 * @param boolean $instaBreak
-	 */
-	public function setInstaBreak($instaBreak){
-		$this->instaBreak = (bool) $instaBreak;
-	}
-	
-	public function getDrops() {
-		return $this->drop;
-	}
-	
-	public function setDrops($drop = []) {
-		$this->drop = $drop;
-	}
+    public function setDrops($drop = [])
+    {
+        $this->drop = $drop;
+    }
 }

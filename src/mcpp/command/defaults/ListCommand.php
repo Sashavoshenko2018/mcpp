@@ -24,35 +24,36 @@ namespace mcpp\command\defaults;
 use mcpp\command\CommandSender;
 use mcpp\Player;
 
+class ListCommand extends VanillaCommand
+{
+    public function __construct($name)
+    {
+        parent::__construct(
+            $name,
+            "Lists all online players",
+            "/list"
+        );
+        $this->setPermission("pocketmine.command.list");
+    }
 
-class ListCommand extends VanillaCommand{
+    public function execute(CommandSender $sender, $currentAlias, array $args)
+    {
+        if(!$this->testPermission($sender)){
+            return true;
+        }
 
-	public function __construct($name){
-		parent::__construct(
-			$name,
-			"Lists all online players",
-			"/list"
-		);
-		$this->setPermission("pocketmine.command.list");
-	}
+        $online = "";
+        $onlineCount = 0;
 
-	public function execute(CommandSender $sender, $currentAlias, array $args){
-		if(!$this->testPermission($sender)){
-			return true;
-		}
+        foreach($sender->getServer()->getOnlinePlayers() as $player){
+            if($player->isOnline() and (!($sender instanceof Player) or $sender->canSee($player))){
+                $online .= $player->getDisplayName() . ", ";
+                ++$onlineCount;
+            }
+        }
 
-		$online = "";
-		$onlineCount = 0;
+        $sender->sendMessage("There are " . $onlineCount . "/" . $sender->getServer()->getMaxPlayers() . " players online:\n" . substr($online, 0, -2));
 
-		foreach($sender->getServer()->getOnlinePlayers() as $player){
-			if($player->isOnline() and (!($sender instanceof Player) or $sender->canSee($player))){
-				$online .= $player->getDisplayName() . ", ";
-				++$onlineCount;
-			}
-		}
-
-		$sender->sendMessage("There are " . $onlineCount . "/" . $sender->getServer()->getMaxPlayers() . " players online:\n" . substr($online, 0, -2));
-
-		return true;
-	}
+        return true;
+    }
 }

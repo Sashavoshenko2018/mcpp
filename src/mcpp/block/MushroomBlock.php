@@ -23,24 +23,26 @@ namespace mcpp\block;
 
 use mcpp\item\Item;
 
-class MushroomBlock extends Solid {
+class MushroomBlock extends Solid
+{
+    protected $id = self::BROWN_MUSHROOM_BLOCK;
 
-	protected $id = self::BROWN_MUSHROOM_BLOCK;
+    public function __construct()
+    {
+    }
 
-	public function __construct(){
+    public function getHardness()
+    {
+        return 0.2;
+    }
 
-	}
+    public function getName()
+    {
+        return "Mushroom Block";
+    }
 
-	public function getHardness(){
-		return 0.2;
-	}
-	
-	public function getName(){
-		return "Mushroom Block";
-	}
-
-	public function getDrops(Item $item){
-		return [];
-	}
-	
+    public function getDrops(Item $item)
+    {
+        return [];
+    }
 }

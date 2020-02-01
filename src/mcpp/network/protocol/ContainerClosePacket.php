@@ -23,21 +23,21 @@ namespace mcpp\network\protocol;
 
 #include <rules/DataPacket.h>
 
+class ContainerClosePacket extends PEPacket
+{
+    const NETWORK_ID = Info::CONTAINER_CLOSE_PACKET;
+    const PACKET_NAME = "CONTAINER_CLOSE_PACKET";
+    public $windowid;
 
-class ContainerClosePacket extends PEPacket{
-	const NETWORK_ID = Info::CONTAINER_CLOSE_PACKET;
-	const PACKET_NAME = "CONTAINER_CLOSE_PACKET";
+    public function decode($playerProtocol)
+    {
+        $this->getHeader($playerProtocol);
+        $this->windowid = $this->getByte();
+    }
 
-	public $windowid;
-
-	public function decode($playerProtocol){
-		$this->getHeader($playerProtocol);
-		$this->windowid = $this->getByte();
-	}
-
-	public function encode($playerProtocol){
-		$this->reset($playerProtocol);
-		$this->putByte($this->windowid);
-	}
-
+    public function encode($playerProtocol)
+    {
+        $this->reset($playerProtocol);
+        $this->putByte($this->windowid);
+    }
 }

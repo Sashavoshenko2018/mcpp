@@ -23,9 +23,11 @@ namespace mcpp\item;
 
 use mcpp\block\Block;
 
-class Potato extends Item{
-	public function __construct($meta = 0, $count = 1){
-		$this->block = Block::get(Item::POTATO_BLOCK);
-		parent::__construct(self::POTATO, 0, $count, "Potato");
-	}
+class Potato extends Item
+{
+    public function __construct($meta = 0, $count = 1)
+    {
+        $this->block = Block::get(Item::POTATO_BLOCK);
+        parent::__construct(self::POTATO, 0, $count, "Potato");
+    }
 }

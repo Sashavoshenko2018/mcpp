@@ -24,26 +24,28 @@ namespace mcpp\event\entity;
 use mcpp\entity\Entity;
 use mcpp\event\Cancellable;
 
-class EntityCombustEvent extends EntityEvent implements Cancellable{
-	public static $handlerList = null;
+class EntityCombustEvent extends EntityEvent implements Cancellable
+{
+    public static $handlerList = null;
+    protected $duration;
 
-	protected $duration;
+    /**
+     * @param Entity $combustee
+     * @param int $duration
+     */
+    public function __construct(Entity $combustee, $duration)
+    {
+        $this->entity = $combustee;
+        $this->duration = $duration;
+    }
 
-	/**
-	 * @param Entity $combustee
-	 * @param int    $duration
-	 */
-	public function __construct(Entity $combustee, $duration){
-		$this->entity = $combustee;
-		$this->duration = $duration;
-	}
+    public function getDuration()
+    {
+        return $this->duration;
+    }
 
-	public function getDuration(){
-		return $this->duration;
-	}
-
-	public function setDuration($duration){
-		$this->duration = (int) $duration;
-	}
-
+    public function setDuration($duration)
+    {
+        $this->duration = (int)$duration;
+    }
 }

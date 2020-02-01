@@ -21,12 +21,12 @@
 
 namespace mcpp\block;
 
-class UndyedShulkerBox extends ShulkerBox {
+class UndyedShulkerBox extends ShulkerBox
+{
+    protected $id = self::UNDYED_SHULKER_BOX;
 
-	protected $id = self::UNDYED_SHULKER_BOX;
-
-	public function getName(){
-		return "Undyed Shulker Box";
-	}
-
-} 
+    public function getName()
+    {
+        return "Undyed Shulker Box";
+    }
+}

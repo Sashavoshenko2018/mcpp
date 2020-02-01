@@ -21,205 +21,219 @@
 
 namespace mcpp\nbt\tag;
 
+use ArrayAccess;
+use Countable;
 use mcpp\nbt\NBT;
 use mcpp\nbt\tag\Enum as TagEnum;
 
-use mcpp\utils\Binary;
+class Enum extends NamedTag implements ArrayAccess, Countable
+{
+    private $tagType;
 
-class Enum extends NamedTag implements \ArrayAccess, \Countable{
+    public function __construct($name = "", $value = [])
+    {
+        $this->name = $name;
+        foreach($value as $k => $v){
+            $this->{$k} = $v;
+        }
+    }
 
-	private $tagType;
+    public function &getValue()
+    {
+        $value = [];
+        foreach($this as $k => $v){
+            if($v instanceof Tag){
+                $value[$k] = $v;
+            }
+        }
 
-	public function __construct($name = "", $value = []){
-		$this->name = $name;
-		foreach($value as $k => $v){
-			$this->{$k} = $v;
-		}
-	}
+        return $value;
+    }
 
-	public function &getValue(){
-		$value = [];
-		foreach($this as $k => $v){
-			if($v instanceof Tag){
-				$value[$k] = $v;
-			}
-		}
+    public function getCount()
+    {
+        $count = 0;
+        foreach($this as $tag){
+            if($tag instanceof Tag){
+                ++$count;
+            }
+        }
 
-		return $value;
-	}
+        return $count;
+    }
 
-	public function getCount(){
-		$count = 0;
-		foreach($this as $tag){
-			if($tag instanceof Tag){
-				++$count;
-			}
-		}
+    public function offsetExists($offset)
+    {
+        return isset($this->{$offset});
+    }
 
-		return $count;
-	}
+    public function offsetGet($offset)
+    {
+        if(isset($this->{$offset}) and $this->{$offset} instanceof Tag){
+            if($this->{$offset} instanceof ArrayAccess){
+                return $this->{$offset};
+            }else{
+                return $this->{$offset}->getValue();
+            }
+        }
 
-	public function offsetExists($offset){
-		return isset($this->{$offset});
-	}
+        return null;
+    }
 
-	public function offsetGet($offset){
-		if(isset($this->{$offset}) and $this->{$offset} instanceof Tag){
-			if($this->{$offset} instanceof \ArrayAccess){
-				return $this->{$offset};
-			}else{
-				return $this->{$offset}->getValue();
-			}
-		}
+    public function offsetSet($offset, $value)
+    {
+        if($value instanceof Tag){
+            $this->{$offset} = $value;
+        }elseif($this->{$offset} instanceof Tag){
+            $this->{$offset}->setValue($value);
+        }
+    }
 
-		return null;
-	}
+    public function offsetUnset($offset)
+    {
+        unset($this->{$offset});
+    }
 
-	public function offsetSet($offset, $value){
-		if($value instanceof Tag){
-			$this->{$offset} = $value;
-		}elseif($this->{$offset} instanceof Tag){
-			$this->{$offset}->setValue($value);
-		}
-	}
+    public function count($mode = COUNT_NORMAL)
+    {
+        for($i = 0; true; $i++){
+            if(!isset($this->{$i})){
+                return $i;
+            }
+            if($mode === COUNT_RECURSIVE){
+                if($this->{$i} instanceof Countable){
+                    $i += count($this->{$i});
+                }
+            }
+        }
 
-	public function offsetUnset($offset){
-		unset($this->{$offset});
-	}
+        return $i;
+    }
 
-	public function count($mode = COUNT_NORMAL){
-		for($i = 0; true; $i++){
-			if(!isset($this->{$i})){
-				return $i;
-			}
-			if($mode === COUNT_RECURSIVE){
-				if($this->{$i} instanceof \Countable){
-					$i += count($this->{$i});
-				}
-			}
-		}
+    public function getType()
+    {
+        return NBT::TAG_Enum;
+    }
 
-		return $i;
-	}
+    public function setTagType($type)
+    {
+        $this->tagType = $type;
+    }
 
-	public function getType(){
-		return NBT::TAG_Enum;
-	}
+    public function getTagType()
+    {
+        return $this->tagType;
+    }
 
-	public function setTagType($type){
-		$this->tagType = $type;
-	}
+    public function read(NBT $nbt, $new = false)
+    {
+        $this->value = [];
+        $this->tagType = ord($nbt->get(1));
+        $size = $new ? $nbt->getSignedVarInt() : $nbt->getInt();
+        for($i = 0; $i < $size and !$nbt->feof(); ++$i){
+            switch($this->tagType){
+                case NBT::TAG_Byte:
+                    $tag = new ByteTag("");
+                    $tag->read($nbt);
+                    $this->{$i} = $tag;
+                    break;
+                case NBT::TAG_Short:
+                    $tag = new ShortTag("");
+                    $tag->read($nbt);
+                    $this->{$i} = $tag;
+                    break;
+                case NBT::TAG_Int:
+                    $tag = new IntTag("");
+                    $tag->read($nbt, $new);
+                    $this->{$i} = $tag;
+                    break;
+                case NBT::TAG_Long:
+                    $tag = new LongTag("");
+                    $tag->read($nbt, $new);
+                    $this->{$i} = $tag;
+                    break;
+                case NBT::TAG_Float:
+                    $tag = new FloatTag("");
+                    $tag->read($nbt);
+                    $this->{$i} = $tag;
+                    break;
+                case NBT::TAG_Double:
+                    $tag = new DoubleTag("");
+                    $tag->read($nbt);
+                    $this->{$i} = $tag;
+                    break;
+                case NBT::TAG_ByteArray:
+                    $tag = new ByteArray("");
+                    $tag->read($nbt, $new);
+                    $this->{$i} = $tag;
+                    break;
+                case NBT::TAG_String:
+                    $tag = new StringTag("");
+                    $tag->read($nbt, $new);
+                    $this->{$i} = $tag;
+                    break;
+                case NBT::TAG_Enum:
+                    $tag = new TagEnum("");
+                    $tag->read($nbt, $new);
+                    $this->{$i} = $tag;
+                    break;
+                case NBT::TAG_Compound:
+                    $tag = new Compound("");
+                    $tag->read($nbt, $new);
+                    $this->{$i} = $tag;
+                    break;
+                case NBT::TAG_IntArray:
+                    $tag = new IntArray("");
+                    $tag->read($nbt, $new);
+                    $this->{$i} = $tag;
+                    break;
+            }
+        }
+    }
 
-	public function getTagType(){
-		return $this->tagType;
-	}
+    public function write(NBT $nbt, $old = false)
+    {
+        if(!isset($this->tagType)){
+            $id = null;
+            foreach($this as $tag){
+                if($tag instanceof Tag){
+                    if(!isset($id)){
+                        $id = $tag->getType();
+                    }elseif($id !== $tag->getType()){
+                        return false;
+                    }
+                }
+            }
+            $this->tagType = $id;
+        }
 
-	public function read(NBT $nbt, $new = false){
-		$this->value = [];
-		$this->tagType = ord($nbt->get(1));
-		$size = $new ? $nbt->getSignedVarInt() : $nbt->getInt();	
-		for($i = 0; $i < $size and !$nbt->feof(); ++$i){
-			switch($this->tagType){
-				case NBT::TAG_Byte:
-					$tag = new ByteTag("");
-					$tag->read($nbt);
-					$this->{$i} = $tag;
-					break;
-				case NBT::TAG_Short:
-					$tag = new ShortTag("");
-					$tag->read($nbt);
-					$this->{$i} = $tag;
-					break;
-				case NBT::TAG_Int:
-					$tag = new IntTag("");
-					$tag->read($nbt, $new);
-					$this->{$i} = $tag;
-					break;
-				case NBT::TAG_Long:
-					$tag = new LongTag("");
-					$tag->read($nbt, $new);
-					$this->{$i} = $tag;
-					break;
-				case NBT::TAG_Float:
-					$tag = new FloatTag("");
-					$tag->read($nbt);
-					$this->{$i} = $tag;
-					break;
-				case NBT::TAG_Double:
-					$tag = new DoubleTag("");
-					$tag->read($nbt);
-					$this->{$i} = $tag;
-					break;
-				case NBT::TAG_ByteArray:
-					$tag = new ByteArray("");
-					$tag->read($nbt, $new);
-					$this->{$i} = $tag;
-					break;
-				case NBT::TAG_String:
-					$tag = new StringTag("");
-					$tag->read($nbt, $new);
-					$this->{$i} = $tag;
-					break;
-				case NBT::TAG_Enum:
-					$tag = new TagEnum("");
-					$tag->read($nbt, $new);
-					$this->{$i} = $tag;
-					break;
-				case NBT::TAG_Compound:
-					$tag = new Compound("");
-					$tag->read($nbt, $new);
-					$this->{$i} = $tag;
-					break;
-				case NBT::TAG_IntArray:
-					$tag = new IntArray("");
-					$tag->read($nbt, $new);
-					$this->{$i} = $tag;
-					break;
-			}
-		}
-	}
+        $nbt->buffer .= chr($this->tagType);
 
-	public function write(NBT $nbt, $old = false){
-		if(!isset($this->tagType)){
-			$id = null;
-			foreach($this as $tag){
-				if($tag instanceof Tag){
-					if(!isset($id)){
-						$id = $tag->getType();
-					}elseif($id !== $tag->getType()){
-						return false;
-					}
-				}
-			}
-			$this->tagType = $id;
-		}
+        /** @var Tag[] $tags */
+        $tags = [];
+        foreach($this as $tag){
+            if($tag instanceof Tag){
+                $tags[] = $tag;
+            }
+        }
+        if($old){
+            $nbt->buffer .= $nbt->endianness === 1 ? pack("N", count($tags)) : pack("V", count($tags));
+        }else{
+            $nbt->putSignedVarInt(count($tags));
+        }
+        foreach($tags as $tag){
+            $tag->write($nbt, $old);
+        }
+    }
 
-		$nbt->buffer .= chr($this->tagType);
-
-		/** @var Tag[] $tags */
-		$tags = [];
-		foreach($this as $tag){
-			if($tag instanceof Tag){
-				$tags[] = $tag;
-			}
-		}
-		if ($old) {
-			$nbt->buffer .= $nbt->endianness === 1 ? pack("N", count($tags)) : pack("V", count($tags));
-		} else {
-			$nbt->putSignedVarInt(count($tags));
-		}
-		foreach($tags as $tag){
-			$tag->write($nbt, $old);
-		}
-	}
-
-	public function __toString(){
-		$str = get_class($this) . "{\n";
-		foreach($this as $tag){
-			if($tag instanceof Tag){
-				$str .= get_class($tag) . ":" . $tag->__toString() . "\n";
-			}
-		}
-		return $str . "}";
-	}
+    public function __toString()
+    {
+        $str = get_class($this) . "{\n";
+        foreach($this as $tag){
+            if($tag instanceof Tag){
+                $str .= get_class($tag) . ":" . $tag->__toString() . "\n";
+            }
+        }
+        return $str . "}";
+    }
 }

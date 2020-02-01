@@ -23,21 +23,21 @@ namespace mcpp\network\protocol;
 
 #include <rules/DataPacket.h>
 
+class SetDifficultyPacket extends PEPacket
+{
+    const NETWORK_ID = Info::SET_DIFFICULTY_PACKET;
+    const PACKET_NAME = "SET_DIFFICULTY_PACKET";
+    public $difficulty;
 
-class SetDifficultyPacket extends PEPacket{
-	const NETWORK_ID = Info::SET_DIFFICULTY_PACKET;
-	const PACKET_NAME = "SET_DIFFICULTY_PACKET";
+    public function decode($playerProtocol)
+    {
+        $this->getHeader($playerProtocol);
+        $this->difficulty = $this->getVarInt();
+    }
 
-	public $difficulty;
-
-	public function decode($playerProtocol){
-		$this->getHeader($playerProtocol);
-		$this->difficulty = $this->getVarInt();
-	}
-
-	public function encode($playerProtocol){
-		$this->reset($playerProtocol);
-		$this->putVarInt($this->difficulty);
-	}
-
+    public function encode($playerProtocol)
+    {
+        $this->reset($playerProtocol);
+        $this->putVarInt($this->difficulty);
+    }
 }

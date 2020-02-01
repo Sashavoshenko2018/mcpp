@@ -26,61 +26,68 @@ use mcpp\item\Tool;
 use mcpp\level\Level;
 use mcpp\Player;
 
-class SnowLayer extends Flowable{
+class SnowLayer extends Flowable
+{
+    protected $id = self::SNOW_LAYER;
 
-	protected $id = self::SNOW_LAYER;
+    public function __construct($meta = 0)
+    {
+        $this->meta = $meta;
+    }
 
-	public function __construct($meta = 0){
-		$this->meta = $meta;
-	}
+    public function getName()
+    {
+        return "Snow Layer";
+    }
 
-	public function getName(){
-		return "Snow Layer";
-	}
+    public function canBeReplaced()
+    {
+        return true;
+    }
 
-	public function canBeReplaced(){
-		return true;
-	}
+    public function getHardness()
+    {
+        return 0.1;
+    }
 
-	public function getHardness(){
-		return 0.1;
-	}
+    public function getToolType()
+    {
+        return Tool::TYPE_SHOVEL;
+    }
 
-	public function getToolType(){
-		return Tool::TYPE_SHOVEL;
-	}
+    public function place(Item $item, Block $block, Block $target, $face, $fx, $fy, $fz, Player $player = null)
+    {
+        $down = $this->getSide(0);
+        if($down->isSolid()){
+            $this->getLevel()->setBlock($block, $this, true);
 
+            return true;
+        }
 
-	public function place(Item $item, Block $block, Block $target, $face, $fx, $fy, $fz, Player $player = null){
-		$down = $this->getSide(0);
-		if($down->isSolid()){
-			$this->getLevel()->setBlock($block, $this, true);
+        return false;
+    }
 
-			return true;
-		}
+    public function onUpdate($type)
+    {
+        if($type === Level::BLOCK_UPDATE_NORMAL){
+            if($this->getSide(0)->getId() === self::AIR){ //Replace with common break method
+                $this->getLevel()->setBlock($this, new Air(), true);
 
-		return false;
-	}
+                return Level::BLOCK_UPDATE_NORMAL;
+            }
+        }
 
-	public function onUpdate($type){
-		if($type === Level::BLOCK_UPDATE_NORMAL){
-			if($this->getSide(0)->getId() === self::AIR){ //Replace with common break method
-				$this->getLevel()->setBlock($this, new Air(), true);
+        return false;
+    }
 
-				return Level::BLOCK_UPDATE_NORMAL;
-			}
-		}
+    public function getDrops(Item $item)
+    {
+        if($item->isShovel() !== false){
+            return [
+                [Item::SNOWBALL, 0, 1],
+            ];
+        }
 
-		return false;
-	}
-
-	public function getDrops(Item $item){
-		if($item->isShovel() !== false){
-			return [
-				[Item::SNOWBALL, 0, 1],
-			];
-		}
-
-		return [];
-	}
+        return [];
+    }
 }

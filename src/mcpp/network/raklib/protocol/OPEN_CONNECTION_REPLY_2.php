@@ -17,18 +17,18 @@ namespace mcpp\network\raklib\protocol;
 
 #include <rules/RakLibPacket.h>
 
-
 use mcpp\network\raklib\RakLib;
 
-class OPEN_CONNECTION_REPLY_2 extends Packet{
+class OPEN_CONNECTION_REPLY_2 extends Packet
+{
     public static $ID = 0x08;
-
     public $serverID;
     public $clientAddress;
     public $clientPort;
     public $mtuSize;
 
-    public function encode(){
+    public function encode()
+    {
         parent::encode();
         $this->put(RakLib::MAGIC);
         $this->putLong($this->serverID);
@@ -37,11 +37,12 @@ class OPEN_CONNECTION_REPLY_2 extends Packet{
         $this->putByte(0); //server security
     }
 
-    public function decode(){
+    public function decode()
+    {
         parent::decode();
         $this->offset += 16; //Magic
         $this->serverID = $this->getLong();
-		$this->getAddress($this->clientAddress, $this->clientPort);
+        $this->getAddress($this->clientAddress, $this->clientPort);
         $this->mtuSize = $this->getShort();
         //server security
     }

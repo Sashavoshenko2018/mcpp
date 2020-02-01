@@ -21,7 +21,6 @@
 
 namespace mcpp\entity;
 
-
-interface Damageable{
-
+interface Damageable
+{
 }

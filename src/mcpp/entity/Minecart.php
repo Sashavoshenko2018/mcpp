@@ -21,7 +21,6 @@
 
 namespace mcpp\entity;
 
-
-class Minecart extends Vehicle{
-
+class Minecart extends Vehicle
+{
 }

@@ -24,11 +24,10 @@ namespace mcpp\level\sound;
 use mcpp\math\Vector3;
 use mcpp\network\protocol\DataPacket;
 
-abstract class Sound extends Vector3{
-	
-	/**
-	 * @return DataPacket|DataPacket[]
-	 */
-	abstract public function encode();
-
+abstract class Sound extends Vector3
+{
+    /**
+     * @return DataPacket|DataPacket[]
+     */
+    abstract public function encode();
 }

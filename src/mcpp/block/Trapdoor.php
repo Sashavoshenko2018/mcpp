@@ -27,144 +27,152 @@ use mcpp\level\sound\DoorSound;
 use mcpp\math\AxisAlignedBB;
 use mcpp\Player;
 
-class Trapdoor extends Transparent{
+class Trapdoor extends Transparent
+{
+    protected $id = self::TRAPDOOR;
 
-	protected $id = self::TRAPDOOR;
+    public function __construct($meta = 0)
+    {
+        $this->meta = $meta;
+    }
 
-	public function __construct($meta = 0){
-		$this->meta = $meta;
-	}
+    public function getName()
+    {
+        return "Wooden Trapdoor";
+    }
 
-	public function getName(){
-		return "Wooden Trapdoor";
-	}
+    public function getHardness()
+    {
+        return 3;
+    }
 
-	public function getHardness(){
-		return 3;
-	}
+    public function canBeActivated()
+    {
+        return true;
+    }
 
-	public function canBeActivated(){
-		return true;
-	}
+    protected function recalculateBoundingBox()
+    {
+        $damage = $this->getDamage();
 
-	protected function recalculateBoundingBox(){
+        $f = 0.1875;
 
-		$damage = $this->getDamage();
+        if(($damage & 0x08) > 0){
+            $bb = new AxisAlignedBB(
+                $this->x,
+                $this->y + 1 - $f,
+                $this->z,
+                $this->x + 1,
+                $this->y + 1,
+                $this->z + 1
+            );
+        }else{
+            $bb = new AxisAlignedBB(
+                $this->x,
+                $this->y,
+                $this->z,
+                $this->x + 1,
+                $this->y + $f,
+                $this->z + 1
+            );
+        }
 
-		$f = 0.1875;
+        if(($damage & 0x04) > 0){
+            if(($damage & 0x03) === 0){
+                $bb->setBounds(
+                    $this->x,
+                    $this->y,
+                    $this->z + 1 - $f,
+                    $this->x + 1,
+                    $this->y + 1,
+                    $this->z + 1
+                );
+            }elseif(($damage & 0x03) === 1){
+                $bb->setBounds(
+                    $this->x,
+                    $this->y,
+                    $this->z,
+                    $this->x + 1,
+                    $this->y + 1,
+                    $this->z + $f
+                );
+            }
+            if(($damage & 0x03) === 2){
+                $bb->setBounds(
+                    $this->x + 1 - $f,
+                    $this->y,
+                    $this->z,
+                    $this->x + 1,
+                    $this->y + 1,
+                    $this->z + 1
+                );
+            }
+            if(($damage & 0x03) === 3){
+                $bb->setBounds(
+                    $this->x,
+                    $this->y,
+                    $this->z,
+                    $this->x + $f,
+                    $this->y + 1,
+                    $this->z + 1
+                );
+            }
+        }
 
-		if(($damage & 0x08) > 0){
-			$bb = new AxisAlignedBB(
-				$this->x,
-				$this->y + 1 - $f,
-				$this->z,
-				$this->x + 1,
-				$this->y + 1,
-				$this->z + 1
-			);
-		}else{
-			$bb = new AxisAlignedBB(
-				$this->x,
-				$this->y,
-				$this->z,
-				$this->x + 1,
-				$this->y + $f,
-				$this->z + 1
-			);
-		}
+        return $bb;
+    }
 
-		if(($damage & 0x04) > 0){
-			if(($damage & 0x03) === 0){
-				$bb->setBounds(
-					$this->x,
-					$this->y,
-					$this->z + 1 - $f,
-					$this->x + 1,
-					$this->y + 1,
-					$this->z + 1
-				);
-			}elseif(($damage & 0x03) === 1){
-				$bb->setBounds(
-					$this->x,
-					$this->y,
-					$this->z,
-					$this->x + 1,
-					$this->y + 1,
-					$this->z + $f
-				);
-			}
-			if(($damage & 0x03) === 2){
-				$bb->setBounds(
-					$this->x + 1 - $f,
-					$this->y,
-					$this->z,
-					$this->x + 1,
-					$this->y + 1,
-					$this->z + 1
-				);
-			}
-			if(($damage & 0x03) === 3){
-				$bb->setBounds(
-					$this->x,
-					$this->y,
-					$this->z,
-					$this->x + $f,
-					$this->y + 1,
-					$this->z + 1
-				);
-			}
-		}
+    public function place(Item $item, Block $block, Block $target, $face, $fx, $fy, $fz, Player $player = null)
+    {
+        if($target->isTransparent() === false || $target->getId() === self::SLAB){
+            if($face == 0 || $face == 1){
+                $directions = [
+                    0 => 1,
+                    1 => 3,
+                    2 => 0,
+                    3 => 2
+                ];
+                if($player !== null){
+                    $this->meta = $directions[$player->getDirection() & 0x03];
+                }
+                if($face == 0){
+                    $this->meta |= 0x04;
+                }
+            }else{
+                $faces = [
+                    2 => 3,
+                    3 => 2,
+                    4 => 1,
+                    5 => 0,
+                ];
+                $this->meta = $faces[$face];
+                if($fy > 0.5){
+                    $this->meta |= 0x04;
+                }
+            }
+            $this->getLevel()->setBlock($block, $this, true, true);
+            return true;
+        }
+        return false;
+    }
 
-		return $bb;
-	}
+    public function getDrops(Item $item)
+    {
+        return [
+            [$this->id, 0, 1],
+        ];
+    }
 
-	public function place(Item $item, Block $block, Block $target, $face, $fx, $fy, $fz, Player $player = null){
-		if($target->isTransparent() === false || $target->getId() === self::SLAB){
-			if ($face == 0 || $face == 1) {
-				$directions = [
-					0 => 1,
-					1 => 3,
-					2 => 0,
-					3 => 2
-				];
-				if($player !== null){
-					$this->meta = $directions[$player->getDirection() & 0x03];
-				}
-				if ($face == 0) {
-					$this->meta |= 0x04; 
-				}				
-			} else {				
-				$faces = [
-					2 => 3,
-					3 => 2,
-					4 => 1,
-					5 => 0,
-				];
-				$this->meta = $faces[$face];
-				if ($fy > 0.5) {
-					$this->meta |= 0x04;
-				}
-			}
-			$this->getLevel()->setBlock($block, $this, true, true);
-			return true;
-		}
-		return false;
-	}
+    public function onActivate(Item $item, Player $player = null)
+    {
+        $this->meta ^= 0x08;
+        $this->getLevel()->setBlock($this, $this, true);
+        $this->level->addSound(new DoorSound($this));
+        return true;
+    }
 
-	public function getDrops(Item $item){
-		return [
-			[$this->id, 0, 1],
-		];
-	}
-
-	public function onActivate(Item $item, Player $player = null){
-		$this->meta ^= 0x08;
-		$this->getLevel()->setBlock($this, $this, true);
-		$this->level->addSound(new DoorSound($this));
-		return true;
-	}
-
-	public function getToolType(){
-		return Tool::TYPE_AXE;
-	}
+    public function getToolType()
+    {
+        return Tool::TYPE_AXE;
+    }
 }

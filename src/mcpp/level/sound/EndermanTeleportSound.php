@@ -24,8 +24,10 @@ namespace mcpp\level\sound;
 use mcpp\math\Vector3;
 use mcpp\network\protocol\LevelEventPacket;
 
-class EndermanTeleportSound extends GenericSound{
-	public function __construct(Vector3 $pos){
-		parent::__construct($pos, LevelEventPacket::EVENT_SOUND_ENDERMAN_TELEPORT);
-	}
+class EndermanTeleportSound extends GenericSound
+{
+    public function __construct(Vector3 $pos)
+    {
+        parent::__construct($pos, LevelEventPacket::EVENT_SOUND_ENDERMAN_TELEPORT);
+    }
 }

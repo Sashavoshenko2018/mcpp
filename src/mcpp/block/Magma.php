@@ -24,28 +24,31 @@ namespace mcpp\block;
 use mcpp\item\Item;
 use mcpp\item\Tool;
 
-class Magma extends Solid {
+class Magma extends Solid
+{
+    protected $id = self::MAGMA;
 
-	protected $id = self::MAGMA;
+    public function __construct()
+    {
+    }
 
-	public function __construct() {
-		
-	}
+    public function getHardness()
+    {
+        return 0.5;
+    }
 
-	public function getHardness() {
-		return 0.5;
-	}
+    public function getName()
+    {
+        return "Magma";
+    }
 
-	public function getName() {
-		return "Magma";
-	}
+    public function getToolType()
+    {
+        return Tool::TYPE_PICKAXE;
+    }
 
-	public function getToolType() {
-		return Tool::TYPE_PICKAXE;
-	}
-	
-	public function getDrops(Item $item) {
-		return [];
-	}
-
+    public function getDrops(Item $item)
+    {
+        return [];
+    }
 }

@@ -22,26 +22,30 @@
 /**
  * Level related events
  */
+
 namespace mcpp\event\level;
 
 use mcpp\event\Event;
 use mcpp\level\Level;
 
-abstract class LevelEvent extends Event{
-	/** @var \mcpp\level\Level */
-	private $level;
+abstract class LevelEvent extends Event
+{
+    /** @var Level */
+    private $level;
 
-	/**
-	 * @param Level $level
-	 */
-	public function __construct(Level $level){
-		$this->level = $level;
-	}
+    /**
+     * @param Level $level
+     */
+    public function __construct(Level $level)
+    {
+        $this->level = $level;
+    }
 
-	/**
-	 * @return \mcpp\level\Level
-	 */
-	public function getLevel(){
-		return $this->level;
-	}
+    /**
+     * @return Level
+     */
+    public function getLevel()
+    {
+        return $this->level;
+    }
 }

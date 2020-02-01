@@ -21,19 +21,19 @@
 
 namespace mcpp\level\generator\normal\biome;
 
+class DesertBiome extends SandyBiome
+{
+    public function __construct()
+    {
+        parent::__construct();
+        $this->setElevation(63, 69);
 
+        $this->temperature = 2;
+        $this->rainfall = 0;
+    }
 
-class DesertBiome extends SandyBiome{
-
-	public function __construct(){
-		parent::__construct();
-		$this->setElevation(63, 69);
-
-		$this->temperature = 2;
-		$this->rainfall = 0;
-	}
-
-	public function getName(){
-		return "Desert";
-	}
+    public function getName()
+    {
+        return "Desert";
+    }
 }

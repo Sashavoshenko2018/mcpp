@@ -21,6 +21,8 @@
 
 namespace mcpp\utils;
 
-class ServerException extends \RuntimeException{
+use RuntimeException;
 
+class ServerException extends RuntimeException
+{
 }

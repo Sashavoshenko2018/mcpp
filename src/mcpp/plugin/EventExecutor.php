@@ -24,13 +24,13 @@ namespace mcpp\plugin;
 use mcpp\event\Event;
 use mcpp\event\Listener;
 
-interface EventExecutor{
-
-	/**
-	 * @param Listener $listener
-	 * @param Event    $event
-	 *
-	 * @return void
-	 */
-	public function execute(Listener $listener, Event $event);
+interface EventExecutor
+{
+    /**
+     * @param Listener $listener
+     * @param Event $event
+     *
+     * @return void
+     */
+    public function execute(Listener $listener, Event $event);
 }

@@ -23,9 +23,10 @@ namespace mcpp\level\generator\normal\biome;
 
 use mcpp\level\generator\biome\Biome;
 
-abstract class NormalBiome extends Biome{
-
-	public function getColor(){
-		return $this->grassColor;
-	}
+abstract class NormalBiome extends Biome
+{
+    public function getColor()
+    {
+        return $this->grassColor;
+    }
 }

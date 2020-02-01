@@ -23,11 +23,12 @@ namespace mcpp\level\particle;
 
 use mcpp\math\Vector3;
 
-class PortalParticle extends GenericParticle{
-	
-	protected $customSpawnName = "minecraft:basic_portal_particle";
-	
-	public function __construct(Vector3 $pos){
-		parent::__construct($pos, Particle::TYPE_PORTAL);
-	}
+class PortalParticle extends GenericParticle
+{
+    protected $customSpawnName = "minecraft:basic_portal_particle";
+
+    public function __construct(Vector3 $pos)
+    {
+        parent::__construct($pos, Particle::TYPE_PORTAL);
+    }
 }

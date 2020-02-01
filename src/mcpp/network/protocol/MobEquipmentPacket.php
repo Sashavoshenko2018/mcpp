@@ -23,34 +23,34 @@ namespace mcpp\network\protocol;
 
 #include <rules/DataPacket.h>
 
+class MobEquipmentPacket extends PEPacket
+{
+    const NETWORK_ID = Info::MOB_EQUIPMENT_PACKET;
+    const PACKET_NAME = "MOB_EQUIPMENT_PACKET";
+    public $eid;
+    public $item;
+    public $slot;
+    public $selectedSlot;
+    public $windowId = 0;
+    const WINDOW_ID_PLAYER_OFFHAND = 0x77;
 
-class MobEquipmentPacket extends PEPacket{
-	const NETWORK_ID = Info::MOB_EQUIPMENT_PACKET;
-	const PACKET_NAME = "MOB_EQUIPMENT_PACKET";
+    public function decode($playerProtocol)
+    {
+        $this->getHeader($playerProtocol);
+        $this->eid = $this->getVarInt();
+        $this->item = $this->getSlot($playerProtocol);
+        $this->slot = $this->getByte();
+        $this->selectedSlot = $this->getByte();
+        $this->windowId = $this->getByte();
+    }
 
-	public $eid;
-	public $item;
-	public $slot;
-	public $selectedSlot;
-	public $windowId = 0;
-	
-	const WINDOW_ID_PLAYER_OFFHAND = 0x77;
-
-	public function decode($playerProtocol){
-		$this->getHeader($playerProtocol);
-		$this->eid = $this->getVarInt();
-		$this->item = $this->getSlot($playerProtocol);
-		$this->slot = $this->getByte();
-		$this->selectedSlot = $this->getByte();
-		$this->windowId = $this->getByte();
-	}
-
-	public function encode($playerProtocol){
-		$this->reset($playerProtocol);
-		$this->putVarInt($this->eid);
-		$this->putSlot($this->item, $playerProtocol);
-		$this->putByte($this->slot);
-		$this->putByte($this->selectedSlot);
-		$this->putByte($this->windowId);
-	}
+    public function encode($playerProtocol)
+    {
+        $this->reset($playerProtocol);
+        $this->putVarInt($this->eid);
+        $this->putSlot($this->item, $playerProtocol);
+        $this->putByte($this->slot);
+        $this->putByte($this->selectedSlot);
+        $this->putByte($this->windowId);
+    }
 }

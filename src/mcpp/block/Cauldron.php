@@ -24,29 +24,33 @@ namespace mcpp\block;
 use mcpp\item\Item;
 use mcpp\item\Tool;
 
-class Cauldron extends Solid {
+class Cauldron extends Solid
+{
+    protected $id = self::CAULDRON;
 
-	protected $id = self::CAULDRON;
-	
-	public function __construct() {
-		
-	}
+    public function __construct()
+    {
+    }
 
-	public function getHardness(){
-		return 2;
-	}
+    public function getHardness()
+    {
+        return 2;
+    }
 
-	public function getName(){
-		return "Cauldron";
-	}
+    public function getName()
+    {
+        return "Cauldron";
+    }
 
-	public function getToolType() {
-		return Tool::TYPE_PICKAXE;
-	}
+    public function getToolType()
+    {
+        return Tool::TYPE_PICKAXE;
+    }
 
-	public function getDrops(Item $item){
-		return [
-			[Item::CAULDRON, 0, 1]
-		];
-	}
+    public function getDrops(Item $item)
+    {
+        return [
+            [Item::CAULDRON, 0, 1]
+        ];
+    }
 }

@@ -23,20 +23,19 @@ namespace mcpp\network\protocol;
 
 #include <rules/DataPacket.h>
 
+class SetPlayerGameTypePacket extends PEPacket
+{
+    const NETWORK_ID = Info::SET_PLAYER_GAMETYPE_PACKET;
+    const PACKET_NAME = "SET_PLAYER_GAMETYPE_PACKET";
+    public $gamemode;
 
-class SetPlayerGameTypePacket extends PEPacket{
-	const NETWORK_ID = Info::SET_PLAYER_GAMETYPE_PACKET;
-	const PACKET_NAME = "SET_PLAYER_GAMETYPE_PACKET";
+    public function decode($playerProtocol)
+    {
+    }
 
-	public $gamemode;
-
-	public function decode($playerProtocol){
-
-	}
-
-	public function encode($playerProtocol){
-		$this->reset($playerProtocol);
-		$this->putSignedVarInt($this->gamemode);
-	}
-
+    public function encode($playerProtocol)
+    {
+        $this->reset($playerProtocol);
+        $this->putSignedVarInt($this->gamemode);
+    }
 }

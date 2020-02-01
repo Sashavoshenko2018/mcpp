@@ -21,7 +21,6 @@
 
 namespace mcpp\entity;
 
-
-interface Tameable{
-
+interface Tameable
+{
 }

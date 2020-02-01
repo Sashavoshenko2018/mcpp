@@ -24,8 +24,10 @@ namespace mcpp\level\sound;
 use mcpp\math\Vector3;
 use mcpp\network\protocol\LevelEventPacket;
 
-class DoorSound extends GenericSound{
-	public function __construct(Vector3 $pos, $pitch = 0){
-		parent::__construct($pos, LevelEventPacket::EVENT_SOUND_DOOR, $pitch);
-	}
+class DoorSound extends GenericSound
+{
+    public function __construct(Vector3 $pos, $pitch = 0)
+    {
+        parent::__construct($pos, LevelEventPacket::EVENT_SOUND_DOOR, $pitch);
+    }
 }

@@ -21,8 +21,9 @@
 
 namespace mcpp\utils;
 
-class MonkeyPatch{
-	public function __construct(){
-
-	}
+class MonkeyPatch
+{
+    public function __construct()
+    {
+    }
 }

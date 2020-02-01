@@ -24,25 +24,26 @@ namespace mcpp\event\entity;
 use mcpp\block\Block;
 use mcpp\entity\Entity;
 
-class EntityCombustByBlockEvent extends EntityCombustEvent{
+class EntityCombustByBlockEvent extends EntityCombustEvent
+{
+    protected $combuster;
 
-	protected $combuster;
+    /**
+     * @param Block $combuster
+     * @param Entity $combustee
+     * @param int $duration
+     */
+    public function __construct(Block $combuster, Entity $combustee, $duration)
+    {
+        parent::__construct($combustee, $duration);
+        $this->combuster = $combuster;
+    }
 
-	/**
-	 * @param Block  $combuster
-	 * @param Entity $combustee
-	 * @param int    $duration
-	 */
-	public function __construct(Block $combuster, Entity $combustee, $duration){
-		parent::__construct($combustee, $duration);
-		$this->combuster = $combuster;
-	}
-
-	/**
-	 * @return Block
-	 */
-	public function getCombuster(){
-		return $this->combuster;
-	}
-
+    /**
+     * @return Block
+     */
+    public function getCombuster()
+    {
+        return $this->combuster;
+    }
 }

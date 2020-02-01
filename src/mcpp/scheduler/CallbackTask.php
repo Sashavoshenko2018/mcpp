@@ -30,33 +30,34 @@ namespace mcpp\scheduler;
  * @deprecated
  *
  */
-class CallbackTask extends Task{
+class CallbackTask extends Task
+{
+    /** @var callable */
+    protected $callable;
+    /** @var array */
+    protected $args;
 
-	/** @var callable */
-	protected $callable;
+    /**
+     * @param callable $callable
+     * @param array $args
+     */
+    public function __construct(callable $callable, array $args = [])
+    {
+        $this->callable = $callable;
+        $this->args = $args;
+        $this->args[] = $this;
+    }
 
-	/** @var array */
-	protected $args;
+    /**
+     * @return callable
+     */
+    public function getCallable()
+    {
+        return $this->callable;
+    }
 
-	/**
-	 * @param callable $callable
-	 * @param array    $args
-	 */
-	public function __construct(callable $callable, array $args = []){
-		$this->callable = $callable;
-		$this->args = $args;
-		$this->args[] = $this;
-	}
-
-	/**
-	 * @return callable
-	 */
-	public function getCallable(){
-		return $this->callable;
-	}
-
-	public function onRun($currentTicks){
-		call_user_func_array($this->callable, $this->args);
-	}
-
+    public function onRun($currentTicks)
+    {
+        call_user_func_array($this->callable, $this->args);
+    }
 }

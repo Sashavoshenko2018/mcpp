@@ -30,100 +30,107 @@ use mcpp\nbt\tag\StringTag;
 use mcpp\Player;
 use mcpp\tile\Tile;
 
-class EnchantingTable extends Transparent {
+class EnchantingTable extends Transparent
+{
+    protected $id = self::ENCHANTING_TABLE;
 
-	protected $id = self::ENCHANTING_TABLE;
+    public function __construct()
+    {
+    }
 
-	public function __construct() {
-		
-	}
+    public function place(Item $item, Block $block, Block $target, $face, $fx, $fy, $fz, Player $player = null)
+    {
+        $this->getLevel()->setBlock($block, $this, true, true);
+        $nbt = new Compound("", [
+            new StringTag("id", Tile::ENCHANT_TABLE),
+            new IntTag("x", $this->x),
+            new IntTag("y", $this->y),
+            new IntTag("z", $this->z)
+        ]);
 
-	public function place(Item $item, Block $block, Block $target, $face, $fx, $fy, $fz, Player $player = null) {
-		$this->getLevel()->setBlock($block, $this, true, true);
-		$nbt = new Compound("", [
-			new StringTag("id", Tile::ENCHANT_TABLE),
-			new IntTag("x", $this->x),
-			new IntTag("y", $this->y),
-			new IntTag("z", $this->z)
-		]);
+        if($item->hasCustomName()){
+            $nbt->CustomName = new StringTag("CustomName", $item->getCustomName());
+        }
 
-		if ($item->hasCustomName()) {
-			$nbt->CustomName = new StringTag("CustomName", $item->getCustomName());
-		}
+        if($item->hasCustomBlockData()){
+            foreach($item->getCustomBlockData() as $key => $v){
+                $nbt->{$key} = $v;
+            }
+        }
 
-		if ($item->hasCustomBlockData()) {
-			foreach ($item->getCustomBlockData() as $key => $v) {
-				$nbt->{$key} = $v;
-			}
-		}
+        Tile::createTile(Tile::ENCHANT_TABLE, $this->getLevel()->getChunk($this->x >> 4, $this->z >> 4), $nbt);
 
-		Tile::createTile(Tile::ENCHANT_TABLE, $this->getLevel()->getChunk($this->x >> 4, $this->z >> 4), $nbt);
+        return true;
+    }
 
-		return true;
-	}
+    public function canBeActivated()
+    {
+        return true;
+    }
 
-	public function canBeActivated() {
-		return true;
-	}
+    public function getHardness()
+    {
+        return 5;
+    }
 
-	public function getHardness() {
-		return 5;
-	}
+    public function getResistance()
+    {
+        return 6000;
+    }
 
-	public function getResistance() {
-		return 6000;
-	}
+    public function getName()
+    {
+        return "Enchanting Table";
+    }
 
-	public function getName() {
-		return "Enchanting Table";
-	}
+    public function getToolType()
+    {
+        return Tool::TYPE_PICKAXE;
+    }
 
-	public function getToolType() {
-		return Tool::TYPE_PICKAXE;
-	}
+    public function onActivate(Item $item, Player $player = null)
+    {
+        if($player instanceof Player){
+            if($player->isCreative()){
+                return true;
+            }
+            $tile = $this->getLevel()->getTile($this);
+            $enchantTable = null;
+            if($tile instanceof EnchantTable){
+                $enchantTable = $tile;
+            }else{
+                $this->getLevel()->setBlock($this, $this, true, true);
+                $nbt = new Compound("", [
+                    new StringTag("id", Tile::ENCHANT_TABLE),
+                    new IntTag("x", $this->x),
+                    new IntTag("y", $this->y),
+                    new IntTag("z", $this->z)
+                ]);
+                if($item->hasCustomName()){
+                    $nbt->CustomName = new StringTag("CustomName", $item->getCustomName());
+                }
+                if($item->hasCustomBlockData()){
+                    foreach($item->getCustomBlockData() as $key => $v){
+                        $nbt->{$key} = $v;
+                    }
+                }
+                /** @var EnchantTable $enchantTable */
+                $enchantTable = Tile::createTile(Tile::ENCHANT_TABLE, $this->getLevel()->getChunk($this->x >> 4, $this->z >> 4), $nbt);
+            }
+            $player->craftingType = Player::CRAFTING_ENCHANT;
+            $player->addWindow(new EnchantInventory($this, $player));
+        }
+        return true;
+    }
 
-	public function onActivate(Item $item, Player $player = null) {
-		if ($player instanceof Player) {
-			if ($player->isCreative()) {
-				return true;
-			}
-			$tile = $this->getLevel()->getTile($this);
-			$enchantTable = null;
-			if ($tile instanceof EnchantTable) {
-				$enchantTable = $tile;
-			} else {
-				$this->getLevel()->setBlock($this, $this, true, true);
-				$nbt = new Compound("", [
-					new StringTag("id", Tile::ENCHANT_TABLE),
-					new IntTag("x", $this->x),
-					new IntTag("y", $this->y),
-					new IntTag("z", $this->z)
-				]);
-				if ($item->hasCustomName()) {
-					$nbt->CustomName = new StringTag("CustomName", $item->getCustomName());
-				}
-				if ($item->hasCustomBlockData()) {
-					foreach ($item->getCustomBlockData() as $key => $v) {
-						$nbt->{$key} = $v;
-					}
-				}
-				/** @var EnchantTable $enchantTable */
-				$enchantTable = Tile::createTile(Tile::ENCHANT_TABLE, $this->getLevel()->getChunk($this->x >> 4, $this->z >> 4), $nbt);
-			}
-			$player->craftingType = Player::CRAFTING_ENCHANT;
-			$player->addWindow(new EnchantInventory($this, $player));
-		}
-		return true;
-	}
-
-	public function getDrops(Item $item) {
-		if ($item->isPickaxe() >= 1) {
-			return [
-					[$this->id, 0, 1],
-			];
-		} else {
-			return [];
-		}
-	}
-
+    public function getDrops(Item $item)
+    {
+        if($item->isPickaxe() >= 1){
+            return [
+                [$this->id, 0, 1],
+            ];
+        }else{
+            return [];
+        }
+    }
 }

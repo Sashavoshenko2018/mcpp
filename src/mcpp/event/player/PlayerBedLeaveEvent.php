@@ -24,18 +24,19 @@ namespace mcpp\event\player;
 use mcpp\block\Block;
 use mcpp\Player;
 
-class PlayerBedLeaveEvent extends PlayerEvent{
-	public static $handlerList = null;
+class PlayerBedLeaveEvent extends PlayerEvent
+{
+    public static $handlerList = null;
+    private $bed;
 
-	private $bed;
+    public function __construct(Player $player, Block $bed)
+    {
+        $this->player = $player;
+        $this->bed = $bed;
+    }
 
-	public function __construct(Player $player, Block $bed){
-		$this->player = $player;
-		$this->bed = $bed;
-	}
-
-	public function getBed(){
-		return $this->bed;
-	}
-
+    public function getBed()
+    {
+        return $this->bed;
+    }
 }

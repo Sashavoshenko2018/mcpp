@@ -22,10 +22,11 @@
 /**
  * Events related to the server core, like networking, stop, level loading
  */
+
 namespace mcpp\event\server;
 
 use mcpp\event\Event;
 
-abstract class ServerEvent extends Event{
-
+abstract class ServerEvent extends Event
+{
 }

@@ -24,11 +24,12 @@ namespace mcpp\event\block;
 use mcpp\block\Block;
 use mcpp\event\Cancellable;
 
-class LeavesDecayEvent extends BlockEvent implements Cancellable{
-	public static $handlerList = null;
+class LeavesDecayEvent extends BlockEvent implements Cancellable
+{
+    public static $handlerList = null;
 
-	public function __construct(Block $block){
-		parent::__construct($block);
-	}
-
+    public function __construct(Block $block)
+    {
+        parent::__construct($block);
+    }
 }

@@ -24,28 +24,31 @@ namespace mcpp\block;
 use mcpp\item\Item;
 use mcpp\item\Tool;
 
-class PackedIce extends Solid {
+class PackedIce extends Solid
+{
+    protected $id = self::PACKED_ICE;
 
-	protected $id = self::PACKED_ICE;
+    public function __construct()
+    {
+    }
 
-	public function __construct(){
+    public function getName()
+    {
+        return "Packed Ice";
+    }
 
-	}
+    public function getHardness()
+    {
+        return 0.5;
+    }
 
-	public function getName(){
-		return "Packed Ice";
-	}
+    public function getToolType()
+    {
+        return Tool::TYPE_PICKAXE;
+    }
 
-	public function getHardness(){
-		return 0.5;
-	}
-	
-	public function getToolType() {
-		return Tool::TYPE_PICKAXE;
-	}
-	
-	public function getDrops(Item $item) {
-		return [];
-	}
-
+    public function getDrops(Item $item)
+    {
+        return [];
+    }
 }

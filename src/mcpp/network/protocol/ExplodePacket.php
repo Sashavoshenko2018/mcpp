@@ -23,40 +23,40 @@ namespace mcpp\network\protocol;
 
 #include <rules/DataPacket.h>
 
+class ExplodePacket extends PEPacket
+{
+    const NETWORK_ID = Info::EXPLODE_PACKET;
+    const PACKET_NAME = "EXPLODE_PACKET";
+    public $x;
+    public $y;
+    public $z;
+    public $radius;
+    public $records = [];
 
-class ExplodePacket extends PEPacket{
-	const NETWORK_ID = Info::EXPLODE_PACKET;
-	const PACKET_NAME = "EXPLODE_PACKET";
-	
-	public $x;
-	public $y;
-	public $z;
-	public $radius;
-	public $records = [];
+    public function clean()
+    {
+        $this->records = [];
+        return parent::clean();
+    }
 
-	public function clean(){
-		$this->records = [];
-		return parent::clean();
-	}
+    public function decode($playerProtocol)
+    {
+    }
 
-	public function decode($playerProtocol){
-
-	}
-
-	public function encode($playerProtocol){
-		$this->reset($playerProtocol);
-		$this->putLFloat($this->x);
-		$this->putLFloat($this->y);
-		$this->putLFloat($this->z);
-		$this->putVarInt((int) ($this->radius * 100));
-		$this->putVarInt(count($this->records));
-		if(count($this->records) > 0){
-			foreach($this->records as $record){
-				$this->putSignedVarInt($record->x);
-				$this->putSignedVarInt($record->y);
-				$this->putSignedVarInt($record->z);
-			}
-		}
-	}
-
+    public function encode($playerProtocol)
+    {
+        $this->reset($playerProtocol);
+        $this->putLFloat($this->x);
+        $this->putLFloat($this->y);
+        $this->putLFloat($this->z);
+        $this->putVarInt((int)($this->radius * 100));
+        $this->putVarInt(count($this->records));
+        if(count($this->records) > 0){
+            foreach($this->records as $record){
+                $this->putSignedVarInt($record->x);
+                $this->putSignedVarInt($record->y);
+                $this->putSignedVarInt($record->z);
+            }
+        }
+    }
 }

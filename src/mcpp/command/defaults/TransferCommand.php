@@ -25,37 +25,38 @@ use mcpp\command\CommandSender;
 use mcpp\Player;
 use mcpp\utils\TextFormat;
 
-class TransferCommand extends VanillaCommand{
+class TransferCommand extends VanillaCommand
+{
+    public function __construct($name)
+    {
+        parent::__construct(
+            $name,
+            "Transfer player to server",
+            "/transfer <address> [port]"
+        );
+        $this->setPermission("pocketmine.command.transfer");
+    }
 
-	public function __construct($name){
-		parent::__construct(
-			$name,
-			"Transfer player to server",
-			"/transfer <address> [port]"
-		);
-		$this->setPermission("pocketmine.command.transfer");
-	}
+    public function execute(CommandSender $sender, $currentAlias, array $args)
+    {
+        if(!$this->testPermission($sender)){
+            return true;
+        }
 
-	public function execute(CommandSender $sender, $currentAlias, array $args){
-		if(!$this->testPermission($sender)){
-			return true;
-		}
+        if(count($args) < 1){
+            $sender->sendMessage(TextFormat::RED . "Usage: " . $this->usageMessage);
 
-		if(count($args) < 1){
-			$sender->sendMessage(TextFormat::RED . "Usage: " . $this->usageMessage);
+            return false;
+        }
 
-			return false;
-		}
-		
-		if(!($sender instanceof Player)){
-			$sender->sendMessage(TextFormat::RED . "Only for players");
-			return false;
-		}
+        if(!($sender instanceof Player)){
+            $sender->sendMessage(TextFormat::RED . "Only for players");
+            return false;
+        }
 
-		$address = $args[0];
-		$port = isset($args[1]) ? (int) $args[1] : false;
-		
-		$sender->transfer($address, $port);
-		
-	}
+        $address = $args[0];
+        $port = isset($args[1]) ? (int)$args[1] : false;
+
+        $sender->transfer($address, $port);
+    }
 }

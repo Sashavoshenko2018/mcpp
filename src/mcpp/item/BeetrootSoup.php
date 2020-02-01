@@ -21,13 +21,15 @@
 
 namespace mcpp\item;
 
+class BeetrootSoup extends Item
+{
+    public function __construct($meta = 0, $count = 1)
+    {
+        parent::__construct(self::BEETROOT_SOUP, 0, $count, "Beetroot Soup");
+    }
 
-class BeetrootSoup extends Item{
-	public function __construct($meta = 0, $count = 1){
-		parent::__construct(self::BEETROOT_SOUP, 0, $count, "Beetroot Soup");
-	}
-
-	public function getMaxStackSize(){
-		return 1;
-	}
+    public function getMaxStackSize()
+    {
+        return 1;
+    }
 }

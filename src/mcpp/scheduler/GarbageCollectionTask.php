@@ -21,12 +21,14 @@
 
 namespace mcpp\scheduler;
 
-class GarbageCollectionTask extends Task{
+use function gc_collect_cycles;
 
-	public function onRun($currentTicks){
-		\gc_collect_cycles();
-		memory_get_usage();
-		memory_get_usage(true);
-	}
-
+class GarbageCollectionTask extends Task
+{
+    public function onRun($currentTicks)
+    {
+        gc_collect_cycles();
+        memory_get_usage();
+        memory_get_usage(true);
+    }
 }

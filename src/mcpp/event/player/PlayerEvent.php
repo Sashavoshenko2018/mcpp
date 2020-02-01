@@ -22,15 +22,19 @@
 /**
  * Player-only related events
  */
+
 namespace mcpp\event\player;
 
 use mcpp\event\Event;
+use mcpp\Player;
 
-abstract class PlayerEvent extends Event{
-	/** @var \mcpp\Player */
-	protected $player;
+abstract class PlayerEvent extends Event
+{
+    /** @var Player */
+    protected $player;
 
-	public function getPlayer(){
-		return $this->player;
-	}
+    public function getPlayer()
+    {
+        return $this->player;
+    }
 }

@@ -21,16 +21,17 @@
 
 namespace mcpp\item;
 
+class LeatherCap extends Armor
+{
+    const SLOT_NUMBER = 0;
 
-class LeatherCap extends Armor{
-	
-	const SLOT_NUMBER = 0;
-	
-	public function __construct($meta = 0, $count = 1){
-		parent::__construct(self::LEATHER_CAP, $meta, $count, "Leather Cap");
-	}
-	
-	public function getMaxDurability() {
-		return 56;
-	}
+    public function __construct($meta = 0, $count = 1)
+    {
+        parent::__construct(self::LEATHER_CAP, $meta, $count, "Leather Cap");
+    }
+
+    public function getMaxDurability()
+    {
+        return 56;
+    }
 }

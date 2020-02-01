@@ -33,15 +33,15 @@ fi
 
 if [ "$POCKETMINE_FILE" == "" ]; then
 	if [ -f ./PocketMine-MP.phar ]; then
-		POCKETMINE_FILE="./PocketMine-MP.phar"
+		POCKETMINE_FILE="./mcpp.phar"
 	elif [ -f ./src/mcpp/Main.php ]; then
 		POCKETMINE_FILE="./src/mcpp/Main.php"
     else
-		echo "PocketMine-MP.phar not found"
-		echo "Downloads can be found at https://github.com/pmmp/PocketMine-MP/releases"
+		echo "mcpp.phar not found"
+		echo "Downloads can be found at https://github.com/ShadowicTeam/mcpp/releases"
 		exit 1
 	fi
-fi
+fi 
 
 LOOPS=0
 

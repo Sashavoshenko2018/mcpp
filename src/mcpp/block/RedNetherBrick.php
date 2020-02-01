@@ -23,18 +23,19 @@ namespace mcpp\block;
 
 use mcpp\item\Item;
 
-class RedNetherBrick extends NetherBrick {
+class RedNetherBrick extends NetherBrick
+{
+    protected $id = self::RED_NETHER_BRICK;
 
-	protected $id = self::RED_NETHER_BRICK;
-	
-	public function getName() {
-		return "Red Nether Brick";
-	}
+    public function getName()
+    {
+        return "Red Nether Brick";
+    }
 
-	public function getDrops(Item $item) {
-		return [
-			[Item::RED_NETHER_BRICK, 0, 1],
-		];
-	}
-
+    public function getDrops(Item $item)
+    {
+        return [
+            [Item::RED_NETHER_BRICK, 0, 1],
+        ];
+    }
 }

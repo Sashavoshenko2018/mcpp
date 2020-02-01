@@ -2,77 +2,85 @@
 
 namespace mcpp\entity\monster\walking;
 
-use mcpp\entity\monster\WalkingMonster;
-use mcpp\entity\Entity;
-use mcpp\nbt\tag\IntTag;
-use mcpp\event\entity\EntityDamageEvent;
-use mcpp\event\entity\EntityDamageByEntityEvent;
 use mcpp\entity\Creature;
+use mcpp\entity\Entity;
+use mcpp\entity\monster\WalkingMonster;
+use mcpp\event\entity\EntityDamageByEntityEvent;
+use mcpp\event\entity\EntityDamageEvent;
+use mcpp\nbt\tag\IntTag;
 
-class Wolf extends WalkingMonster{
-	const NETWORK_ID = 14;
+class Wolf extends WalkingMonster
+{
+    const NETWORK_ID = 14;
+    private $angry = 0;
+    public $width = 0.72;
+    public $height = 0.9;
 
-	private $angry = 0;
+    public function getSpeed()
+    {
+        return 1.2;
+    }
 
-	public $width = 0.72;
-	public $height = 0.9;
+    public function initEntity()
+    {
+        parent::initEntity();
 
-	public function getSpeed(){
-		return 1.2;
-	}
+        if(isset($this->namedtag->Angry)){
+            $this->angry = (int)$this->namedtag["Angry"];
+        }
 
-	public function initEntity(){
-		parent::initEntity();
+        $this->setMaxHealth(8);
+        $this->fireProof = true;
+        $this->setDamage([0, 3, 4, 6]);
+    }
 
-		if(isset($this->namedtag->Angry)){
-			$this->angry = (int) $this->namedtag["Angry"];
-		}
+    public function saveNBT()
+    {
+        parent::saveNBT();
+        $this->namedtag->Angry = new IntTag("Angry", $this->angry);
+    }
 
-		$this->setMaxHealth(8);
-		$this->fireProof = true;
-		$this->setDamage([0, 3, 4, 6]);
-	}
+    public function getName()
+    {
+        return "Wolf";
+    }
 
-	public function saveNBT(){
-		parent::saveNBT();
-		$this->namedtag->Angry = new IntTag("Angry", $this->angry);
-	}
+    public function isAngry()
+    {
+        return $this->angry > 0;
+    }
 
-	public function getName(){
-		return "Wolf";
-	}
+    public function setAngry(int $val)
+    {
+        $this->angry = $val;
+    }
 
-	public function isAngry(){
-		return $this->angry > 0;
-	}
+    public function attack($damage, EntityDamageEvent $source)
+    {
+        parent::attack($damage, $source);
 
-	public function setAngry(int $val){
-		$this->angry = $val;
-	}
+        if(!$source->isCancelled()){
+            $this->setAngry(1000);
+        }
+    }
 
-	public function attack($damage, EntityDamageEvent $source){
-		parent::attack($damage, $source);
+    public function targetOption(Creature $creature, float $distance)
+    {
+        return $this->isAngry() && parent::targetOption($creature, $distance);
+    }
 
-		if(!$source->isCancelled()){
-			$this->setAngry(1000);
-		}
-	}
+    public function attackEntity(Entity $player)
+    {
+        if($this->attackDelay > 10 && $this->distanceSquared($player) < 1.6){
+            $this->attackDelay = 0;
 
-	public function targetOption(Creature $creature, float $distance){
-		return $this->isAngry() && parent::targetOption($creature, $distance);
-	}
+            $ev = new EntityDamageByEntityEvent($this, $player, EntityDamageEvent::CAUSE_ENTITY_ATTACK, $this->getDamage());
+            $player->attack($ev->getFinalDamage(), $ev);
+        }
+    }
 
-	public function attackEntity(Entity $player){
-		if($this->attackDelay > 10 && $this->distanceSquared($player) < 1.6){
-			$this->attackDelay = 0;
-
-			$ev = new EntityDamageByEntityEvent($this, $player, EntityDamageEvent::CAUSE_ENTITY_ATTACK, $this->getDamage());
-			$player->attack($ev->getFinalDamage(), $ev);
-		}
-	}
-
-	public function getDrops(){
-		return [];
-	}
-
+    public function getDrops()
+    {
+        return [];
+    }
 }

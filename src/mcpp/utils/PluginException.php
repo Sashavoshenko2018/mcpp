@@ -21,6 +21,6 @@
 
 namespace mcpp\utils;
 
-class PluginException extends ServerException{
-
+class PluginException extends ServerException
+{
 }

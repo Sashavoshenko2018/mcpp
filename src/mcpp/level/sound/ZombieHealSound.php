@@ -24,8 +24,10 @@ namespace mcpp\level\sound;
 use mcpp\math\Vector3;
 use mcpp\network\protocol\LevelEventPacket;
 
-class ZombieHealSound extends GenericSound{
-	public function __construct(Vector3 $pos, $pitch = 0){
-		parent::__construct($pos, LevelEventPacket::EVENT_SOUND_ZOMBIE_HEAL, $pitch);
-	}
+class ZombieHealSound extends GenericSound
+{
+    public function __construct(Vector3 $pos, $pitch = 0)
+    {
+        parent::__construct($pos, LevelEventPacket::EVENT_SOUND_ZOMBIE_HEAL, $pitch);
+    }
 }

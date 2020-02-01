@@ -29,45 +29,47 @@ use mcpp\Player;
 /**
  * Called when a player places a block
  */
-class BlockPlaceEvent extends BlockEvent implements Cancellable{
-	public static $handlerList = null;
+class BlockPlaceEvent extends BlockEvent implements Cancellable
+{
+    public static $handlerList = null;
+    /** @var Player */
+    protected $player;
+    /** @var Item */
+    protected $item;
+    protected $blockReplace;
+    protected $blockAgainst;
 
-	/** @var \mcpp\Player */
-	protected $player;
+    public function __construct(Player $player, Block $blockPlace, Block $blockReplace, Block $blockAgainst, Item $item)
+    {
+        $this->block = $blockPlace;
+        $this->blockReplace = $blockReplace;
+        $this->blockAgainst = $blockAgainst;
+        $this->item = $item;
+        $this->player = $player;
+    }
 
-	/** @var \mcpp\item\Item */
-	protected $item;
+    public function getPlayer()
+    {
+        return $this->player;
+    }
 
+    /**
+     * Gets the item in hand
+     *
+     * @return mixed
+     */
+    public function getItem()
+    {
+        return $this->item;
+    }
 
-	protected $blockReplace;
-	protected $blockAgainst;
+    public function getBlockReplaced()
+    {
+        return $this->blockReplace;
+    }
 
-	public function __construct(Player $player, Block $blockPlace, Block $blockReplace, Block $blockAgainst, Item $item){
-		$this->block = $blockPlace;
-		$this->blockReplace = $blockReplace;
-		$this->blockAgainst = $blockAgainst;
-		$this->item = $item;
-		$this->player = $player;
-	}
-
-	public function getPlayer(){
-		return $this->player;
-	}
-
-	/**
-	 * Gets the item in hand
-	 *
-	 * @return mixed
-	 */
-	public function getItem(){
-		return $this->item;
-	}
-
-	public function getBlockReplaced(){
-		return $this->blockReplace;
-	}
-
-	public function getBlockAgainst(){
-		return $this->blockAgainst;
-	}
+    public function getBlockAgainst()
+    {
+        return $this->blockAgainst;
+    }
 }

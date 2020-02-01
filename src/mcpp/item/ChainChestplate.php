@@ -21,16 +21,17 @@
 
 namespace mcpp\item;
 
+class ChainChestplate extends Armor
+{
+    const SLOT_NUMBER = 1;
 
-class ChainChestplate extends Armor{
-	
-	const SLOT_NUMBER = 1;
-	
-	public function __construct($meta = 0, $count = 1){
-		parent::__construct(self::CHAIN_CHESTPLATE, $meta, $count, "Chain Chestplate");
-	}
-	
-	public function getMaxDurability() {
-		return 241;
-	}
+    public function __construct($meta = 0, $count = 1)
+    {
+        parent::__construct(self::CHAIN_CHESTPLATE, $meta, $count, "Chain Chestplate");
+    }
+
+    public function getMaxDurability()
+    {
+        return 241;
+    }
 }

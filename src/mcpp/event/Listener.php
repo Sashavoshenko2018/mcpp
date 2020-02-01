@@ -21,6 +21,6 @@
 
 namespace mcpp\event;
 
-interface Listener{
-
+interface Listener
+{
 }
