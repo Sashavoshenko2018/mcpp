@@ -310,7 +310,7 @@ class Server
     /**
      * @return string
      */
-    public function getPocketMineVersion()
+    public function getMcppVersion()
     {
         return VERSION;
     }
@@ -1551,7 +1551,7 @@ class Server
 
         $this->console = new CommandReader();
 
-        $version = new VersionString($this->getPocketMineVersion());
+        $version = new VersionString($this->getMcppVersion());
         $this->logger->info("Starting Minecraft: PE server version " . TextFormat::AQUA . $this->getVersion());
 
         $this->logger->info("Loading mcpp-soft.yml...");
@@ -1660,7 +1660,7 @@ class Server
         Level::$COMPRESSION_LEVEL = $this->getProperty("chunk-sending.compression-level", 8);
 
         if(defined("mcpp\\DEBUG") and DEBUG >= 0){
-            @cli_set_process_title($this->getName() . " " . $this->getPocketMineVersion());
+            @cli_set_process_title($this->getName() . " " . $this->getMcppVersion());
         }
 
         $this->logger->info("Starting Minecraft PE server on " . ($this->getIp() === "" ? "*" : $this->getIp()) . ":" . $this->getPort());
@@ -2444,7 +2444,7 @@ class Server
     private function titleTick()
     {
         if(defined("mcpp\\DEBUG") and DEBUG >= 0 and ANSI === true){
-            echo "\x1b]0;" . $this->getName() . " " . $this->getPocketMineVersion() . " | Online " . count($this->players) . "/" . $this->getMaxPlayers() . " | RAM " . round((memory_get_usage() / 1024) / 1024, 2) . "/" . round((memory_get_usage(true) / 1024) / 1024, 2) . " MB | U " . round($this->network->getUpload() / 1024, 2) . " D " . round($this->network->getDownload() / 1024, 2) . " kB/s | TPS " . $this->getTicksPerSecond() . " | Load " . $this->getTickUsage() . "%\x07";
+            echo "\x1b]0;" . $this->getName() . " " . $this->getMcppVersion() . " | Online " . count($this->players) . "/" . $this->getMaxPlayers() . " | RAM " . round((memory_get_usage() / 1024) / 1024, 2) . "/" . round((memory_get_usage(true) / 1024) / 1024, 2) . " MB | U " . round($this->network->getUpload() / 1024, 2) . " D " . round($this->network->getDownload() / 1024, 2) . " kB/s | TPS " . $this->getTicksPerSecond() . " | Load " . $this->getTickUsage() . "%\x07";
         }
     }
 

@@ -37,7 +37,7 @@ class TellCommand extends VanillaCommand
             "/tell <player> <message>",
             ["w", "msg"]
         );
-        $this->setPermission("pocketmine.command.tell");
+        $this->setPermission("mcpp.command.tell");
     }
 
     public function execute(CommandSender $sender, $currentAlias, array $args)

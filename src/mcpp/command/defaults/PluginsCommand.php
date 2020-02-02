@@ -34,7 +34,7 @@ class PluginsCommand extends VanillaCommand
             "/plugins",
             ["pl"]
         );
-        $this->setPermission("pocketmine.command.plugins");
+        $this->setPermission("mcpp.command.plugins");
     }
 
     public function execute(CommandSender $sender, $currentAlias, array $args)

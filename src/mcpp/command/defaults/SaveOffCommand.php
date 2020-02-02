@@ -33,7 +33,7 @@ class SaveOffCommand extends VanillaCommand
             "Disables server autosaving",
             "/save-off"
         );
-        $this->setPermission("pocketmine.command.save.disable");
+        $this->setPermission("mcpp.command.save.disable");
     }
 
     public function execute(CommandSender $sender, $currentAlias, array $args)

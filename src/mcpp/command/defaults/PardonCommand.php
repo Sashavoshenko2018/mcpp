@@ -34,7 +34,7 @@ class PardonCommand extends VanillaCommand
             "Allows the specified player to use this server",
             "/pardon <player>"
         );
-        $this->setPermission("pocketmine.command.unban.player");
+        $this->setPermission("mcpp.command.unban.player");
     }
 
     public function execute(CommandSender $sender, $currentAlias, array $args)

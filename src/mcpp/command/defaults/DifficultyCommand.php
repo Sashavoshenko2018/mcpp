@@ -35,7 +35,7 @@ class DifficultyCommand extends VanillaCommand
             "Sets the game difficulty",
             "/difficulty <new difficulty>"
         );
-        $this->setPermission("pocketmine.command.difficulty");
+        $this->setPermission("mcpp.command.difficulty");
     }
 
     public function execute(CommandSender $sender, $currentAlias, array $args)

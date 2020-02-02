@@ -16,3 +16,4 @@ white-list.txt
 resources/
 launcher.sh
 checker.sh
+mcpp.phar

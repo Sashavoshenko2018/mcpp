@@ -34,7 +34,7 @@ class PingCommand extends VanillaCommand
             "Return player ping",
             "/ping"
         );
-        $this->setPermission("pocketmine.command.ping");
+        $this->setPermission("mcpp.command.ping");
     }
 
     public function execute(CommandSender $sender, $currentAlias, array $args)

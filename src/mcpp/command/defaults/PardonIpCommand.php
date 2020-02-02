@@ -34,7 +34,7 @@ class PardonIpCommand extends VanillaCommand
             "Allows the specified IP address to use this server",
             "/pardon-ip <address>"
         );
-        $this->setPermission("pocketmine.command.unban.ip");
+        $this->setPermission("mcpp.command.unban.ip");
     }
 
     public function execute(CommandSender $sender, $currentAlias, array $args)

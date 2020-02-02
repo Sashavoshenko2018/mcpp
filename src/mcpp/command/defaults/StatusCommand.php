@@ -33,7 +33,7 @@ class StatusCommand extends VanillaCommand
             "Reads back the server's performance.",
             "/status"
         );
-        $this->setPermission("pocketmine.command.status");
+        $this->setPermission("mcpp.command.status");
     }
 
     public function execute(CommandSender $sender, $currentAlias, array $args)

@@ -199,7 +199,7 @@ class PluginManager
                         $description = $loader->getPluginDescription($file);
                         if($description instanceof PluginDescription){
                             $name = $description->getName();
-                            if(stripos($name, "pocketmine") !== false or stripos($name, "minecraft") !== false or stripos($name, "mojang") !== false){
+                            if(stripos($name, "mcpp") !== false or stripos($name, "minecraft") !== false or stripos($name, "mojang") !== false){
                                 $this->server->getLogger()->error("Could not load plugin '" . $name . "': restricted name");
                                 continue;
                             }elseif(strpos($name, " ") !== false){

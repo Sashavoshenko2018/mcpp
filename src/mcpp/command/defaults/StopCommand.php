@@ -33,7 +33,7 @@ class StopCommand extends VanillaCommand
             "Stops the server, with optional reason",
             "/stop [reason]"
         );
-        $this->setPermission("pocketmine.command.stop");
+        $this->setPermission("mcpp.command.stop");
     }
 
     public function execute(CommandSender $sender, $currentAlias, array $args)

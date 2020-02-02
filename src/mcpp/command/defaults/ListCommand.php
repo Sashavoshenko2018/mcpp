@@ -33,7 +33,7 @@ class ListCommand extends VanillaCommand
             "Lists all online players",
             "/list"
         );
-        $this->setPermission("pocketmine.command.list");
+        $this->setPermission("mcpp.command.list");
     }
 
     public function execute(CommandSender $sender, $currentAlias, array $args)

@@ -35,7 +35,7 @@ class DeopCommand extends VanillaCommand
             "Takes the specified player's operator status",
             "/deop <player>"
         );
-        $this->setPermission("pocketmine.command.op.take");
+        $this->setPermission("mcpp.command.op.take");
     }
 
     public function execute(CommandSender $sender, $currentAlias, array $args)

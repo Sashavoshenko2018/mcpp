@@ -36,7 +36,7 @@ class HelpCommand extends VanillaCommand
             "/help [pageNumber]\n/help <topic> [pageNumber]",
             ["?"]
         );
-        $this->setPermission("pocketmine.command.help");
+        $this->setPermission("mcpp.command.help");
     }
 
     public function execute(CommandSender $sender, $currentAlias, array $args)

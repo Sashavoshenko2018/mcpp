@@ -33,7 +33,7 @@ class SeedCommand extends VanillaCommand
             "Shows the world seed",
             "/seed"
         );
-        $this->setPermission("pocketmine.command.seed");
+        $this->setPermission("mcpp.command.seed");
     }
 
     public function execute(CommandSender $sender, $currentAlias, array $args)

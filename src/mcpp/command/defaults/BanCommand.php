@@ -35,7 +35,7 @@ class BanCommand extends VanillaCommand
             "Prevents the specified player from using this server",
             "/ban <player> [reason...]"
         );
-        $this->setPermission("pocketmine.command.ban.player");
+        $this->setPermission("mcpp.command.ban.player");
     }
 
     public function execute(CommandSender $sender, $currentAlias, array $args)

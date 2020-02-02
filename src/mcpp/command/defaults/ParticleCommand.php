@@ -57,7 +57,7 @@ class ParticleCommand extends VanillaCommand
             "%pocketmine.command.particle.description",
             "%pocketmine.command.particle.usage"
         );
-        $this->setPermission("pocketmine.command.particle");
+        $this->setPermission("mcpp.command.particle");
     }
 
     public function execute(CommandSender $sender, $currentAlias, array $args)

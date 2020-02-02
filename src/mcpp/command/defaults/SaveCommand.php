@@ -33,7 +33,7 @@ class SaveCommand extends VanillaCommand
             "Saves the server to disk",
             "/save-all"
         );
-        $this->setPermission("pocketmine.command.save.perform");
+        $this->setPermission("mcpp.command.save.perform");
     }
 
     public function execute(CommandSender $sender, $currentAlias, array $args)

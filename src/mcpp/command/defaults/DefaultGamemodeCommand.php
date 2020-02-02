@@ -34,7 +34,7 @@ class DefaultGamemodeCommand extends VanillaCommand
             "Set the default gamemode",
             "/defaultgamemode <mode>"
         );
-        $this->setPermission("pocketmine.command.defaultgamemode");
+        $this->setPermission("mcpp.command.defaultgamemode");
     }
 
     public function execute(CommandSender $sender, $currentAlias, array $args)

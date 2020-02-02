@@ -36,7 +36,7 @@ class SpawnpointCommand extends VanillaCommand
             "Sets a player's spawn point",
             "/spawnpoint OR /spawnpoint <player> OR /spawnpoint <player> <x> <y> <z>"
         );
-        $this->setPermission("pocketmine.command.spawnpoint");
+        $this->setPermission("mcpp.command.spawnpoint");
     }
 
     public function execute(CommandSender $sender, $currentAlias, array $args)

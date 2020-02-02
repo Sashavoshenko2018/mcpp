@@ -35,7 +35,7 @@ class KickCommand extends VanillaCommand
             "Removes the specified player from the server",
             "/kick <player> [reason...]"
         );
-        $this->setPermission("pocketmine.command.kick");
+        $this->setPermission("mcpp.command.kick");
     }
 
     public function execute(CommandSender $sender, $currentAlias, array $args)

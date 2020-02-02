@@ -34,7 +34,7 @@ class TransferCommand extends VanillaCommand
             "Transfer player to server",
             "/transfer <address> [port]"
         );
-        $this->setPermission("pocketmine.command.transfer");
+        $this->setPermission("mcpp.command.transfer");
     }
 
     public function execute(CommandSender $sender, $currentAlias, array $args)

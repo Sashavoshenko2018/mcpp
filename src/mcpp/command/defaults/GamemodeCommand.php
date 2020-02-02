@@ -36,7 +36,7 @@ class GamemodeCommand extends VanillaCommand
             "Changes the player to a specific game mode",
             "/gamemode <mode> [player]"
         );
-        $this->setPermission("pocketmine.command.gamemode");
+        $this->setPermission("mcpp.command.gamemode");
     }
 
     public function execute(CommandSender $sender, $currentAlias, array $args)

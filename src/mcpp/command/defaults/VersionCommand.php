@@ -35,7 +35,7 @@ class VersionCommand extends VanillaCommand
             "/version",
             ["ver", "about"]
         );
-        $this->setPermission("pocketmine.command.version");
+        $this->setPermission("mcpp.command.version");
     }
 
     public function execute(CommandSender $sender, $currentAlias, array $args)
@@ -48,11 +48,11 @@ class VersionCommand extends VanillaCommand
         if(!empty($version)){
             $output .= $version . ". ";
         }
-        $output .= "This server is running " . $sender->getServer()->getName() . " " . $sender->getServer()->getPocketMineVersion();
+        $output .= "This server is running " . $sender->getServer()->getName() . " " . $sender->getServer()->getMcppVersion();
 
         $sender->sendMessage($output);
         //		if(count($args) === 0){
-        //			$output = "This server is running " . $sender->getServer()->getName() . " version " . $sender->getServer()->getPocketMineVersion() . " 「" . $sender->getServer()->getCodename() . "」 (Implementing API version " . $sender->getServer()->getApiVersion() . " for Minecraft: PE " . $sender->getServer()->getVersion() . " protocol version " . Info::CURRENT_PROTOCOL . ")";
+        //			$output = "This server is running " . $sender->getServer()->getName() . " version " . $sender->getServer()->getMcppVersion() . " 「" . $sender->getServer()->getCodename() . "」 (Implementing API version " . $sender->getServer()->getApiVersion() . " for Minecraft: PE " . $sender->getServer()->getVersion() . " protocol version " . Info::CURRENT_PROTOCOL . ")";
         //			if(\mcpp\GIT_COMMIT !== str_repeat("00", 20)){
         //				$output .= " [git " . \mcpp\GIT_COMMIT . "]";
         //			}

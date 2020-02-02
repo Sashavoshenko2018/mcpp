@@ -36,7 +36,7 @@ class TimingsCommand extends VanillaCommand
             "Records timings to see performance of the server.",
             "/timings <reset|report|on|off|paste>"
         );
-        $this->setPermission("pocketmine.command.timings");
+        $this->setPermission("mcpp.command.timings");
     }
 
     public function execute(CommandSender $sender, $currentAlias, array $args)
@@ -113,7 +113,7 @@ class TimingsCommand extends VanillaCommand
                 curl_setopt($ch, CURLOPT_AUTOREFERER, false);
                 curl_setopt($ch, CURLOPT_FOLLOWLOCATION, false);
                 curl_setopt($ch, CURLOPT_HEADER, true);
-                curl_setopt($ch, CURLOPT_HTTPHEADER, ["User-Agent: " . $this->getName() . " " . $sender->getServer()->getPocketMineVersion()]);
+                curl_setopt($ch, CURLOPT_HTTPHEADER, ["User-Agent: " . $this->getName() . " " . $sender->getServer()->getMcppVersion()]);
                 curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
                 $data = curl_exec($ch);
                 curl_close($ch);

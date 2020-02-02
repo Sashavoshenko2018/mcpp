@@ -36,7 +36,7 @@ class GiveCommand extends VanillaCommand
             "Gives the specified player a certain amount of items",
             "/give <player> <item[:damage]> [amount]"
         );
-        $this->setPermission("pocketmine.command.give");
+        $this->setPermission("mcpp.command.give");
     }
 
     public function execute(CommandSender $sender, $currentAlias, array $args)

@@ -34,7 +34,7 @@ class ReloadCommand extends VanillaCommand
             "Reloads the server configuration and plugins",
             "/reload"
         );
-        $this->setPermission("pocketmine.command.reload");
+        $this->setPermission("mcpp.command.reload");
     }
 
     public function execute(CommandSender $sender, $currentAlias, array $args)

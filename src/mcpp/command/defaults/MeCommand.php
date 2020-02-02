@@ -36,7 +36,7 @@ class MeCommand extends VanillaCommand
             "Performs the specified action in chat",
             "/me <action...>"
         );
-        $this->setPermission("pocketmine.command.me");
+        $this->setPermission("mcpp.command.me");
     }
 
     public function execute(CommandSender $sender, $currentAlias, array $args)

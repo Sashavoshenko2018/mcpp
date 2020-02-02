@@ -32,7 +32,7 @@ class BanListCommand extends VanillaCommand
             "View all players banned from this server",
             "/banlist [ips|players]"
         );
-        $this->setPermission("pocketmine.command.ban.list");
+        $this->setPermission("mcpp.command.ban.list");
     }
 
     public function execute(CommandSender $sender, $currentAlias, array $args)

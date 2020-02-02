@@ -35,7 +35,7 @@ class BanIpCommand extends VanillaCommand
             "Prevents the specified IP address from using this server",
             "/ban-ip <address|player> [reason...]"
         );
-        $this->setPermission("pocketmine.command.ban.ip");
+        $this->setPermission("mcpp.command.ban.ip");
     }
 
     public function execute(CommandSender $sender, $currentAlias, array $args)

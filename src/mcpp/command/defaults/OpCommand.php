@@ -35,7 +35,7 @@ class OpCommand extends VanillaCommand
             "Gives the specified player operator status",
             "/op <player>"
         );
-        $this->setPermission("pocketmine.command.op.give");
+        $this->setPermission("mcpp.command.op.give");
     }
 
     public function execute(CommandSender $sender, $currentAlias, array $args)

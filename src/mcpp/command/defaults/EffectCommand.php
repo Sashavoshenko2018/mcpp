@@ -34,7 +34,7 @@ class EffectCommand extends VanillaCommand
             "Adds/Removes effects on players",
             "commands.effect.usage=/effect <player> <effect> [seconds] [amplifier] [hideParticles] OR /effect <player> clear"
         );
-        $this->setPermission("pocketmine.command.effect");
+        $this->setPermission("mcpp.command.effect");
     }
 
     public function execute(CommandSender $sender, $currentAlias, array $args)

@@ -33,7 +33,10 @@ use mcpp\command\defaults\GamemodeCommand;
 use mcpp\command\defaults\GiveCommand;
 use mcpp\command\defaults\HelpCommand;
 use mcpp\command\defaults\KickCommand;
+use mcpp\command\defaults\KillCommand;
 use mcpp\command\defaults\ListCommand;
+use mcpp\command\defaults\MakeServerCommand;
+use mcpp\command\defaults\MeCommand;
 use mcpp\command\defaults\OpCommand;
 use mcpp\command\defaults\PardonCommand;
 use mcpp\command\defaults\PardonIpCommand;
@@ -51,16 +54,15 @@ use mcpp\command\defaults\SpawnpointCommand;
 use mcpp\command\defaults\StatusCommand;
 use mcpp\command\defaults\StopCommand;
 use mcpp\command\defaults\TeleportCommand;
+use mcpp\command\defaults\TellCommand;
 use mcpp\command\defaults\TimeCommand;
 use mcpp\command\defaults\TimingsCommand;
+use mcpp\command\defaults\TransferCommand;
 use mcpp\command\defaults\VanillaCommand;
 use mcpp\command\defaults\VersionCommand;
 use mcpp\command\defaults\WhitelistCommand;
 use mcpp\Server;
 use mcpp\utils\MainLogger;
-
-//use mcpp\command\defaults\MeCommand;
-//use mcpp\command\defaults\TellCommand;
 
 class SimpleCommandMap implements CommandMap
 {
@@ -79,46 +81,47 @@ class SimpleCommandMap implements CommandMap
 
     private function setDefaultCommands()
     {
-        $this->register("pocketmine", new VersionCommand("version"));
-        $this->register("pocketmine", new PluginsCommand("plugins"));
-        $this->register("pocketmine", new SeedCommand("seed"));
-        $this->register("pocketmine", new HelpCommand("help"));
-        $this->register("pocketmine", new StopCommand("stop"));
-        //		$this->register("pocketmine", new TellCommand("tell"));
-        $this->register("pocketmine", new DefaultGamemodeCommand("defaultgamemode"));
-        $this->register("pocketmine", new BanCommand("ban"));
-        $this->register("pocketmine", new BanIpCommand("ban-ip"));
-        $this->register("pocketmine", new BanListCommand("banlist"));
-        $this->register("pocketmine", new PardonCommand("pardon"));
-        $this->register("pocketmine", new PardonIpCommand("pardon-ip"));
-        $this->register("pocketmine", new SayCommand("say"));
-        //		$this->register("pocketmine", new MeCommand("me"));
-        $this->register("pocketmine", new ListCommand("list"));
-        $this->register("pocketmine", new DifficultyCommand("difficulty"));
-        $this->register("pocketmine", new KickCommand("kick"));
-        $this->register("pocketmine", new OpCommand("op"));
-        $this->register("pocketmine", new DeopCommand("deop"));
-        $this->register("pocketmine", new WhitelistCommand("whitelist"));
-        $this->register("pocketmine", new SaveOnCommand("save-on"));
-        $this->register("pocketmine", new SaveOffCommand("save-off"));
-        $this->register("pocketmine", new SaveCommand("save-all"));
-        $this->register("pocketmine", new GiveCommand("give"));
-        $this->register("pocketmine", new EffectCommand("effect"));
-        $this->register("pocketmine", new ParticleCommand("particle"));
-        $this->register("pocketmine", new GamemodeCommand("gamemode"));
-        //		$this->register("pocketmine", new KillCommand("kill"));
-        $this->register("pocketmine", new SpawnpointCommand("spawnpoint"));
-        $this->register("pocketmine", new SetWorldSpawnCommand("setworldspawn"));
-        $this->register("pocketmine", new TeleportCommand("tp"));
-        $this->register("pocketmine", new TimeCommand("time"));
-        $this->register("pocketmine", new TimingsCommand("timings"));
-        $this->register("pocketmine", new ReloadCommand("reload"));
+        $this->register("mcpp", new VersionCommand("version"));
+        $this->register("mcpp", new PluginsCommand("plugins"));
+        $this->register("mcpp", new SeedCommand("seed"));
+        $this->register("mcpp", new HelpCommand("help"));
+        $this->register("mcpp", new StopCommand("stop"));
+        $this->register("mcpp", new TellCommand("tell"));
+        $this->register("mcpp", new DefaultGamemodeCommand("defaultgamemode"));
+        $this->register("mcpp", new BanCommand("ban"));
+        $this->register("mcpp", new BanIpCommand("ban-ip"));
+        $this->register("mcpp", new BanListCommand("banlist"));
+        $this->register("mcpp", new PardonCommand("pardon"));
+        $this->register("mcpp", new PardonIpCommand("pardon-ip"));
+        $this->register("mcpp", new SayCommand("say"));
+        $this->register("mcpp", new MeCommand("me"));
+        $this->register("mcpp", new ListCommand("list"));
+        $this->register("mcpp", new DifficultyCommand("difficulty"));
+        $this->register("mcpp", new KickCommand("kick"));
+        $this->register("mcpp", new OpCommand("op"));
+        $this->register("mcpp", new DeopCommand("deop"));
+        $this->register("mcpp", new WhitelistCommand("whitelist"));
+        $this->register("mcpp", new SaveOnCommand("save-on"));
+        $this->register("mcpp", new SaveOffCommand("save-off"));
+        $this->register("mcpp", new SaveCommand("save-all"));
+        $this->register("mcpp", new GiveCommand("give"));
+        $this->register("mcpp", new EffectCommand("effect"));
+        $this->register("mcpp", new ParticleCommand("particle"));
+        $this->register("mcpp", new GamemodeCommand("gamemode"));
+        $this->register("mcpp", new KillCommand("kill"));
+        $this->register("mcpp", new SpawnpointCommand("spawnpoint"));
+        $this->register("mcpp", new SetWorldSpawnCommand("setworldspawn"));
+        $this->register("mcpp", new TeleportCommand("tp"));
+        $this->register("mcpp", new TimeCommand("time"));
+        $this->register("mcpp", new TimingsCommand("timings"));
+        $this->register("mcpp", new ReloadCommand("reload"));
+        $this->register("mcpp", new MakeServerCommand("makeserver"));
 
-        //		$this->register("pocketmine", new TransferCommand("transfer"));
-        $this->register("pocketmine", new PingCommand("ping"));
+        $this->register("mcpp", new TransferCommand("transfer"));
+        $this->register("mcpp", new PingCommand("ping"));
 
         if($this->server->getProperty("debug.commands", false) === true){
-            $this->register("pocketmine", new StatusCommand("status"));
+            $this->register("mcpp", new StatusCommand("status"));
         }
     }
 

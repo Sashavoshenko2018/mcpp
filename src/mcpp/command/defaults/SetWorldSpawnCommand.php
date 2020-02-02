@@ -36,7 +36,7 @@ class SetWorldSpawnCommand extends VanillaCommand
             "Sets a worlds's spawn point. If no coordinates are specified, the player's coordinates will be used.",
             "/setworldspawn OR /setworldspawn <x> <y> <z>"
         );
-        $this->setPermission("pocketmine.command.setworldspawn");
+        $this->setPermission("mcpp.command.setworldspawn");
     }
 
     public function execute(CommandSender $sender, $currentAlias, array $args)

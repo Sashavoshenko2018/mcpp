@@ -35,7 +35,7 @@ class KillCommand extends VanillaCommand
             "Commits suicide, only usable as a player",
             "/kill"
         );
-        $this->setPermission("pocketmine.command.kill");
+        $this->setPermission("mcpp.command.kill");
     }
 
     public function execute(CommandSender $sender, $currentAlias, array $args)

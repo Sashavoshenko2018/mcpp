@@ -34,7 +34,7 @@ class WhitelistCommand extends VanillaCommand
             "Manages the list of players allowed to use this server",
             "/whitelist (add|remove) <player>\n/whitelist (on|off|list|reload)"
         );
-        $this->setPermission("pocketmine.command.whitelist.reload;pocketmine.command.whitelist.enable;pocketmine.command.whitelist.disable;pocketmine.command.whitelist.list;pocketmine.command.whitelist.add;pocketmine.command.whitelist.remove");
+        $this->setPermission("mcpp.command.whitelist.reload;pocketmine.command.whitelist.enable;pocketmine.command.whitelist.disable;pocketmine.command.whitelist.list;pocketmine.command.whitelist.add;pocketmine.command.whitelist.remove");
     }
 
     public function execute(CommandSender $sender, $currentAlias, array $args)
@@ -97,7 +97,7 @@ class WhitelistCommand extends VanillaCommand
 
     private function badPerm(CommandSender $sender, $perm)
     {
-        if(!$sender->hasPermission("pocketmine.command.whitelist.$perm")){
+        if(!$sender->hasPermission("mcpp.command.whitelist.$perm")){
             $sender->sendMessage(TextFormat::RED . "You do not have permission to perform this action.");
 
             return true;

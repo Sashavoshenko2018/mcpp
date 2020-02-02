@@ -36,7 +36,7 @@ class TeleportCommand extends VanillaCommand
             "Teleports the given player (or yourself) to another player or coordinates",
             "/tp [player] <target> and/or <x> <y> <z>"
         );
-        $this->setPermission("pocketmine.command.teleport");
+        $this->setPermission("mcpp.command.teleport");
     }
 
     public function execute(CommandSender $sender, $currentAlias, array $args)

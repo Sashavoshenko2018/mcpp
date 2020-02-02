@@ -43,9 +43,9 @@ namespace mcpp
     ##################################################
 
     if(Phar::running(true) !== ""){
-        @define("PATH", Phar::running(true) . "/");
+        @define("mcpp\\PATH", Phar::running(true) . "/");
     }else{
-        @define("PATH", getcwd() . DIRECTORY_SEPARATOR);
+        @define("mcpp\\PATH", getcwd() . DIRECTORY_SEPARATOR);
     }
 
     if(version_compare("7.0", PHP_VERSION) > 0){
@@ -360,16 +360,6 @@ namespace mcpp
 
     if(!extension_loaded("uopz")){
         //$logger->notice("Couldn't find the uopz extension. Some functions may be limited");
-    }
-
-    if(extension_loaded("pocketmine")){
-        if(version_compare(phpversion("pocketmine"), "0.0.1") < 0){
-            $logger->critical("You have the native PocketMine extension, but your version is lower than 0.0.1.");
-            ++$errors;
-        }elseif(version_compare(phpversion("pocketmine"), "0.0.4") > 0){
-            $logger->critical("You have the native PocketMine extension, but your version is higher than 0.0.4.");
-            ++$errors;
-        }
     }
 
     if(!extension_loaded("curl")){
