@@ -26,6 +26,7 @@ use ClassLoader;
 use Exception;
 use LogLevel;
 use McpeEncrypter;
+
 use mcpp\block\Block;
 use mcpp\command\CommandReader;
 use mcpp\command\CommandSender;
@@ -119,6 +120,7 @@ use mcpp\packs\PackManager;
 use mcpp\permission\BanList;
 use mcpp\permission\DefaultPermissions;
 use mcpp\plugin\PharPluginLoader;
+use mcpp\plugin\FolderPluginLoader;
 use mcpp\plugin\Plugin;
 use mcpp\plugin\PluginLoadOrder;
 use mcpp\plugin\PluginManager;
@@ -1694,7 +1696,8 @@ class Server
         //		$this->pluginManager->setUseTimings($this->getProperty("settings.enable-profiling", false));
         $this->pluginManager->setUseTimings(true);
         $this->pluginManager->registerInterface(PharPluginLoader::class);
-
+        $this->pluginManager->registerInterface(FolderPluginLoader::class);
+        
         set_exception_handler([$this, "exceptionHandler"]);
         register_shutdown_function([$this, "crashDump"]);
 
@@ -2084,6 +2087,7 @@ class Server
         }
 
         $this->pluginManager->registerInterface(PharPluginLoader::class);
+        $this->pluginManager->registerInterface(FolderPluginLoader::class);
         $this->pluginManager->loadPlugins($this->pluginPath);
         $this->enablePlugins(PluginLoadOrder::STARTUP);
         $this->enablePlugins(PluginLoadOrder::POSTWORLD);

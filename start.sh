@@ -8,7 +8,7 @@ while getopts "p:f:l" OPTION 2> /dev/null; do
 			PHP_BINARY="$OPTARG"
 			;;
 		f)
-			POCKETMINE_FILE="$OPTARG"
+			MCPP_FILE="$OPTARG"
 			;;
 		l)
 			DO_LOOP="yes"
@@ -31,11 +31,11 @@ if [ "$PHP_BINARY" == "" ]; then
 	fi
 fi
 
-if [ "$POCKETMINE_FILE" == "" ]; then
-	if [ -f ./PocketMine-MP.phar ]; then
-		POCKETMINE_FILE="./mcpp.phar"
+if [ "$MCPP_FILE" == "" ]; then
+	if [ -f ./mcpp.phar ]; then
+		MCPP_FILE="./mcpp.phar"
 	elif [ -f ./src/mcpp/Main.php ]; then
-		POCKETMINE_FILE="./src/mcpp/Main.php"
+		MCPP_FILE="./src/mcpp/Main.php"
     else
 		echo "mcpp.phar not found"
 		echo "Downloads can be found at https://github.com/ShadowicTeam/mcpp/releases"
@@ -52,12 +52,12 @@ if [ "$DO_LOOP" == "yes" ]; then
 		if [ ${LOOPS} -gt 0 ]; then
 			echo "Restarted $LOOPS times"
 		fi
-		"$PHP_BINARY" "$POCKETMINE_FILE" $@
+		"$PHP_BINARY" "$MCPP_FILE" $@
 		echo "To escape the loop, press CTRL+C now. Otherwise, wait 5 seconds for the server to restart."
 		echo ""
 		sleep 5
 		((LOOPS++))
 	done
 else
-	exec "$PHP_BINARY" "$POCKETMINE_FILE" $@
+	exec "$PHP_BINARY" "$MCPP_FILE" $@
 fi
