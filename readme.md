@@ -1,4 +1,9 @@
-# mcpp
-A Minecraft: PE server software forked from Steadfast2
+# MCPP
 
-still work in process
+Mcpp is a Minecraft: PE server software forked from Steadfast2
+
+## Features
+- Folder Plugin Loading
+
+## License
+[LGPL](https://choosealicense.com/licenses/lgpl/)
