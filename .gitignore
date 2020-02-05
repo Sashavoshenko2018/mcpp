@@ -15,5 +15,7 @@ server.properties
 white-list.txt
 resources/
 launcher.sh
+compile.sh
 checker.sh
+install.log
 mcpp.phar
