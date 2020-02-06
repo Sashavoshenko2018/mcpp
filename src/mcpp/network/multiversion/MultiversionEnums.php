@@ -441,6 +441,7 @@ abstract class MultiversionEnums
     private static function getSoundKeyByProtocol($protocol)
     {
         switch($protocol){
+            case Info::PROTOCOL_113:
             case Info::PROTOCOL_120:
             case Info::PROTOCOL_200:
                 return self::GROUP_2;
@@ -580,6 +581,18 @@ abstract class MultiversionEnums
             "ARG_TYPE_TEXT" => 0x12,
             "ARG_TYPE_JSON" => 0x15,
             "ARG_TYPE_COMMAND" => 0x1c,
+        ],
+        Info::PROTOCOL_113 => [
+            "ARG_TYPE_INT" => 0x01,
+            "ARG_TYPE_FLOAT" => 0x02,
+            "ARG_TYPE_VALUE" => 0x03,
+            "ARG_TYPE_TARGET" => 0x04,
+            "ARG_TYPE_STRING" => 0x0c,
+            "ARG_TYPE_POSITION" => 0x0d,
+            "ARG_TYPE_RAWTEXT" => 0x10,
+            "ARG_TYPE_TEXT" => 0x12,
+            "ARG_TYPE_JSON" => 0x15,
+            "ARG_TYPE_COMMAND" => 0x1c,
         ]
     ];
 
@@ -667,6 +680,43 @@ abstract class MultiversionEnums
             "TYPE_NOTE" => 36,
             "TYPE_WITCH_MAGIC" => 37,
             "TYPE_ICE_CRYSTAL" => 40,
+        ],
+        Info::PROTOCOL_113 => [
+            "TYPE_BUBBLE" => 1,
+            "TYPE_CRITICAL" => 2,
+            "TYPE_SMOKE" => 4,
+            "TYPE_EXPLODE" => 5,
+            "TYPE_WHITE_SMOKE" => 6,
+            "TYPE_FLAME" => 7,
+            "TYPE_LAVA" => 8,
+            "TYPE_LARGE_SMOKE" => 9,
+            "TYPE_REDSTONE" => 10,
+            "TYPE_ITEM_BREAK" => 12,
+            "TYPE_SNOWBALL_POOF" => 13,
+            "TYPE_LARGE_EXPLODE" => 14,
+            "TYPE_HUGE_EXPLODE" => 15,
+            "TYPE_MOB_FLAME" => 16,
+            "TYPE_HEART" => 17,
+            "TYPE_TERRAIN" => 18,
+            "TYPE_TOWN_AURA" => 19,
+            "TYPE_PORTAL" => 20,
+            "TYPE_WATER_SPLASH" => 21,
+            "TYPE_WATER_WAKE" => 22,
+            "TYPE_DRIP_WATER" => 23,
+            "TYPE_DRIP_LAVA" => 24,
+            "TYPE_DUST" => 25,
+            "TYPE_MOB_SPELL" => 26,
+            "TYPE_MOB_SPELL_AMBIENT" => 27,
+            "TYPE_MOB_SPELL_INSTANTANEOUS" => 28,
+            "TYPE_INK" => 29,
+            "TYPE_SLIME" => 30,
+            "TYPE_RAIN_SPLASH" => 31,
+            "TYPE_VILLAGER_ANGRY" => 32,
+            "TYPE_VILLAGER_HAPPY" => 33,
+            "TYPE_ENCHANTMENT_TABLE" => 34,
+            "TYPE_NOTE" => 36,
+            "TYPE_WITCH_MAGIC" => 37,
+            "TYPE_ICE_CRYSTAL" => 40,
         ]
     ];
     private static $packTypes = [
@@ -692,6 +742,17 @@ abstract class MultiversionEnums
             "TYPE_SKINS" => 7,
             "TYPE_WORLD_TEMPLATE" => 8,
             "TYPE_COUNT" => 9,
+        ],
+        Info::PROTOCOL_113 => [
+            "TYPE_INVALID" => 0,
+            "TYPE_RESOURCE" => 1,
+            "TYPE_BEHAVIOR" => 2,
+            "TYPE_WORLD_TEMPLATE" => 3,
+            "TYPE_ADDON" => 4,
+            "TYPE_SKINS" => 5,
+            "TYPE_CACHED" => 6,
+            "TYPE_COPY_PROTECTED" => 7,
+            "TYPE_COUNT" => 8,
         ]
     ];
 
@@ -700,7 +761,7 @@ abstract class MultiversionEnums
         if($playerProtocol >= Info::PROTOCOL_370){
             $key = Info::PROTOCOL_370;
         }else{
-            $key = Info::PROTOCOL_120;
+            $key = Info::PROTOCOL_113;
         }
         return self::$packTypes[$key][$typeName] ?? 0;
     }
