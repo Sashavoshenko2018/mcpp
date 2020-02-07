@@ -1,13 +1,13 @@
 <?php
 
-namespace mcpp\network\protocol\v110;
+namespace mcpp\network\protocol\v113;
 
-use mcpp\network\protocol\Info110;
+use mcpp\network\protocol\Info113;
 use mcpp\network\protocol\PEPacket;
 
 class InventoryContentPacket extends PEPacket
 {
-    const NETWORK_ID = Info110::INVENTORY_CONTENT_PACKET;
+    const NETWORK_ID = Info113::INVENTORY_CONTENT_PACKET;
     const PACKET_NAME = "INVENTORY_CONTENT_PACKET";
     public $inventoryID;
     public $items = [];

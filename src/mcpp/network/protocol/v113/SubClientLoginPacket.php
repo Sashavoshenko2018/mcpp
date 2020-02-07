@@ -1,8 +1,8 @@
 <?php
 
-namespace mcpp\network\protocol\v110;
+namespace mcpp\network\protocol\v113;
 
-use mcpp\network\protocol\Info110;
+use mcpp\network\protocol\Info113;
 use mcpp\network\protocol\PEPacket;
 use mcpp\Server;
 use mcpp\utils\Binary;
@@ -11,7 +11,7 @@ use mcpp\utils\UUID;
 
 class SubClientLoginPacket extends PEPacket
 {
-    const NETWORK_ID = Info110::SUB_CLIENT_LOGIN_PACKET;
+    const NETWORK_ID = Info113::SUB_CLIENT_LOGIN_PACKET;
     const PACKET_NAME = "SUB_CLIENT_LOGIN_PACKET";
     public $username;
     public $clientId;

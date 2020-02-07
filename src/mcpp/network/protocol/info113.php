@@ -25,7 +25,7 @@
 
 namespace mcpp\network\protocol;
 
-interface Info110
+interface Info113
 {
     /**
      * Minecraft: PE packets

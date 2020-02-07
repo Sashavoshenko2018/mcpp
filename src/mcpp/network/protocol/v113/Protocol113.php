@@ -1,8 +1,8 @@
 <?php
 
-namespace mcpp\network\protocol\v110;
+namespace mcpp\network\protocol\v113;
 
-abstract class Protocol110
+abstract class Protocol113
 {
     const CONTAINER_ID_NONE = -1;
     const CONTAINER_ID_INVENTORY = 0;

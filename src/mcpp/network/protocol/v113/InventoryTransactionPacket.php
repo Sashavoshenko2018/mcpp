@@ -1,14 +1,14 @@
 <?php
 
-namespace mcpp\network\protocol\v110;
+namespace mcpp\network\protocol\v113;
 
 use mcpp\inventory\transactions\SimpleTransactionData;
-use mcpp\network\protocol\Info110;
+use mcpp\network\protocol\Info113;
 use mcpp\network\protocol\PEPacket;
 
 class InventoryTransactionPacket extends PEPacket
 {
-    const NETWORK_ID = Info110::INVENTORY_TRANSACTION_PACKET;
+    const NETWORK_ID = Info113::INVENTORY_TRANSACTION_PACKET;
     const PACKET_NAME = "INVENTORY_TRANSACTION_PACKET";
     const TRANSACTION_TYPE_NORMAL = 0;
     const TRANSACTION_TYPE_INVENTORY_MISMATCH = 1;
@@ -72,7 +72,7 @@ class InventoryTransactionPacket extends PEPacket
                     $tr->flags = $this->getVarInt(); // flags NoFlag = 0 WorldInteraction_Random = 1
                     break;
                 case self::INV_SOURCE_TYPE_CREATIVE:
-                    $tr->inventoryId = Protocol110::CONTAINER_ID_CREATIVE;
+                    $tr->inventoryId = Protocol113::CONTAINER_ID_CREATIVE;
                     break;
                 case self::INV_SOURCE_TYPE_CRAFT:
                 case self::INV_SOURCE_TYPE_CRAFT_SLOT:

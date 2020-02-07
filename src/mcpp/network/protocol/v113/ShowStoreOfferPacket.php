@@ -1,13 +1,13 @@
 <?php
 
-namespace mcpp\network\protocol\v110;
+namespace mcpp\network\protocol\v113;
 
-use mcpp\network\protocol\Info110;
+use mcpp\network\protocol\Info113;
 use mcpp\network\protocol\PEPacket;
 
 class ShowStoreOfferPacket extends PEPacket
 {
-    const NETWORK_ID = Info110::SHOW_STORE_OFFER_PACKET;
+    const NETWORK_ID = Info113::SHOW_STORE_OFFER_PACKET;
     const PACKET_NAME = "SHOW_STORE_OFFER_PACKET";
     /** @var string */
     public $productId = '';
