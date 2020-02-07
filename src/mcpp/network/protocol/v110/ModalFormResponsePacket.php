@@ -1,13 +1,13 @@
 <?php
 
-namespace mcpp\network\protocol\v113;
+namespace mcpp\network\protocol\v110;
 
-use mcpp\network\protocol\Info113;
+use mcpp\network\protocol\Info110;
 use mcpp\network\protocol\PEPacket;
 
 class ModalFormResponsePacket extends PEPacket
 {
-    const NETWORK_ID = Info113::MODAL_FORM_RESPONSE_PACKET;
+    const NETWORK_ID = Info110::MODAL_FORM_RESPONSE_PACKET;
     const PACKET_NAME = "MODAL_FORM_RESPONSE_PACKET";
     public $formId;
     public $data;

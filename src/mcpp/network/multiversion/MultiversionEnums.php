@@ -441,7 +441,7 @@ abstract class MultiversionEnums
     private static function getSoundKeyByProtocol($protocol)
     {
         switch($protocol){
-            case Info::PROTOCOL_113:
+            case Info::PROTOCOL_110:
             case Info::PROTOCOL_120:
             case Info::PROTOCOL_200:
                 return self::GROUP_2;
@@ -582,7 +582,7 @@ abstract class MultiversionEnums
             "ARG_TYPE_JSON" => 0x15,
             "ARG_TYPE_COMMAND" => 0x1c,
         ],
-        Info::PROTOCOL_113 => [
+        Info::PROTOCOL_110 => [
             "ARG_TYPE_INT" => 0x01,
             "ARG_TYPE_FLOAT" => 0x02,
             "ARG_TYPE_VALUE" => 0x03,
@@ -681,7 +681,7 @@ abstract class MultiversionEnums
             "TYPE_WITCH_MAGIC" => 37,
             "TYPE_ICE_CRYSTAL" => 40,
         ],
-        Info::PROTOCOL_113 => [
+        Info::PROTOCOL_110 => [
             "TYPE_BUBBLE" => 1,
             "TYPE_CRITICAL" => 2,
             "TYPE_SMOKE" => 4,
@@ -743,7 +743,7 @@ abstract class MultiversionEnums
             "TYPE_WORLD_TEMPLATE" => 8,
             "TYPE_COUNT" => 9,
         ],
-        Info::PROTOCOL_113 => [
+        Info::PROTOCOL_110 => [
             "TYPE_INVALID" => 0,
             "TYPE_RESOURCE" => 1,
             "TYPE_BEHAVIOR" => 2,
@@ -761,7 +761,7 @@ abstract class MultiversionEnums
         if($playerProtocol >= Info::PROTOCOL_370){
             $key = Info::PROTOCOL_370;
         }else{
-            $key = Info::PROTOCOL_113;
+            $key = Info::PROTOCOL_110;
         }
         return self::$packTypes[$key][$typeName] ?? 0;
     }

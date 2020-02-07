@@ -1,13 +1,13 @@
 <?php
 
-namespace mcpp\network\protocol\v113;
+namespace mcpp\network\protocol\v110;
 
-use mcpp\network\protocol\Info113;
+use mcpp\network\protocol\Info110;
 use mcpp\network\protocol\PEPacket;
 
 class BossEventPacket extends PEPacket
 {
-    const NETWORK_ID = Info113::BOSS_EVENT_PACKET;
+    const NETWORK_ID = Info110::BOSS_EVENT_PACKET;
     const PACKET_NAME = "BOSS_EVENT_PACKET";
     const EVENT_TYPE_ADD = 0;          // from server to client only
     const EVENT_TYPE_PLAYER_ADDED = 1; // from client to server only

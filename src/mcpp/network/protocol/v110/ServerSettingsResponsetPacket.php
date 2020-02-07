@@ -1,13 +1,13 @@
 <?php
 
-namespace mcpp\network\protocol\v113;
+namespace mcpp\network\protocol\v110;
 
-use mcpp\network\protocol\Info113;
+use mcpp\network\protocol\Info110;
 use mcpp\network\protocol\PEPacket;
 
 class ServerSettingsResponsetPacket extends PEPacket
 {
-    const NETWORK_ID = Info113::SERVER_SETTINGS_RESPONSE_PACKET;
+    const NETWORK_ID = Info110::SERVER_SETTINGS_RESPONSE_PACKET;
     const PACKET_NAME = "SERVER_SETTINGS_RESPONSE_PACKET";
     public $formId;
     public $data;
