@@ -2,20 +2,18 @@
 
 /*
  *
- *  ____            _        _   __  __ _                  __  __ ____  
- * |  _ \ ___   ___| | _____| |_|  \/  (_)_ __   ___      |  \/  |  _ \ 
- * | |_) / _ \ / __| |/ / _ \ __| |\/| | | '_ \ / _ \_____| |\/| | |_) |
- * |  __/ (_) | (__|   <  __/ |_| |  | | | | | |  __/_____| |  | |  __/ 
- * |_|   \___/ \___|_|\_\___|\__|_|  |_|_|_| |_|\___|     |_|  |_|_| 
- *
+ *  _____     ____      ______          _____      _____
+ * |           \/        |     |   ____|         |          |     |          |
+ *|         | \/|      |     |    | ____       |____ |      |____ |
+*|____|     |__ |     |_______|      |                 |
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
  *
- * @author PocketMine Team
+ * @author ShadowicTeam/sashavoshenko2018
  * @link http://www.pocketmine.net/
- * 
+ *
  *
 */
 
@@ -28,7 +26,7 @@ namespace mcpp\network\protocol;
 interface Info
 {
     const CURRENT_PROTOCOL = 113;
-    const ACCEPTED_PROTOCOLS = [120, 134, 135, 136, 137, 140, 141, 150, 160, 200, 201, 220, 221, 222, 224, 223, 240, 250, 260, 261, 270, 271, 273, 274, 280, 281, 282, 290, 291, 310, 311, 312, 313, 330, 331, 332, 342, 340, 350, 351, 352, 353, 354, 360, 361, 370, 371, 385, 386, 387, 388, 389, 390];
+    const ACCEPTED_PROTOCOLS = [113, 120, 134, 135, 136, 137, 140, 141, 150, 160, 200, 201, 220, 221, 222, 224, 223, 240, 250, 260, 261, 270, 271, 273, 274, 280, 281, 282, 290, 291, 310, 311, 312, 313, 330, 331, 332, 342, 340, 350, 351, 352, 353, 354, 360, 361, 370, 371, 385, 386, 387, 388, 389, 390];
     const PROTOCOL_134 = 134; // 1.2.0.20, 1.2.0.22
     const PROTOCOL_135 = 135; // 1.2.0.24, 1.2.0.25
     const PROTOCOL_136 = 136; // 1.2.0.31
@@ -199,14 +197,3 @@ interface Info
     const SHOW_PROFILE_PACKET = 0x68;                          // NEW
     const SET_DEFAULT_GAME_TYPE_PACKET = 0x69;                 // NEW
 }
-
-
-
-
-
-
-
-
-
-
-
