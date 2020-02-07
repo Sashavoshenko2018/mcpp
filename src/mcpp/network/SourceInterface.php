@@ -39,7 +39,7 @@ interface SourceInterface
      * @param string $reason
      *
      */
-    public function close(Player $player, $reason = "unknown reason");
+    public function close(Player $player, $reason = "Server Error");
 
     /**
      * @param string $name

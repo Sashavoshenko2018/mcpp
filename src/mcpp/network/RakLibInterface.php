@@ -136,7 +136,7 @@ class RakLibInterface implements ServerInstance, AdvancedSourceInterface
         }
     }
 
-    public function close(Player $player, $reason = "unknown reason")
+    public function close(Player $player, $reason = "Server Error")
     {
         if(isset($this->identifiers[$player])){
             unset($this->players[$this->identifiers[$player]]);
