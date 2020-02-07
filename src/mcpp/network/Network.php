@@ -94,7 +94,6 @@ use mcpp\network\protocol\v110\PlayerSkinPacket;
 use mcpp\network\protocol\v110\PurchaseReceiptPacket;
 use mcpp\network\protocol\v110\ServerSettingsRequestPacket;
 use mcpp\network\protocol\v110\SubClientLoginPacket;
-use mcpp\network\protocol\v120\CommandRequestPacket;
 use mcpp\network\protocol\v120\InventoryContentPacket;
 use mcpp\network\protocol\v120\InventoryTransactionPacket;
 use mcpp\network\protocol\v120\ModalFormResponsePacket;
