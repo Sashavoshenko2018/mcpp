@@ -142,13 +142,13 @@ use mcpp\network\protocol\TextPacket;
 use mcpp\network\protocol\TransferPacket;
 use mcpp\network\protocol\UpdateAttributesPacket;
 use mcpp\network\protocol\UpdateBlockPacket;
-use mcpp\network\protocol\v120\InventoryContentPacket;
-use mcpp\network\protocol\v120\InventoryTransactionPacket;
-use mcpp\network\protocol\v120\PlayerSkinPacket;
-use mcpp\network\protocol\v120\Protocol120;
-use mcpp\network\protocol\v120\ServerSettingsResponsetPacket;
-use mcpp\network\protocol\v120\ShowModalFormPacket;
-use mcpp\network\protocol\v120\SubClientLoginPacket;
+use mcpp\network\protocol\v113\InventoryContentPacket;
+use mcpp\network\protocol\v113\InventoryTransactionPacket;
+use mcpp\network\protocol\v113\PlayerSkinPacket;
+use mcpp\network\protocol\v113\Protocol113;
+use mcpp\network\protocol\v113\ServerSettingsResponsetPacket;
+use mcpp\network\protocol\v113\ShowModalFormPacket;
+use mcpp\network\protocol\v113\SubClientLoginPacket;
 use mcpp\network\protocol\v310\AvailableEntityIdentifiersPacket;
 use mcpp\network\protocol\v310\NetworkChunkPublisherUpdatePacket;
 use mcpp\network\protocol\v331\BiomeDefinitionListPacket;
@@ -240,7 +240,7 @@ class Player extends Human implements CommandSender, InventoryHolder, IPlayer
     protected $iusername = '';
     protected $displayName = '';
     protected $startAction = -1;
-    public $protocol = ProtocolInfo::PROTOCOL_120;
+    public $protocol = ProtocolInfo::PROTOCOL_113;
     /** @var Vector3 */
     protected $sleeping = null;
     protected $clientID = null;
@@ -2193,7 +2193,7 @@ class Player extends Human implements CommandSender, InventoryHolder, IPlayer
                     }
                 }catch(Exception $e){
                     $pk = new ContainerClosePacket();
-                    $pk->windowid = Protocol120::CONTAINER_ID_INVENTORY;
+                    $pk->windowid = Protocol113::CONTAINER_ID_INVENTORY;
                     $this->dataPacket($pk);
                     $this->lastQuickCraftTransactionGroup = [];
                 }
@@ -2318,7 +2318,7 @@ class Player extends Human implements CommandSender, InventoryHolder, IPlayer
                     $this->dataPacket($pk);
                 }
                 break;
-            /** @minProtocol 120 */
+            /** @minProtocol 113 */
             case 'INVENTORY_TRANSACTION_PACKET':
                 switch($packet->transactionType){
                     case InventoryTransactionPacket::TRANSACTION_TYPE_INVENTORY_MISMATCH:
@@ -2377,7 +2377,7 @@ class Player extends Human implements CommandSender, InventoryHolder, IPlayer
                         break;
                 }
                 break;
-            /** @minProtocol 120 */
+            /** @minProtocol 113 */
             case 'COMMAND_REQUEST_PACKET':
                 if($packet->command[0] != '/'){
                     $this->sendMessage('Invalid command data.');
@@ -2390,7 +2390,7 @@ class Player extends Human implements CommandSender, InventoryHolder, IPlayer
                     $this->processCommand($commandLine);
                 }
                 break;
-            /** @minProtocol 120 */
+            /** @minProtocol 113 */
             case 'PLAYER_SKIN_PACKET':
                 if($this->setSkin($packet->newSkinByteData, $packet->newSkinId, $packet->newSkinGeometryName, $packet->newSkinGeometryData, $packet->newCapeByteData, $packet->isPremiumSkin)){
                     // Send new skin to viewers and to self
@@ -2399,11 +2399,11 @@ class Player extends Human implements CommandSender, InventoryHolder, IPlayer
                 }
                 break;
 
-            /** @minProtocol 120 */
+            /** @minProtocol 113 */
             case 'MODAL_FORM_RESPONSE_PACKET':
                 $this->checkModal($packet->formId, json_decode($packet->data, true));
                 break;
-            /** @minProtocol 120 */
+            /** @minProtocol 113 */
             case 'PURCHASE_RECEIPT_PACKET':
                 $event = new PlayerReceiptsReceivedEvent($this, $packet->receipts);
                 $this->server->getPluginManager()->callEvent($event);
@@ -3332,7 +3332,7 @@ class Player extends Human implements CommandSender, InventoryHolder, IPlayer
             $slots[] = clone $item;
         }
         $pk = new InventoryContentPacket();
-        $pk->inventoryID = Protocol120::CONTAINER_ID_CREATIVE;
+        $pk->inventoryID = Protocol113::CONTAINER_ID_CREATIVE;
         $pk->items = $slots;
         $this->dataPacket($pk);
 
@@ -4149,7 +4149,7 @@ class Player extends Human implements CommandSender, InventoryHolder, IPlayer
     }
 
     /**
-     * @minProtocolSupport 120
+     * @minProtocolSupport 113
      * @param InventoryTransactionPacket $packet
      */
     private function normalTransactionLogic($packet)
@@ -4196,7 +4196,7 @@ class Player extends Human implements CommandSender, InventoryHolder, IPlayer
     }
 
     /**
-     * @minprotocol 120
+     * @minprotocol 113
      * @param SimpleTransactionData[] $transactionsData
      */
     private function tryDropItem($transactionsData)
@@ -4248,7 +4248,7 @@ class Player extends Human implements CommandSender, InventoryHolder, IPlayer
     }
 
     /**
-     * @minprotocol 120
+     * @minprotocol 113
      * @param Item[] $craftSlots
      * @param Recipe $recipe
      * @throws Exception
@@ -4312,7 +4312,7 @@ class Player extends Human implements CommandSender, InventoryHolder, IPlayer
     }
 
     /**
-     * @minprotocol 120
+     * @minprotocol 113
      * @param Item[] $craftSlots
      * @param Recipe $recipe
      * @throws Exception
@@ -4414,7 +4414,7 @@ class Player extends Human implements CommandSender, InventoryHolder, IPlayer
     }
 
     /**
-     * @minprotocol 120
+     * @minprotocol 113
      * @param SimpleTransactionData[] $transactionsData
      */
     private function tryEnchant($transactionsData)
@@ -4951,7 +4951,7 @@ class Player extends Human implements CommandSender, InventoryHolder, IPlayer
     }
 
     /**
-     * @minprotocol 120
+     * @minprotocol 113
      *
      * @param SubClientLoginPacket $packet
      * @param Player $parent
